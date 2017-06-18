@@ -46,6 +46,8 @@ bool SystemClass::Initialize()
 	if (!result)
 		return false;
 
+	CreateConsole();
+
 	return true;
 }
 
@@ -256,6 +258,37 @@ void SystemClass::ShutdownWindows()
 
 	//Release the pointer to this class
 	ApplicationHandle = NULL;
+
+	return;
+}
+
+void SystemClass::CreateConsole()
+{
+	HANDLE hStdHandle;
+	CONSOLE_SCREEN_BUFFER_INFO consoleInfo;
+	FILE* fp = nullptr;
+
+	//Allocate a console
+	AllocConsole();
+
+	//Redirect unbuffered STDOUT to the console
+	hStdHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+	freopen_s(&fp, "CONOUT$", "w", stdout);
+	setvbuf(stdout, NULL, _IONBF, 0);
+	
+	//Redirect unbuffered STDIN to the console
+	hStdHandle = GetStdHandle(STD_INPUT_HANDLE);
+	freopen_s(&fp, "CONIN$", "r", stdin);
+	setvbuf(stdin, NULL, _IONBF, 0);
+	
+	//Redirect unbuffered STDERR to the console
+	hStdHandle = GetStdHandle(STD_ERROR_HANDLE);
+	freopen_s(&fp, "CONOUT$", "w", stderr);
+	setvbuf(stderr, NULL, _IONBF, 0);
+
+	//Make cout, wcout, cin, wcin, wcerr, cerr, wclog and clog 
+	//point to console as well
+	std::ios::sync_with_stdio();
 
 	return;
 }
