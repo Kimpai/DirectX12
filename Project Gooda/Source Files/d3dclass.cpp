@@ -5,13 +5,17 @@ Direct3DClass::Direct3DClass()
 	m_device = nullptr;
 	m_commandQueue = nullptr;
 	m_swapChain = nullptr;
-	m_renderTargetViewHeap = nullptr;
+	m_renderTargetViewDescHeap = nullptr;
 	m_backBufferRenderTarget[0] = nullptr;
 	m_backBufferRenderTarget[1] = nullptr;
-	m_commandAllocator = nullptr;
+	m_backBufferRenderTarget[2] = nullptr;
+	m_commandAllocator[0] = nullptr;
+	m_commandAllocator[1] = nullptr;
+	m_commandAllocator[2] = nullptr;
 	m_commandList = nullptr;
-	m_pipelineState = nullptr;
-	m_fence = nullptr;
+	m_fence[0] = nullptr;
+	m_fence[1] = nullptr;
+	m_fence[2] = nullptr;
 	m_fenceEvent = nullptr;
 }
 
@@ -36,7 +40,7 @@ bool Direct3DClass::Initialize(int screenHeight, int screenWidth, HWND hwnd, boo
 	IDXGIFactory4* factory;
 	IDXGIAdapter* adapter;
 	IDXGIOutput* adapterOutput;
-	unsigned int numModes, i, numerator, denominator, renderTargetViewDescriptorSize;
+	unsigned int numModes, numerator, denominator, renderTargetViewDescriptorSize;
 	unsigned long long stringLength;
 	DXGI_MODE_DESC* displayModeList;
 	DXGI_ADAPTER_DESC adapterDesc;
@@ -44,7 +48,7 @@ bool Direct3DClass::Initialize(int screenHeight, int screenWidth, HWND hwnd, boo
 	DXGI_SWAP_CHAIN_DESC swapChainDesc;
 	IDXGISwapChain* swapChain;
 	D3D12_DESCRIPTOR_HEAP_DESC renderTargetViewHeapDesc;
-	D3D12_CPU_DESCRIPTOR_HANDLE renderTargetViewHandle;
+	CD3DX12_CPU_DESCRIPTOR_HANDLE renderTargetViewHandle;
 
 
 	//Store the vsync setting.
@@ -122,7 +126,7 @@ bool Direct3DClass::Initialize(int screenHeight, int screenWidth, HWND hwnd, boo
 
 	//Now go through all the display modes and find the one that matches the screen height and width.
 	//When a match is found store the numerator and denominator of the refresh rate for that monitor.
-	for (i = 0; i<numModes; i++)
+	for (unsigned int i = 0; i < numModes; i++)
 	{
 		if (displayModeList[i].Height == (unsigned int)screenHeight)
 		{
@@ -167,7 +171,7 @@ bool Direct3DClass::Initialize(int screenHeight, int screenWidth, HWND hwnd, boo
 	ZeroMemory(&swapChainDesc, sizeof(swapChainDesc));
 
 	//Set the swap chain to use double buffering.
-	swapChainDesc.BufferCount = 2;
+	swapChainDesc.BufferCount = frameBufferCount;
 
 	//Set the height and width of the back buffers in the swap chain.
 	swapChainDesc.BufferDesc.Height = screenHeight;
@@ -234,68 +238,64 @@ bool Direct3DClass::Initialize(int screenHeight, int screenWidth, HWND hwnd, boo
 	}
 
 	//Clear pointer to original swap chain interface since we are using version 3 instead (m_swapChain).
-	swapChain = 0;
+	swapChain = nullptr;
 
 	//Release the factory now that the swap chain has been created.
 	factory->Release();
 	factory = nullptr;
 
+	//Initialize the frameIndex to the current back buffer index
+	m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
+
 	//Initialize the render target view heap description for the two back buffers.
 	ZeroMemory(&renderTargetViewHeapDesc, sizeof(renderTargetViewHeapDesc));
 
 	//Set the number of descriptors to two for our two back buffers.  Also set the heap type to render target views.
-	renderTargetViewHeapDesc.NumDescriptors = 2;
+	renderTargetViewHeapDesc.NumDescriptors = frameBufferCount;
 	renderTargetViewHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
 	renderTargetViewHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 
 	//Create the render target view heap for the back buffers.
-	result = m_device->CreateDescriptorHeap(&renderTargetViewHeapDesc, __uuidof(ID3D12DescriptorHeap), (void**)&m_renderTargetViewHeap);
+	result = m_device->CreateDescriptorHeap(&renderTargetViewHeapDesc, __uuidof(ID3D12DescriptorHeap), (void**)&m_renderTargetViewDescHeap);
 	if (FAILED(result))
 	{
 		return false;
 	}
 
 	//Get a handle to the starting memory location in the render target view heap to identify where the render target views will be located for the two back buffers.
-	renderTargetViewHandle = m_renderTargetViewHeap->GetCPUDescriptorHandleForHeapStart();
+	renderTargetViewHandle = m_renderTargetViewDescHeap->GetCPUDescriptorHandleForHeapStart();
 
 	//Get the size of the memory location for the render target view descriptors.
 	renderTargetViewDescriptorSize = m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
-	//Get a pointer to the first back buffer from the swap chain.
-	result = m_swapChain->GetBuffer(0, __uuidof(ID3D12Resource), (void**)&m_backBufferRenderTarget[0]);
-	if (FAILED(result))
+	for (int i = 0; i < frameBufferCount; i++)
 	{
-		return false;
+		//Get a pointer to the first back buffer from the swap chain.
+		result = m_swapChain->GetBuffer(i, __uuidof(ID3D12Resource), (void**)&m_backBufferRenderTarget[i]);
+		if (FAILED(result))
+		{
+			return false;
+		}
+
+		//Create a render target view for the first back buffer.
+		m_device->CreateRenderTargetView(m_backBufferRenderTarget[i], NULL, renderTargetViewHandle);
+
+		//Increment the render target view handle by the render target view desc size
+		renderTargetViewHandle.Offset(1, renderTargetViewDescriptorSize);
 	}
-
-	//Create a render target view for the first back buffer.
-	m_device->CreateRenderTargetView(m_backBufferRenderTarget[0], NULL, renderTargetViewHandle);
-
-	//Increment the view handle to the next descriptor location in the render target view heap.
-	renderTargetViewHandle.ptr += renderTargetViewDescriptorSize;
-
-	//Get a pointer to the second back buffer from the swap chain.
-	result = m_swapChain->GetBuffer(1, __uuidof(ID3D12Resource), (void**)&m_backBufferRenderTarget[1]);
-	if (FAILED(result))
+	
+	for (int i = 0; i < frameBufferCount; i++)
 	{
-		return false;
-	}
-
-	//Create a render target view for the second back buffer.
-	m_device->CreateRenderTargetView(m_backBufferRenderTarget[1], NULL, renderTargetViewHandle);
-
-	//Finally get the initial index to which buffer is the current back buffer.
-	m_bufferIndex = m_swapChain->GetCurrentBackBufferIndex();
-
-	//Create a command allocator.
-	result = m_device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, __uuidof(ID3D12CommandAllocator), (void**)&m_commandAllocator);
-	if (FAILED(result))
-	{
-		return false;
+		//Create a command allocator.
+		result = m_device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, __uuidof(ID3D12CommandAllocator), (void**)&m_commandAllocator[i]);
+		if (FAILED(result))
+		{
+			return false;
+		}
 	}
 
 	//Create a basic command list.
-	result = m_device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_commandAllocator, NULL, __uuidof(ID3D12GraphicsCommandList), (void**)&m_commandList);
+	result = m_device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_commandAllocator[0], NULL, __uuidof(ID3D12GraphicsCommandList), (void**)&m_commandList);
 	if (FAILED(result))
 	{
 		return false;
@@ -308,22 +308,24 @@ bool Direct3DClass::Initialize(int screenHeight, int screenWidth, HWND hwnd, boo
 		return false;
 	}
 
-	//Create a fence for GPU synchronization.
-	result = m_device->CreateFence(0, D3D12_FENCE_FLAG_NONE, __uuidof(ID3D12Fence), (void**)&m_fence);
-	if (FAILED(result))
+	for (int i = 0; i < frameBufferCount; i++)
 	{
-		return false;
-	}
+		//Create a fence for GPU synchronization.
+		result = m_device->CreateFence(0, D3D12_FENCE_FLAG_NONE, __uuidof(ID3D12Fence), (void**)&m_fence[i]);
+		if (FAILED(result))
+		{
+			return false;
+		}
 
+		m_fenceValue[i] = 0;
+	}
+	
 	//Create an event object for the fence.
 	m_fenceEvent = CreateEventEx(NULL, FALSE, FALSE, EVENT_ALL_ACCESS);
 	if (m_fenceEvent == NULL)
 	{
 		return false;
 	}
-
-	//Initialize the starting fence value. 
-	m_fenceValue = 1;
 
 	return true;
 }
@@ -340,18 +342,14 @@ void Direct3DClass::Shutdown()
 	//Close the object handle to the fence event.
 	CloseHandle(m_fenceEvent);
 
-	//Release the fence.
-	if (m_fence)
+	for (int i = 0; i < frameBufferCount; i++)
 	{
-		m_fence->Release();
-		m_fence = nullptr;
-	}
-
-	//Release the empty pipe line state.
-	if (m_pipelineState)
-	{
-		m_pipelineState->Release();
-		m_pipelineState = nullptr;
+		//Release the fence.
+		if (m_fence[i])
+		{
+			m_fence[i]->Release();
+			m_fence[i] = nullptr;
+		}
 	}
 
 	//Release the command list.
@@ -361,11 +359,14 @@ void Direct3DClass::Shutdown()
 		m_commandList = nullptr;
 	}
 
-	//Release the command allocator.
-	if (m_commandAllocator)
+	for (int i = 0; i < frameBufferCount; i++)
 	{
-		m_commandAllocator->Release();
-		m_commandAllocator = nullptr;
+		//Release the command allocator.
+		if (m_commandAllocator[i])
+		{
+			m_commandAllocator[i]->Release();
+			m_commandAllocator[i] = nullptr;
+		}
 	}
 
 	//Release the back buffer render target views.
@@ -379,12 +380,17 @@ void Direct3DClass::Shutdown()
 		m_backBufferRenderTarget[1]->Release();
 		m_backBufferRenderTarget[1] = nullptr;
 	}
+	if (m_backBufferRenderTarget[2])
+	{
+		m_backBufferRenderTarget[2]->Release();
+		m_backBufferRenderTarget[2] = nullptr;
+	}
 
 	//Release the render target view heap.
-	if (m_renderTargetViewHeap)
+	if (m_renderTargetViewDescHeap)
 	{
-		m_renderTargetViewHeap->Release();
-		m_renderTargetViewHeap = nullptr;
+		m_renderTargetViewDescHeap->Release();
+		m_renderTargetViewDescHeap = nullptr;
 	}
 
 	//Release the swap chain.
@@ -415,23 +421,43 @@ void Direct3DClass::Shutdown()
 bool Direct3DClass::Render()
 {
 	HRESULT result;
-	D3D12_RESOURCE_BARRIER barrier;
-	D3D12_CPU_DESCRIPTOR_HANDLE renderTargetViewHandle;
+	CD3DX12_RESOURCE_BARRIER barrier;
+	CD3DX12_CPU_DESCRIPTOR_HANDLE renderTargetViewHandle;
 	unsigned int renderTargetViewDescriptorSize;
 	float color[4];
 	ID3D12CommandList* ppCommandLists[1];
-	unsigned long long fenceToWaitFor;
 
+	//Swap the current render target view buffer index so drawing is don on the correct buffer
+	m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
 
-	// Reset (re-use) the memory associated command allocator.
-	result = m_commandAllocator->Reset();
+	//If the current fence value is still less than the "m_fenceValue", then GPU has not finished
+	//the command queue since it has not reached the "m_commandQueue->Signal" command
+	if (m_fence[m_frameIndex]->GetCompletedValue() < m_fenceValue[m_frameIndex])
+	{
+		result = m_fence[m_frameIndex]->SetEventOnCompletion(m_fenceValue[m_frameIndex], m_fenceEvent);
+		if (FAILED(result))
+		{
+			return false;
+		}
+
+		//Wait until the fence has triggered the correct fence event
+		WaitForSingleObject(m_fenceEvent, INFINITE);
+	}
+
+	//Increment m_fenceValue for next frame
+	m_fenceValue[m_frameIndex]++;
+
+	//Can only reset an allocator once the GPU is done with it.
+	//Resetting it will free the memory that the command list was stored in
+	result = m_commandAllocator[m_frameIndex]->Reset();
 	if (FAILED(result))
 	{
 		return false;
 	}
 
-	//Reset the command list, use empty pipeline state for now since there are no shaders and we are just clearing the screen.
-	result = m_commandList->Reset(m_commandAllocator, m_pipelineState);
+	//Reset the command list so that it can start recording again.
+	//Only one command list can record at a given time.
+	result = m_commandList->Reset(m_commandAllocator[m_frameIndex], NULL);
 	if (FAILED(result))
 	{
 		return false;
@@ -439,21 +465,12 @@ bool Direct3DClass::Render()
 
 	//Record commands in the command list now.
 	//Start by setting the resource barrier.
-	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	barrier.Transition.pResource = m_backBufferRenderTarget[m_bufferIndex];
-	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
-	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	m_commandList->ResourceBarrier(1, &barrier);
+	m_commandList->ResourceBarrier(1, &barrier.Transition(m_backBufferRenderTarget[m_frameIndex],
+		D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
 
 	//Get the render target view handle for the current back buffer.
-	renderTargetViewHandle = m_renderTargetViewHeap->GetCPUDescriptorHandleForHeapStart();
-	renderTargetViewDescriptorSize = m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-	if (m_bufferIndex == 1)
-	{
-		renderTargetViewHandle.ptr += renderTargetViewDescriptorSize;
-	}
+	renderTargetViewHandle.InitOffsetted(m_renderTargetViewDescHeap->GetCPUDescriptorHandleForHeapStart(),
+		m_frameIndex, renderTargetViewDescriptorSize = m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV));
 
 	//Set the back buffer as the render target.
 	m_commandList->OMSetRenderTargets(1, &renderTargetViewHandle, FALSE, NULL);
@@ -466,9 +483,8 @@ bool Direct3DClass::Render()
 	m_commandList->ClearRenderTargetView(renderTargetViewHandle, color, 0, NULL);
 
 	//Indicate that the back buffer will now be used to present.
-	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
-	m_commandList->ResourceBarrier(1, &barrier);
+	m_commandList->ResourceBarrier(1, &barrier.Transition(m_backBufferRenderTarget[m_frameIndex],
+		D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 
 	//Close the list of commands.
 	result = m_commandList->Close();
@@ -481,7 +497,14 @@ bool Direct3DClass::Render()
 	ppCommandLists[0] = m_commandList;
 
 	//Execute the list of commands.
-	m_commandQueue->ExecuteCommandLists(1, ppCommandLists);
+	m_commandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
+
+	//Signal and increment the fence value.
+	result = m_commandQueue->Signal(m_fence[m_frameIndex], m_fenceValue[m_frameIndex]);
+	if (FAILED(result))
+	{
+		return false;
+	}
 
 	//Finally present the back buffer to the screen since rendering is complete.
 	if (m_vsync)
@@ -502,29 +525,6 @@ bool Direct3DClass::Render()
 			return false;
 		}
 	}
-
-	//Signal and increment the fence value.
-	fenceToWaitFor = m_fenceValue;
-	result = m_commandQueue->Signal(m_fence, fenceToWaitFor);
-	if (FAILED(result))
-	{
-		return false;
-	}
-	m_fenceValue++;
-
-	//Wait until the GPU is done rendering.
-	if (m_fence->GetCompletedValue() < fenceToWaitFor)
-	{
-		result = m_fence->SetEventOnCompletion(fenceToWaitFor, m_fenceEvent);
-		if (FAILED(result))
-		{
-			return false;
-		}
-		WaitForSingleObject(m_fenceEvent, INFINITE);
-	}
-
-	//Alternate the back buffer index back and forth between 0 and 1 each frame.
-	m_bufferIndex == 0 ? m_bufferIndex = 1 : m_bufferIndex = 0;
 
 	return true;
 }

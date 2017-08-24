@@ -265,7 +265,6 @@ void SystemClass::ShutdownWindows()
 void SystemClass::CreateConsole()
 {
 	HANDLE hStdHandle;
-	CONSOLE_SCREEN_BUFFER_INFO consoleInfo;
 	FILE* fp = nullptr;
 
 	//Allocate a console
