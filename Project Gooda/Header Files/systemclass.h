@@ -4,11 +4,8 @@
 
 #include <Windows.h>
 #include <stdio.h>
-#include <fcntl.h>
-#include <io.h>
 #include <iostream>
 #include <fstream>
-#include <WinSock2.h>
 #include "inputclass.h"
 #include "graphicsclass.h"
 
@@ -41,4 +38,3 @@ private:
 
 static LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 static SystemClass* ApplicationHandle = nullptr;
-static const WORD MAX_CONSOLE_LINES = 500;

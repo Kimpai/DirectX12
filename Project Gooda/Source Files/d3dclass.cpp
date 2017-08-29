@@ -423,7 +423,6 @@ bool Direct3DClass::Render()
 	HRESULT result;
 	CD3DX12_RESOURCE_BARRIER barrier;
 	CD3DX12_CPU_DESCRIPTOR_HANDLE renderTargetViewHandle;
-	unsigned int renderTargetViewDescriptorSize;
 	float color[4];
 	ID3D12CommandList* ppCommandLists[1];
 
@@ -470,7 +469,7 @@ bool Direct3DClass::Render()
 
 	//Get the render target view handle for the current back buffer.
 	renderTargetViewHandle.InitOffsetted(m_renderTargetViewDescHeap->GetCPUDescriptorHandleForHeapStart(),
-		m_frameIndex, renderTargetViewDescriptorSize = m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV));
+		m_frameIndex, m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV));
 
 	//Set the back buffer as the render target.
 	m_commandList->OMSetRenderTargets(1, &renderTargetViewHandle, FALSE, NULL);
