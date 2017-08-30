@@ -48,7 +48,7 @@ void ColorShaderClass::Render(ID3D12GraphicsCommandList* commandList)
 
 ID3D12PipelineState* ColorShaderClass::GetPipelineState()
 {
-	return NULL;
+	return m_pipelineState;
 }
 
 bool ColorShaderClass::InitializeShader(ID3D12Device* device, HWND hwnd, WCHAR* vsFilename, WCHAR* psFilename)
@@ -118,7 +118,7 @@ bool ColorShaderClass::InitializeShader(ID3D12Device* device, HWND hwnd, WCHAR* 
 
 	//Fill out an input layout desc structure
 	//Get the number of elements in an array by "sizeof(array) / sizeof(arrayElementType)"
-	inputLayoutDesc.NumElements = _countof(inputElementDesc);
+	inputLayoutDesc.NumElements = sizeof(inputElementDesc) / sizeof(D3D12_INPUT_ELEMENT_DESC);
 	inputLayoutDesc.pInputElementDescs = inputElementDesc;
 
 	//Fill in the pipeline state object desc

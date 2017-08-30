@@ -2,6 +2,8 @@
 
 #include <Windows.h>
 #include "d3dclass.h"
+#include "colorshaderclass.h"
+#include "modelclass.h"
 
 const bool FULL_SCREEN = false;
 const bool VSYNC_ENABLED = true;
@@ -23,4 +25,6 @@ private:
 	bool Render();
 
 	Direct3DClass* m_Direct3D;
+	ColorShaderClass* m_ColorShader;
+	ModelClass* m_Model;
 };

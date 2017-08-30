@@ -301,13 +301,6 @@ bool Direct3DClass::Initialize(int screenHeight, int screenWidth, HWND hwnd, boo
 		return false;
 	}
 
-	//Initially we need to close the command list during initialization as it is created in a recording state.
-	result = m_commandList->Close();
-	if (FAILED(result))
-	{
-		return false;
-	}
-
 	for (int i = 0; i < frameBufferCount; i++)
 	{
 		//Create a fence for GPU synchronization.
@@ -321,11 +314,25 @@ bool Direct3DClass::Initialize(int screenHeight, int screenWidth, HWND hwnd, boo
 	}
 	
 	//Create an event object for the fence.
-	m_fenceEvent = CreateEventEx(NULL, FALSE, FALSE, EVENT_ALL_ACCESS);
+	m_fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 	if (m_fenceEvent == NULL)
 	{
 		return false;
 	}
+
+	//Fill out the Viewport
+	m_viewport.TopLeftX = 0;
+	m_viewport.TopLeftY = 0;
+	m_viewport.Width = (float)screenWidth;
+	m_viewport.Height = (float)screenHeight;
+	m_viewport.MinDepth = 0.0f;
+	m_viewport.MaxDepth = 1.0f;
+
+	//Fill out a scissor rect
+	m_rect.left = 0;
+	m_rect.top = 0;
+	m_rect.right = screenWidth;
+	m_rect.bottom = screenHeight;
 
 	return true;
 }
@@ -418,13 +425,11 @@ void Direct3DClass::Shutdown()
 }
 
 
-bool Direct3DClass::Render()
+bool Direct3DClass::BeginScene(ID3D12PipelineState* pipelinestate)
 {
 	HRESULT result;
-	CD3DX12_RESOURCE_BARRIER barrier;
 	CD3DX12_CPU_DESCRIPTOR_HANDLE renderTargetViewHandle;
 	float color[4];
-	ID3D12CommandList* ppCommandLists[1];
 
 	//Swap the current render target view buffer index so drawing is don on the correct buffer
 	m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
@@ -456,7 +461,7 @@ bool Direct3DClass::Render()
 
 	//Reset the command list so that it can start recording again.
 	//Only one command list can record at a given time.
-	result = m_commandList->Reset(m_commandAllocator[m_frameIndex], NULL);
+	result = m_commandList->Reset(m_commandAllocator[m_frameIndex], pipelinestate);
 	if (FAILED(result))
 	{
 		return false;
@@ -464,7 +469,7 @@ bool Direct3DClass::Render()
 
 	//Record commands in the command list now.
 	//Start by setting the resource barrier.
-	m_commandList->ResourceBarrier(1, &barrier.Transition(m_backBufferRenderTarget[m_frameIndex],
+	m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_backBufferRenderTarget[m_frameIndex],
 		D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
 
 	//Get the render target view handle for the current back buffer.
@@ -479,10 +484,21 @@ bool Direct3DClass::Render()
 	color[1] = 0.5;
 	color[2] = 0.5;
 	color[3] = 1.0;
+	
 	m_commandList->ClearRenderTargetView(renderTargetViewHandle, color, 0, NULL);
+	m_commandList->RSSetViewports(1, &m_viewport);
+	m_commandList->RSSetScissorRects(1, &m_rect);
+
+	return true;
+}
+
+bool Direct3DClass::EndScene()
+{
+	HRESULT result;
+	ID3D12CommandList* ppCommandLists[1];
 
 	//Indicate that the back buffer will now be used to present.
-	m_commandList->ResourceBarrier(1, &barrier.Transition(m_backBufferRenderTarget[m_frameIndex],
+	m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_backBufferRenderTarget[m_frameIndex],
 		D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 
 	//Close the list of commands.
@@ -526,4 +542,62 @@ bool Direct3DClass::Render()
 	}
 
 	return true;
+}
+
+bool Direct3DClass::CloseCommandList()
+{
+	HRESULT result;
+
+	result = m_commandList->Close();
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool Direct3DClass::ResetCommandList(ID3D12PipelineState* pipelinestate)
+{
+	HRESULT result;
+
+	result = m_commandList->Reset(m_commandAllocator[m_frameIndex], pipelinestate);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool Direct3DClass::ExecuteCommandList()
+{
+	HRESULT result;
+	ID3D12CommandList* ppCommandLists[1];
+
+	//Load the command list array (only one command list for now).
+	ppCommandLists[0] = m_commandList;
+
+	//Execute the list of commands.
+	m_commandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
+
+	//Signal and increment the fence value.
+	m_fenceValue[m_frameIndex]++;
+	result = m_commandQueue->Signal(m_fence[m_frameIndex], m_fenceValue[m_frameIndex]);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+	return true;
+}
+
+ID3D12Device* Direct3DClass::GetDevice()
+{
+	return m_device;
+}
+
+ID3D12GraphicsCommandList* Direct3DClass::GetCommandList()
+{
+	return m_commandList;
 }

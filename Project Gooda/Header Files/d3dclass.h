@@ -20,7 +20,13 @@ public:
 	bool Initialize(int, int, HWND, bool, bool, float, float);
 	void Shutdown();
 
-	bool Render();
+	bool BeginScene(ID3D12PipelineState*);
+	bool EndScene();
+	bool CloseCommandList();
+	bool ResetCommandList(ID3D12PipelineState*);
+	bool ExecuteCommandList();
+	ID3D12Device* GetDevice();
+	ID3D12GraphicsCommandList* GetCommandList();
 
 private:
 	bool m_vsync;
@@ -36,6 +42,8 @@ private:
 	ID3D12Fence* m_fence[frameBufferCount];
 	HANDLE m_fenceEvent;
 	UINT64 m_fenceValue[frameBufferCount];
+	D3D12_VIEWPORT m_viewport;
+	D3D12_RECT m_rect;
 	int m_frameIndex;
 	int m_videoCardMemory;
 };
