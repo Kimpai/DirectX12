@@ -113,7 +113,8 @@ bool ColorShaderClass::InitializeShader(ID3D12Device* device, HWND hwnd, WCHAR* 
 
 	D3D12_INPUT_ELEMENT_DESC inputElementDesc[] =
 	{
-		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
+		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+		{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
 	};
 
 	//Fill out an input layout desc structure
@@ -220,5 +221,5 @@ void ColorShaderClass::RenderShader(ID3D12GraphicsCommandList* commandList)
 	commandList->SetGraphicsRootSignature(m_rootSignature);
 
 	//Draw
-	commandList->DrawInstanced(3, 1, 0, 0);
+	commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
 }

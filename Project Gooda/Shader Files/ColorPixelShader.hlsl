@@ -1,4 +1,11 @@
-float4 main() : SV_TARGET
+struct PixelShaderInput
 {
-	return float4(0.0f, 1.0f, 0.0f, 1.0f);
+    float4 pos : SV_Position;
+    float4 color : COLOR;
+};
+
+float4 main(PixelShaderInput input) : SV_TARGET
+{
+    //Return the interpolated color
+	return input.color;
 }

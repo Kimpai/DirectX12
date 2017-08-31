@@ -83,6 +83,22 @@ bool GraphicsClass::Initialize(int screenHeight, int screenWidth, HWND hwnd)
 
 void GraphicsClass::Shutdown()
 {
+	//Release the Model object
+	if (m_Model)
+	{
+		m_Model->Shutdown();
+		delete m_Model;
+		m_Model = nullptr;
+	}
+
+	//Release the Color Shader object
+	if (m_ColorShader)
+	{
+		m_ColorShader->Shutdown();
+		delete m_ColorShader;
+		m_ColorShader = nullptr;
+	}
+
 	//Release the Direct3D object
 	if (m_Direct3D)
 	{
