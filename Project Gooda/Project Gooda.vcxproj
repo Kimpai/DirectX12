@@ -157,6 +157,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source Files\colorshaderclass.cpp" />
+    <ClCompile Include="Source Files\consoleclass.cpp" />
     <ClCompile Include="Source Files\d3dclass.cpp" />
     <ClCompile Include="Source Files\graphicsclass.cpp" />
     <ClCompile Include="Source Files\inputclass.cpp" />
@@ -166,6 +167,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Header Files\colorshaderclass.h" />
+    <ClInclude Include="Header Files\consoleclass.h" />
     <ClInclude Include="Header Files\d3dclass.h" />
     <ClInclude Include="Header Files\graphicsclass.h" />
     <ClInclude Include="Header Files\inputclass.h" />

@@ -6,8 +6,10 @@
 #include <stdio.h>
 #include <iostream>
 #include <fstream>
+#include <thread>
 #include "inputclass.h"
 #include "graphicsclass.h"
+#include "consoleclass.h"
 
 class SystemClass
 {
@@ -26,7 +28,6 @@ private:
 	bool Frame();
 	void InitializeWindows(int&, int&);
 	void ShutdownWindows();
-	void CreateConsole();
 
 	LPCWSTR m_applicationName;
 	HINSTANCE m_hinstance;
@@ -34,6 +35,8 @@ private:
 
 	InputClass* m_Input;
 	GraphicsClass* m_Graphics;
+	ConsoleClass* m_Console;
+	
 };
 
 static LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);

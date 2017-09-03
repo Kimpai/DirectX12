@@ -4,6 +4,7 @@ SystemClass::SystemClass()
 {
 	m_Input = nullptr;
 	m_Graphics = nullptr;
+	m_Console = nullptr;
 }
 
 SystemClass::SystemClass(const SystemClass& other)
@@ -46,7 +47,15 @@ bool SystemClass::Initialize()
 	if (!result)
 		return false;
 
-	CreateConsole();
+	m_Console = new ConsoleClass();
+	if (!m_Console)
+		return false;
+
+	result = m_Console->Initialize();
+	if (!result)
+	{
+		return false;
+	}
 
 	return true;
 }
@@ -65,6 +74,12 @@ void SystemClass::Shutdown()
 	{
 		delete m_Graphics;
 		m_Graphics = nullptr;
+	}
+
+	if (m_Console)
+	{
+		delete m_Console;
+		m_Console = nullptr;
 	}
 
 	//Shutdown the window
@@ -151,6 +166,10 @@ bool SystemClass::Frame()
 
 	//Do the frame processing for the graphics object
 	result = m_Graphics->Frame();
+	if (!result)
+		return false;
+
+	result = m_Console->Frame();
 	if (!result)
 		return false;
 
@@ -258,36 +277,6 @@ void SystemClass::ShutdownWindows()
 
 	//Release the pointer to this class
 	ApplicationHandle = NULL;
-
-	return;
-}
-
-void SystemClass::CreateConsole()
-{
-	HANDLE hStdHandle;
-	FILE* fp = nullptr;
-
-	//Allocate a console
-	AllocConsole();
-
-	//Redirect unbuffered STDOUT to the console
-	hStdHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-	freopen_s(&fp, "CONOUT$", "w", stdout);
-	setvbuf(stdout, NULL, _IONBF, 0);
-	
-	//Redirect unbuffered STDIN to the console
-	hStdHandle = GetStdHandle(STD_INPUT_HANDLE);
-	freopen_s(&fp, "CONIN$", "r", stdin);
-	setvbuf(stdin, NULL, _IONBF, 0);
-	
-	//Redirect unbuffered STDERR to the console
-	hStdHandle = GetStdHandle(STD_ERROR_HANDLE);
-	freopen_s(&fp, "CONOUT$", "w", stderr);
-	setvbuf(stderr, NULL, _IONBF, 0);
-
-	//Make cout, wcout, cin, wcin, wcerr, cerr, wclog and clog 
-	//point to console as well
-	std::ios::sync_with_stdio();
 
 	return;
 }
