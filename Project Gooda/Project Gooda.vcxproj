@@ -73,18 +73,22 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(ProjectDir)/Include;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)/Lib;$(LibraryPath)</LibraryPath>
+    <ReferencePath>$(ReferencePath)</ReferencePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>$(ProjectDir)/Include;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)/Lib;$(LibraryPath)</LibraryPath>
+    <ReferencePath>$(ReferencePath)</ReferencePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(ProjectDir)/Include;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)/Lib;$(LibraryPath)</LibraryPath>
+    <ReferencePath>$(ReferencePath)</ReferencePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(ProjectDir)/Include;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)/Lib;$(LibraryPath)</LibraryPath>
+    <ReferencePath>$(ReferencePath)</ReferencePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -161,6 +165,7 @@
     <ClCompile Include="Source Files\d3dclass.cpp" />
     <ClCompile Include="Source Files\graphicsclass.cpp" />
     <ClCompile Include="Source Files\inputclass.cpp" />
+    <ClCompile Include="Source Files\luaclass.cpp" />
     <ClCompile Include="Source Files\main.cpp" />
     <ClCompile Include="Source Files\modelclass.cpp" />
     <ClCompile Include="Source Files\systemclass.cpp" />
@@ -171,6 +176,7 @@
     <ClInclude Include="Header Files\d3dclass.h" />
     <ClInclude Include="Header Files\graphicsclass.h" />
     <ClInclude Include="Header Files\inputclass.h" />
+    <ClInclude Include="Header Files\luaclass.h" />
     <ClInclude Include="Header Files\modelclass.h" />
     <ClInclude Include="Header Files\systemclass.h" />
   </ItemGroup>

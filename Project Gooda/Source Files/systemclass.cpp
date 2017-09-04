@@ -5,6 +5,7 @@ SystemClass::SystemClass()
 	m_Input = nullptr;
 	m_Graphics = nullptr;
 	m_Console = nullptr;
+	m_Lua = nullptr;
 }
 
 SystemClass::SystemClass(const SystemClass& other)
@@ -47,15 +48,27 @@ bool SystemClass::Initialize()
 	if (!result)
 		return false;
 
+	//Create console object
 	m_Console = new ConsoleClass();
 	if (!m_Console)
 		return false;
 
+	//Initialize console object
 	result = m_Console->Initialize();
 	if (!result)
 	{
 		return false;
 	}
+
+	//Create lua object
+	m_Lua = new LuaClass();
+	if (!m_Lua)
+	{
+		return false;
+	}
+
+	//Initialize lua object
+	m_Lua->Initialize();
 
 	return true;
 }
@@ -76,10 +89,18 @@ void SystemClass::Shutdown()
 		m_Graphics = nullptr;
 	}
 
+	//Release console object
 	if (m_Console)
 	{
 		delete m_Console;
 		m_Console = nullptr;
+	}
+
+	//Release lua object
+	if (m_Lua)
+	{
+		delete m_Lua;
+		m_Lua = nullptr;
 	}
 
 	//Shutdown the window

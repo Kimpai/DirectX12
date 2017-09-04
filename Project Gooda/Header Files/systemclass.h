@@ -10,6 +10,7 @@
 #include "inputclass.h"
 #include "graphicsclass.h"
 #include "consoleclass.h"
+#include "luaclass.h"
 
 class SystemClass
 {
@@ -36,7 +37,7 @@ private:
 	InputClass* m_Input;
 	GraphicsClass* m_Graphics;
 	ConsoleClass* m_Console;
-	
+	LuaClass* m_Lua;
 };
 
 static LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);

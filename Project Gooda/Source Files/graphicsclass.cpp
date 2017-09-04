@@ -54,6 +54,7 @@ bool GraphicsClass::Initialize(int screenHeight, int screenWidth, HWND hwnd)
 	result = m_ColorShader->Initialize(m_Direct3D->GetDevice(), hwnd);
 	if (!result)
 	{
+		MessageBox(hwnd, (LPCSTR)L"Could not initialize Color Shader", (LPCSTR)L"Error", MB_OK);
 		return false;
 	}
 
@@ -61,6 +62,7 @@ bool GraphicsClass::Initialize(int screenHeight, int screenWidth, HWND hwnd)
 	result = m_Model->Initialize(m_Direct3D->GetDevice(), m_Direct3D->GetCommandList());
 	if (!result)
 	{
+		MessageBox(hwnd, (LPCSTR)L"Could not initialize Model", (LPCSTR)L"Error", MB_OK);
 		return false;
 	}
 

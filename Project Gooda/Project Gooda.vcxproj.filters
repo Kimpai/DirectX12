@@ -42,6 +42,9 @@
     <ClCompile Include="Source Files\consoleclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source Files\luaclass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Header Files\systemclass.h">
@@ -63,6 +66,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Header Files\consoleclass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Header Files\luaclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
