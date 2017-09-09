@@ -13,12 +13,12 @@ public:
 	~ConsoleClass();
 	
 	bool Initialize();
-	bool Frame();
+	bool Frame(std::string&);
 
 private:
 	HANDLE m_stdOutputHandle;
 	HANDLE m_stdInputHandle;
 	HANDLE m_stdErrorHandle;
 
-	void InputHandle();
+	bool InputHandle(std::string&);
 };

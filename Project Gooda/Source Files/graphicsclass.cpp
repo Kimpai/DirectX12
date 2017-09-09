@@ -126,6 +126,14 @@ bool GraphicsClass::Frame()
 	return true;
 }
 
+int GraphicsClass::RenderQuad(lua_State * L)
+{	
+	if (lua_isboolean(L, 1))
+		renderQuad = lua_toboolean(L, 1);
+
+	return 0;
+}
+
 bool GraphicsClass::Render()
 {
 	bool result;
@@ -137,9 +145,12 @@ bool GraphicsClass::Render()
 		return false;
 	}
 
-	m_Model->Render(m_Direct3D->GetCommandList());
+	if (renderQuad)
+	{
+		m_Model->Render(m_Direct3D->GetCommandList());
 
-	m_ColorShader->Render(m_Direct3D->GetCommandList());
+		m_ColorShader->Render(m_Direct3D->GetCommandList());
+	}
 
 	//Close the command list and execute the commands
 	result = m_Direct3D->EndScene();

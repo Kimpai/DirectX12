@@ -70,6 +70,11 @@ bool SystemClass::Initialize()
 	//Initialize lua object
 	m_Lua->Initialize();
 
+	m_Lua->PushCFunction(m_Lua->Print);
+	m_Lua->SetGlobal("Print");
+	m_Lua->PushCFunction(m_Graphics->RenderQuad);
+	m_Lua->SetGlobal("RenderQuad");
+
 	return true;
 }
 
@@ -180,17 +185,21 @@ LRESULT SystemClass::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM 
 bool SystemClass::Frame()
 {
 	bool result;
+	std::string input;
 
 	//Check if the user pressed escape and wants to exit the application
 	if (m_Input->IsKeyDown(VK_ESCAPE))
 		return false;
 
+	//Do the console frame processing
+	if (m_Console->Frame(input))
+	{
+		if (!m_Lua->DoString(input.c_str()))
+			std::cout << "Lua Error" << std::endl;
+	}
+
 	//Do the frame processing for the graphics object
 	result = m_Graphics->Frame();
-	if (!result)
-		return false;
-
-	result = m_Console->Frame();
 	if (!result)
 		return false;
 

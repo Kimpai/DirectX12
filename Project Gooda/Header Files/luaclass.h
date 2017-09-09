@@ -2,10 +2,8 @@
 
 #include <lua.hpp>
 #include <lauxlib.h>
-
-#pragma comment(lib, "lua5.3.lib")
-#pragma comment(lib, "lua5.3-static.lib")
-#pragma comment(lib, "luac.lib")
+#include <string>
+#include <iostream>
 
 class LuaClass
 {
@@ -18,6 +16,10 @@ public:
 	void Shutdown();
 	void PushCFunction(lua_CFunction);
 	void SetGlobal(char*);
+	bool DoString(const char*);
+	lua_State* GetState();
+
+	static int Print(lua_State* L);
 
 private:
 	lua_State* m_luaState;

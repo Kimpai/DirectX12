@@ -56,17 +56,15 @@ bool ConsoleClass::Initialize()
 	return true;
 }
 
-bool ConsoleClass::Frame()
+bool ConsoleClass::Frame(std::string& input)
 {
-	InputHandle();
-
-	return true;
+	return InputHandle(input);
 }
 
-void ConsoleClass::InputHandle()
+bool ConsoleClass::InputHandle(std::string& input)
 {
 	DWORD result;
-	char inputBuffer[512];
+	char inputBuffer[512] = { 0 };
 	INPUT_RECORD buffer[128];
 	DWORD read;
 
@@ -74,7 +72,7 @@ void ConsoleClass::InputHandle()
 
 	if (result == WAIT_OBJECT_0)
 	{
-		ReadConsoleInput(m_stdInputHandle, buffer, 128, &read);
+		PeekConsoleInput(m_stdInputHandle, buffer, 128, &read);
 
 		switch (buffer->EventType)
 		{
@@ -84,8 +82,9 @@ void ConsoleClass::InputHandle()
 
 		case KEY_EVENT:
 			ReadConsole(m_stdInputHandle, inputBuffer, 512, &read, NULL);
+			input = inputBuffer;
 			FlushConsoleInputBuffer(m_stdInputHandle);
-			break;
+			return true;
 
 		case MOUSE_EVENT:
 			FlushConsoleInputBuffer(m_stdInputHandle);
@@ -101,5 +100,6 @@ void ConsoleClass::InputHandle()
 	}
 
 	FlushConsoleInputBuffer(m_stdInputHandle);
-	return;
+
+	return false;
 }
