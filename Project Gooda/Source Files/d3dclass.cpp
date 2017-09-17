@@ -37,26 +37,43 @@ bool Direct3DClass::Initialize(int screenHeight, int screenWidth, HWND hwnd, boo
 	D3D_FEATURE_LEVEL featureLevel;
 	HRESULT result;
 	D3D12_COMMAND_QUEUE_DESC commandQueueDesc;
-	IDXGIFactory4* factory;
-	IDXGIAdapter* adapter;
-	IDXGIOutput* adapterOutput;
+	ComPtr<IDXGIFactory4> factory = nullptr;
+	ComPtr<IDXGIAdapter> adapter = nullptr;
+	ComPtr<IDXGIOutput> adapterOutput = nullptr;
 	unsigned int numModes, numerator, denominator, renderTargetViewDescriptorSize;
 	unsigned long long stringLength;
 	DXGI_MODE_DESC* displayModeList;
 	DXGI_ADAPTER_DESC adapterDesc;
 	int error;
 	DXGI_SWAP_CHAIN_DESC swapChainDesc;
-	IDXGISwapChain* swapChain;
+	IDXGISwapChain* swapChain = nullptr;
 	D3D12_DESCRIPTOR_HEAP_DESC renderTargetViewHeapDesc;
 	CD3DX12_CPU_DESCRIPTOR_HANDLE renderTargetViewHandle;
 
-
+	
 	//Store the vsync setting.
 	m_vsync = vsync;
 
 	//Set the feature level to DirectX 12.1 to enable using all the DirectX 12 features.
 	//Note: Not all cards support full DirectX 12, this feature level may need to be reduced on some cards to 12.0.
 	featureLevel = D3D_FEATURE_LEVEL_11_1;
+
+	#if _DEBUG
+		//Get the interface to DirectX 12 debugger
+		ID3D12Debug* debugController = nullptr;
+		result = D3D12GetDebugInterface(__uuidof(ID3D12Debug), (void**)&debugController);
+		if (FAILED(result))
+		{
+			return false;
+		}
+
+		//Enable debug layer
+		debugController->EnableDebugLayer();
+
+		//Release the debug controller now that the debug layer has been enabled
+		debugController->Release();
+		debugController = nullptr;
+	#endif
 
 	//Create the Direct3D 12 device.
 	result = D3D12CreateDevice(NULL, featureLevel, __uuidof(ID3D12Device), (void**)&m_device);
@@ -160,11 +177,9 @@ bool Direct3DClass::Initialize(int screenHeight, int screenWidth, HWND hwnd, boo
 	displayModeList = nullptr;
 
 	// Release the adapter output.
-	adapterOutput->Release();
 	adapterOutput = nullptr;
 
 	// Release the adapter.
-	adapter->Release();
 	adapter = nullptr;
 
 	//Initialize the swap chain description.
@@ -223,7 +238,7 @@ bool Direct3DClass::Initialize(int screenHeight, int screenWidth, HWND hwnd, boo
 	swapChainDesc.Flags = 0;
 
 	//Finally create the swap chain using the swap chain description.	
-	result = factory->CreateSwapChain(m_commandQueue, &swapChainDesc, &swapChain);
+	result = factory->CreateSwapChain(m_commandQueue.Get(), &swapChainDesc, &swapChain);
 	if (FAILED(result))
 	{
 		return false;
@@ -241,7 +256,6 @@ bool Direct3DClass::Initialize(int screenHeight, int screenWidth, HWND hwnd, boo
 	swapChain = nullptr;
 
 	//Release the factory now that the swap chain has been created.
-	factory->Release();
 	factory = nullptr;
 
 	//Initialize the frameIndex to the current back buffer index
@@ -278,7 +292,7 @@ bool Direct3DClass::Initialize(int screenHeight, int screenWidth, HWND hwnd, boo
 		}
 
 		//Create a render target view for the first back buffer.
-		m_device->CreateRenderTargetView(m_backBufferRenderTarget[i], NULL, renderTargetViewHandle);
+		m_device->CreateRenderTargetView(m_backBufferRenderTarget[i].Get(), NULL, renderTargetViewHandle);
 
 		//Increment the render target view handle by the render target view desc size
 		renderTargetViewHandle.Offset(1, renderTargetViewDescriptorSize);
@@ -295,7 +309,7 @@ bool Direct3DClass::Initialize(int screenHeight, int screenWidth, HWND hwnd, boo
 	}
 
 	//Create a basic command list.
-	result = m_device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_commandAllocator[0], NULL, __uuidof(ID3D12GraphicsCommandList), (void**)&m_commandList);
+	result = m_device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_commandAllocator[0].Get(), NULL, __uuidof(ID3D12GraphicsCommandList), (void**)&m_commandList);
 	if (FAILED(result))
 	{
 		return false;
@@ -340,6 +354,13 @@ bool Direct3DClass::Initialize(int screenHeight, int screenWidth, HWND hwnd, boo
 
 void Direct3DClass::Shutdown()
 {
+	//Wait of GPU to finish before releasing com objects
+	for (int i = 0; i < frameBufferCount; i++)
+	{
+		m_frameIndex = i;
+		WaitforFrameToFinish();
+	}
+
 	//Before shutting down set to windowed mode or when you release the swap chain it will throw an exception.
 	if (m_swapChain)
 	{
@@ -354,7 +375,6 @@ void Direct3DClass::Shutdown()
 		//Release the fence.
 		if (m_fence[i])
 		{
-			m_fence[i]->Release();
 			m_fence[i] = nullptr;
 		}
 	}
@@ -362,7 +382,6 @@ void Direct3DClass::Shutdown()
 	//Release the command list.
 	if (m_commandList)
 	{
-		m_commandList->Release();
 		m_commandList = nullptr;
 	}
 
@@ -371,7 +390,6 @@ void Direct3DClass::Shutdown()
 		//Release the command allocator.
 		if (m_commandAllocator[i])
 		{
-			m_commandAllocator[i]->Release();
 			m_commandAllocator[i] = nullptr;
 		}
 	}
@@ -379,45 +397,38 @@ void Direct3DClass::Shutdown()
 	//Release the back buffer render target views.
 	if (m_backBufferRenderTarget[0])
 	{
-		m_backBufferRenderTarget[0]->Release();
 		m_backBufferRenderTarget[0] = nullptr;
 	}
 	if (m_backBufferRenderTarget[1])
 	{
-		m_backBufferRenderTarget[1]->Release();
 		m_backBufferRenderTarget[1] = nullptr;
 	}
 	if (m_backBufferRenderTarget[2])
 	{
-		m_backBufferRenderTarget[2]->Release();
 		m_backBufferRenderTarget[2] = nullptr;
 	}
 
 	//Release the render target view heap.
 	if (m_renderTargetViewDescHeap)
 	{
-		m_renderTargetViewDescHeap->Release();
 		m_renderTargetViewDescHeap = nullptr;
 	}
 
 	//Release the swap chain.
 	if (m_swapChain)
 	{
-		m_swapChain->Release();
 		m_swapChain = nullptr;
 	}
 
 	//Release the command queue.
 	if (m_commandQueue)
 	{
-		m_commandQueue->Release();
 		m_commandQueue = nullptr;
 	}
 
 	//Release the device.
 	if (m_device)
 	{
-		m_device->Release();
 		m_device = nullptr;
 	}
 
@@ -425,7 +436,7 @@ void Direct3DClass::Shutdown()
 }
 
 
-bool Direct3DClass::BeginScene(ID3D12PipelineState* pipelinestate)
+bool Direct3DClass::BeginScene(ColorShaderClass* shader)
 {
 	HRESULT result;
 	CD3DX12_CPU_DESCRIPTOR_HANDLE renderTargetViewHandle;
@@ -461,7 +472,7 @@ bool Direct3DClass::BeginScene(ID3D12PipelineState* pipelinestate)
 
 	//Reset the command list so that it can start recording again.
 	//Only one command list can record at a given time.
-	result = m_commandList->Reset(m_commandAllocator[m_frameIndex], pipelinestate);
+	result = m_commandList->Reset(m_commandAllocator[m_frameIndex].Get(), shader->GetPipelineState());
 	if (FAILED(result))
 	{
 		return false;
@@ -469,15 +480,18 @@ bool Direct3DClass::BeginScene(ID3D12PipelineState* pipelinestate)
 
 	//Record commands in the command list now.
 	//Start by setting the resource barrier.
-	m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_backBufferRenderTarget[m_frameIndex],
+	m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_backBufferRenderTarget[m_frameIndex].Get(),
 		D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
 
 	//Get the render target view handle for the current back buffer.
 	renderTargetViewHandle.InitOffsetted(m_renderTargetViewDescHeap->GetCPUDescriptorHandleForHeapStart(),
 		m_frameIndex, m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV));
 
+	//Get the depth stencil view handle
+	CD3DX12_CPU_DESCRIPTOR_HANDLE depthStencilViewHandle(shader->GetDepthStencilViewHandle());
+
 	//Set the back buffer as the render target.
-	m_commandList->OMSetRenderTargets(1, &renderTargetViewHandle, FALSE, NULL);
+	m_commandList->OMSetRenderTargets(1, &renderTargetViewHandle, FALSE, &depthStencilViewHandle);
 
 	//Then set the color to clear the window to.
 	color[0] = 0.5;
@@ -486,8 +500,11 @@ bool Direct3DClass::BeginScene(ID3D12PipelineState* pipelinestate)
 	color[3] = 1.0;
 	
 	m_commandList->ClearRenderTargetView(renderTargetViewHandle, color, 0, NULL);
+	m_commandList->ClearDepthStencilView(shader->GetDepthStencilViewHandle(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, NULL);
 	m_commandList->RSSetViewports(1, &m_viewport);
 	m_commandList->RSSetScissorRects(1, &m_rect);
+	m_commandList->SetGraphicsRootSignature(shader->GetRootSignature());
+	m_commandList->SetPipelineState(shader->GetPipelineState());
 
 	return true;
 }
@@ -495,10 +512,10 @@ bool Direct3DClass::BeginScene(ID3D12PipelineState* pipelinestate)
 bool Direct3DClass::EndScene()
 {
 	HRESULT result;
-	ID3D12CommandList* ppCommandLists[1];
+	ID3D12CommandList* ppCommandLists[] = { m_commandList.Get() };
 
 	//Indicate that the back buffer will now be used to present.
-	m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_backBufferRenderTarget[m_frameIndex],
+	m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_backBufferRenderTarget[m_frameIndex].Get(),
 		D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 
 	//Close the list of commands.
@@ -509,13 +526,13 @@ bool Direct3DClass::EndScene()
 	}
 
 	//Load the command list array (only one command list for now).
-	ppCommandLists[0] = m_commandList;
+	ppCommandLists[0] = m_commandList.Get();
 
 	//Execute the list of commands.
 	m_commandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
 
 	//Signal and increment the fence value.
-	result = m_commandQueue->Signal(m_fence[m_frameIndex], m_fenceValue[m_frameIndex]);
+	result = m_commandQueue->Signal(m_fence[m_frameIndex].Get(), m_fenceValue[m_frameIndex]);
 	if (FAILED(result))
 	{
 		return false;
@@ -561,7 +578,7 @@ bool Direct3DClass::ResetCommandList(ID3D12PipelineState* pipelinestate)
 {
 	HRESULT result;
 
-	result = m_commandList->Reset(m_commandAllocator[m_frameIndex], pipelinestate);
+	result = m_commandList->Reset(m_commandAllocator[m_frameIndex].Get(), pipelinestate);
 	if (FAILED(result))
 	{
 		return false;
@@ -573,17 +590,17 @@ bool Direct3DClass::ResetCommandList(ID3D12PipelineState* pipelinestate)
 bool Direct3DClass::ExecuteCommandList()
 {
 	HRESULT result;
-	ID3D12CommandList* ppCommandLists[1];
+	ID3D12CommandList* ppCommandLists[] = { m_commandList.Get() };
 
 	//Load the command list array (only one command list for now).
-	ppCommandLists[0] = m_commandList;
+	ppCommandLists[0] = m_commandList.Get();
 
 	//Execute the list of commands.
 	m_commandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
 
 	//Signal and increment the fence value.
 	m_fenceValue[m_frameIndex]++;
-	result = m_commandQueue->Signal(m_fence[m_frameIndex], m_fenceValue[m_frameIndex]);
+	result = m_commandQueue->Signal(m_fence[m_frameIndex].Get(), m_fenceValue[m_frameIndex]);
 	if (FAILED(result))
 	{
 		return false;
@@ -594,10 +611,37 @@ bool Direct3DClass::ExecuteCommandList()
 
 ID3D12Device* Direct3DClass::GetDevice()
 {
-	return m_device;
+	return m_device.Get();
 }
 
 ID3D12GraphicsCommandList* Direct3DClass::GetCommandList()
 {
-	return m_commandList;
+	return m_commandList.Get();
+}
+
+bool Direct3DClass::WaitforFrameToFinish()
+{
+	HRESULT result;
+
+	//Swap the current render target view buffer index so drawing is don on the correct buffer
+	m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
+
+	//If the current fence value is still less than the "m_fenceValue", then GPU has not finished
+	//the command queue since it has not reached the "m_commandQueue->Signal" command
+	if (m_fence[m_frameIndex]->GetCompletedValue() < m_fenceValue[m_frameIndex])
+	{
+		result = m_fence[m_frameIndex]->SetEventOnCompletion(m_fenceValue[m_frameIndex], m_fenceEvent);
+		if (FAILED(result))
+		{
+			return false;
+		}
+
+		//Wait until the fence has triggered the correct fence event
+		WaitForSingleObject(m_fenceEvent, INFINITE);
+	}
+
+	//Increment m_fenceValue for next frame
+	m_fenceValue[m_frameIndex]++;
+
+	return true;
 }

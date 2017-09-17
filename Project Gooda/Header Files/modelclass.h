@@ -3,8 +3,10 @@
 #include <d3d12.h>
 #include <d3dx12.h>
 #include <DirectXMath.h>
+#include <wrl.h>
 
 using namespace DirectX;
+using namespace Microsoft::WRL;
 
 class ModelClass
 {
@@ -28,8 +30,10 @@ private:
 	void ShutdownBuffers();
 	void RenderBuffers(ID3D12GraphicsCommandList*);
 
-	ID3D12Resource* m_vertexBuffer;
+	ComPtr<ID3D12Resource> m_vertexBuffer;
 	D3D12_VERTEX_BUFFER_VIEW m_vertexBufferView;
-	ID3D12Resource* m_indexBuffer;
+	ComPtr<ID3D12Resource> m_vertexBufferUploadHeap;
+	ComPtr<ID3D12Resource> m_indexBuffer;
 	D3D12_INDEX_BUFFER_VIEW m_indexBufferView;
+	ComPtr<ID3D12Resource> m_indexBufferUploadHeap;
 };

@@ -51,7 +51,7 @@ bool GraphicsClass::Initialize(int screenHeight, int screenWidth, HWND hwnd)
 	}
 
 	//Initialize the Color Shader object
-	result = m_ColorShader->Initialize(m_Direct3D->GetDevice(), hwnd);
+	result = m_ColorShader->Initialize(m_Direct3D->GetDevice(), hwnd, screenHeight, screenWidth);
 	if (!result)
 	{
 		MessageBox(hwnd, (LPCSTR)L"Could not initialize Color Shader", (LPCSTR)L"Error", MB_OK);
@@ -139,7 +139,7 @@ bool GraphicsClass::Render()
 	bool result;
 
 	//Reset the command list and put it in a recording state
-	result = m_Direct3D->BeginScene(m_ColorShader->GetPipelineState());
+	result = m_Direct3D->BeginScene(m_ColorShader);
 	if (!result)
 	{
 		return false;
@@ -148,8 +148,6 @@ bool GraphicsClass::Render()
 	if (renderQuad)
 	{
 		m_Model->Render(m_Direct3D->GetCommandList());
-
-		m_ColorShader->Render(m_Direct3D->GetCommandList());
 	}
 
 	//Close the command list and execute the commands
