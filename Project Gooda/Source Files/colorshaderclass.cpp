@@ -8,6 +8,15 @@ ColorShaderClass::ColorShaderClass()
 	m_pixelShader = nullptr;
 	m_depthStencilBuffer = nullptr;
 	m_depthStencilDescHeap = nullptr;
+	m_constantBufferDescHeap[0] = nullptr;
+	m_constantBufferDescHeap[1] = nullptr;
+	m_constantBufferDescHeap[2] = nullptr;
+	m_constantBufferUploadHeap[0] = nullptr;
+	m_constantBufferUploadHeap[1] = nullptr;
+	m_constantBufferUploadHeap[2] = nullptr;
+	m_constantBufferGPUAddress[0] = nullptr;
+	m_constantBufferGPUAddress[1] = nullptr;
+	m_constantBufferGPUAddress[2] = nullptr;
 }
 
 ColorShaderClass::ColorShaderClass(const ColorShaderClass& other)
@@ -43,7 +52,37 @@ void ColorShaderClass::Shutdown()
 	return;
 }
 
-ID3D12PipelineState * ColorShaderClass::GetPipelineState()
+void ColorShaderClass::Frame(int frameIndex)
+{
+	static float redIncrement = 0.00008f;
+	static float greenIncrement = 0.00008f;
+	static float blueIncrement = 0.00009f;
+
+	m_constantBuffer.color.x += redIncrement;
+	m_constantBuffer.color.y += greenIncrement;
+	m_constantBuffer.color.z += blueIncrement;
+
+	if (m_constantBuffer.color.x >= 1.0f || m_constantBuffer.color.x <= 0.0f)
+	{
+		m_constantBuffer.color.x = m_constantBuffer.color.x >= 1.0f ? 1.0f : 0.0f;
+		redIncrement = -redIncrement;
+	}
+	if (m_constantBuffer.color.y >= 1.0f || m_constantBuffer.color.y <= 0.0f)
+	{
+		m_constantBuffer.color.y = m_constantBuffer.color.y >= 1.0f ? 1.0f : 0.0f;
+		greenIncrement = -greenIncrement;
+	}
+	if (m_constantBuffer.color.z >= 1.0f || m_constantBuffer.color.z <= 0.0f)
+	{
+		m_constantBuffer.color.z = m_constantBuffer.color.z >= 1.0f ? 1.0f : 0.0f;
+		blueIncrement = -blueIncrement;
+	}
+
+	//Copy constant buffer instance to the mapped constant buffer resource
+	memcpy(m_constantBufferGPUAddress[frameIndex], &m_constantBuffer, sizeof(m_constantBuffer));
+}
+
+ID3D12PipelineState* ColorShaderClass::GetPipelineState()
 {
 	return m_pipelineState.Get();
 }
@@ -58,10 +97,16 @@ CD3DX12_CPU_DESCRIPTOR_HANDLE ColorShaderClass::GetDepthStencilViewHandle()
 	return CD3DX12_CPU_DESCRIPTOR_HANDLE(m_depthStencilDescHeap->GetCPUDescriptorHandleForHeapStart());
 }
 
+ID3D12DescriptorHeap* ColorShaderClass::GetDescriptorHeap(int frameIndex)
+{
+	return m_constantBufferDescHeap[frameIndex].Get();
+}
+
 bool ColorShaderClass::InitializeShader(ID3D12Device* device, HWND hwnd, WCHAR* vsFilename, WCHAR* psFilename, int height, int width)
 {
 	HRESULT result;
 	CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc;
+	D3D12_ROOT_PARAMETER rootParameters[1];
 	D3D12_SHADER_BYTECODE vertexShaderByteCode = {};
 	D3D12_SHADER_BYTECODE pixelShaderByteCode = {};
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC pipelineStateDesc = {};
@@ -73,20 +118,8 @@ bool ColorShaderClass::InitializeShader(ID3D12Device* device, HWND hwnd, WCHAR* 
 	D3D12_CLEAR_VALUE depthOptimizedClearValue = {};
 	ComPtr<ID3DBlob> rootsignature;
 	ComPtr<ID3DBlob> errorMessage;
-
-	//Create root signature
-	rootSignatureDesc.Init(0, NULL, 0, NULL, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
-	result = D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &rootsignature, NULL);
-	if (FAILED(result))
-	{
-		return false;
-	}
-
-	result = device->CreateRootSignature(0, rootsignature->GetBufferPointer(), rootsignature->GetBufferSize(), __uuidof(ID3D12RootSignature), (void**)&m_rootSignature);
-	if (FAILED(result))
-	{
-		return false;
-	}
+	D3D12_DESCRIPTOR_RANGE descriptorTableRanges[1];
+	D3D12_ROOT_DESCRIPTOR_TABLE descriptorTable;
 
 	//Create vertex and pixel shaders
 	result = D3DCompileFromFile(vsFilename, NULL, NULL, "main", "vs_5_0", D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, 0, &m_vertexShader, &errorMessage);
@@ -118,6 +151,81 @@ bool ColorShaderClass::InitializeShader(ID3D12Device* device, HWND hwnd, WCHAR* 
 	//Fill out the shader byteccode structure for the pixel shader
 	pixelShaderByteCode.BytecodeLength = m_pixelShader->GetBufferSize();
 	pixelShaderByteCode.pShaderBytecode = m_pixelShader->GetBufferPointer();
+
+	//Fill out a descriptor range
+	descriptorTableRanges[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
+	descriptorTableRanges[0].NumDescriptors = 1;
+	descriptorTableRanges[0].RegisterSpace = 0;
+	descriptorTableRanges[0].BaseShaderRegister = 0;
+	descriptorTableRanges[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+	//Create a descriptor table
+	descriptorTable.NumDescriptorRanges = _countof(descriptorTableRanges);
+	descriptorTable.pDescriptorRanges = &descriptorTableRanges[0];
+
+	//Fill out a root parameter
+	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[0].DescriptorTable = descriptorTable;
+	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+
+	//Create root signature
+	rootSignatureDesc.Init(_countof(rootParameters), rootParameters, 0, NULL, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT | 
+		D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
+		D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
+		D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS |
+		D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS);
+	result = D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &rootsignature, &errorMessage);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+	result = device->CreateRootSignature(0, rootsignature->GetBufferPointer(), rootsignature->GetBufferSize(), __uuidof(ID3D12RootSignature), (void**)&m_rootSignature);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+	m_rootSignature->SetName(L"Root Signature");
+
+	//Create the constant buffer descriptor heap
+	for (int i = 0; i < frameBufferCount; i++)
+	{
+		D3D12_DESCRIPTOR_HEAP_DESC constantBufferHeapDesc = {};
+		constantBufferHeapDesc.NumDescriptors = 1;
+		constantBufferHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+		constantBufferHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+		result = device->CreateDescriptorHeap(&constantBufferHeapDesc, __uuidof(ID3D12DescriptorHeap), (void**)&m_constantBufferDescHeap[i]);
+		if (FAILED(result))
+		{
+			return false;
+		}
+	}
+
+	//Create the constant buffer resource heap
+	for (int i = 0; i < frameBufferCount; i++)
+	{
+		result = device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), D3D12_HEAP_FLAG_NONE,
+			&CD3DX12_RESOURCE_DESC::Buffer(1024 * 64), D3D12_RESOURCE_STATE_GENERIC_READ,
+			NULL, __uuidof(ID3D12Resource), &m_constantBufferUploadHeap[i]);
+		if (FAILED(result))
+		{
+			return false;
+		}
+
+		m_constantBufferUploadHeap[i].Get()->SetName(L"Constant Buffer Upload Resource Heap");
+
+		D3D12_CONSTANT_BUFFER_VIEW_DESC constantBufferViewDesc = {};
+		constantBufferViewDesc.BufferLocation = m_constantBufferUploadHeap[i].Get()->GetGPUVirtualAddress();
+		constantBufferViewDesc.SizeInBytes = (sizeof(ConstantBuffer) + 255) & ~255;
+
+		device->CreateConstantBufferView(&constantBufferViewDesc, m_constantBufferDescHeap[i].Get()->GetCPUDescriptorHandleForHeapStart());
+
+		ZeroMemory(&m_constantBuffer, sizeof(m_constantBuffer));
+
+		CD3DX12_RANGE readRange(0, 0);
+		result = m_constantBufferUploadHeap[i].Get()->Map(0, &readRange, reinterpret_cast<void**>(&m_constantBufferGPUAddress[i]));
+	}
 
 	//Fill out a depth stencil desc structure
 	depthStencilDesc.DepthEnable = TRUE;
@@ -194,6 +302,7 @@ bool ColorShaderClass::InitializeShader(ID3D12Device* device, HWND hwnd, WCHAR* 
 	pipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	pipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
 	pipelineStateDesc.DepthStencilState = depthStencilDesc;
+	pipelineStateDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
 	pipelineStateDesc.SampleDesc.Count = 1;
 	pipelineStateDesc.SampleDesc.Quality = 0;
 	pipelineStateDesc.SampleMask = 0xffffffff;
@@ -235,6 +344,39 @@ void ColorShaderClass::ShutdownShaders()
 	if (m_rootSignature)
 	{
 		m_rootSignature = nullptr;
+	}
+
+	//Release the depth stencil buffer
+	if (m_depthStencilBuffer)
+	{
+		m_depthStencilBuffer = nullptr;
+	}
+
+	//Release the depth stencil descriptor heap
+	if (m_depthStencilDescHeap)
+	{
+		m_depthStencilDescHeap = nullptr;
+	}
+
+	//Release the constant buffer descriptor heap
+	for (int i = 0; i < frameBufferCount; i++)
+	{
+		if (m_constantBufferDescHeap[i])
+			m_constantBufferDescHeap[i] = nullptr;
+	}
+
+	//Release the constant buffer upload heap
+	for (int i = 0; i < frameBufferCount; i++)
+	{
+		if (m_constantBufferUploadHeap[i])
+			m_constantBufferUploadHeap[i] = nullptr;
+	}
+	
+	//Release the constant buffer GPU Address
+	for (int i = 0; i < frameBufferCount; i++)
+	{
+		if (m_constantBufferGPUAddress[i])
+			m_constantBufferGPUAddress[i] = nullptr;
 	}
 
 	return;

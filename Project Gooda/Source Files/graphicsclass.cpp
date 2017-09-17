@@ -116,6 +116,9 @@ bool GraphicsClass::Frame()
 {
 	bool result;
 
+	//Update constant buffer
+	m_ColorShader->Frame(m_Direct3D->GetCurrentFrame());
+
 	//Render the graphics scene
 	result = Render();
 	if (!result)

@@ -5,8 +5,7 @@
 #include <d3dx12.h>
 #include <wrl.h>
 #include "colorshaderclass.h"
-
-const int frameBufferCount = 3;
+#include "frame.h"
 
 using namespace Microsoft::WRL;
 
@@ -27,6 +26,7 @@ public:
 	bool ExecuteCommandList();
 	ID3D12Device* GetDevice();
 	ID3D12GraphicsCommandList* GetCommandList();
+	int GetCurrentFrame();
 
 private:
 	bool WaitforFrameToFinish();

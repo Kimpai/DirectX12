@@ -3,9 +3,13 @@
 #include <d3d12.h>
 #include <d3dx12.h>
 #include <d3dcompiler.h>
+#include <DirectXMath.h>
 #include <fstream>
+#include <iostream>
 #include <wrl.h>
+#include "frame.h"
 
+using namespace DirectX;
 using namespace Microsoft::WRL;
 
 class ColorShaderClass
@@ -17,11 +21,19 @@ public:
 
 	bool Initialize(ID3D12Device*, HWND, int, int);
 	void Shutdown();
+	void Frame(int);
 	ID3D12PipelineState* GetPipelineState();
 	ID3D12RootSignature* GetRootSignature();
 	CD3DX12_CPU_DESCRIPTOR_HANDLE GetDepthStencilViewHandle();
+	ID3D12DescriptorHeap* GetDescriptorHeap(int);
 
 private:
+	struct ConstantBuffer
+	{
+		XMFLOAT4 color;
+	};
+
+
 	bool InitializeShader(ID3D12Device*, HWND, WCHAR*, WCHAR*, int, int);
 	void ShutdownShaders();
 	void OutputShaderErrorMessage(ID3DBlob*, HWND, WCHAR*);
@@ -32,4 +44,8 @@ private:
 	ComPtr<ID3DBlob> m_pixelShader;
 	ComPtr<ID3D12Resource> m_depthStencilBuffer;
 	ComPtr<ID3D12DescriptorHeap> m_depthStencilDescHeap;
+	ComPtr<ID3D12DescriptorHeap> m_constantBufferDescHeap[frameBufferCount];
+	ComPtr<ID3D12Resource> m_constantBufferUploadHeap[frameBufferCount];
+	ConstantBuffer m_constantBuffer;
+	UINT8* m_constantBufferGPUAddress[frameBufferCount];
 };

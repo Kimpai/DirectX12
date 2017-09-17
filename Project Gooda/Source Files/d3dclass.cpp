@@ -60,7 +60,7 @@ bool Direct3DClass::Initialize(int screenHeight, int screenWidth, HWND hwnd, boo
 
 	#if _DEBUG
 		//Get the interface to DirectX 12 debugger
-		ID3D12Debug* debugController = nullptr;
+		ComPtr<ID3D12Debug1> debugController = nullptr;
 		result = D3D12GetDebugInterface(__uuidof(ID3D12Debug), (void**)&debugController);
 		if (FAILED(result))
 		{
@@ -69,9 +69,10 @@ bool Direct3DClass::Initialize(int screenHeight, int screenWidth, HWND hwnd, boo
 
 		//Enable debug layer
 		debugController->EnableDebugLayer();
+		//debugController->SetEnableGPUBasedValidation(true);
+		//debugController->SetEnableSynchronizedCommandQueueValidation(true);
 
 		//Release the debug controller now that the debug layer has been enabled
-		debugController->Release();
 		debugController = nullptr;
 	#endif
 
@@ -498,13 +499,17 @@ bool Direct3DClass::BeginScene(ColorShaderClass* shader)
 	color[1] = 0.5;
 	color[2] = 0.5;
 	color[3] = 1.0;
-	
+
+	//Set the constant buffer descriptor heap
+	ID3D12DescriptorHeap* descriptorHeaps[] = { shader->GetDescriptorHeap(m_frameIndex) };
+
 	m_commandList->ClearRenderTargetView(renderTargetViewHandle, color, 0, NULL);
 	m_commandList->ClearDepthStencilView(shader->GetDepthStencilViewHandle(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, NULL);
+	m_commandList->SetGraphicsRootSignature(shader->GetRootSignature());
+	m_commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+	m_commandList->SetGraphicsRootDescriptorTable(0, shader->GetDescriptorHeap(m_frameIndex)->GetGPUDescriptorHandleForHeapStart());
 	m_commandList->RSSetViewports(1, &m_viewport);
 	m_commandList->RSSetScissorRects(1, &m_rect);
-	m_commandList->SetGraphicsRootSignature(shader->GetRootSignature());
-	m_commandList->SetPipelineState(shader->GetPipelineState());
 
 	return true;
 }
@@ -617,6 +622,11 @@ ID3D12Device* Direct3DClass::GetDevice()
 ID3D12GraphicsCommandList* Direct3DClass::GetCommandList()
 {
 	return m_commandList.Get();
+}
+
+int Direct3DClass::GetCurrentFrame()
+{
+	return m_frameIndex;
 }
 
 bool Direct3DClass::WaitforFrameToFinish()
