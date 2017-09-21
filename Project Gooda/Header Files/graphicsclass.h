@@ -6,7 +6,7 @@
 #include <iostream>
 #include "d3dclass.h"
 #include "colorshaderclass.h"
-#include "modelclass.h"
+#include "cubeclass.h"
 
 const bool FULL_SCREEN = false;
 const bool VSYNC_ENABLED = true;
@@ -32,5 +32,5 @@ private:
 
 	Direct3DClass* m_Direct3D;
 	ColorShaderClass* m_ColorShader;
-	ModelClass* m_Model;
+	CubeClass* m_Cube;
 };

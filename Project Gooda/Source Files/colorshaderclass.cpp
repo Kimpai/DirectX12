@@ -8,15 +8,6 @@ ColorShaderClass::ColorShaderClass()
 	m_pixelShader = nullptr;
 	m_depthStencilBuffer = nullptr;
 	m_depthStencilDescHeap = nullptr;
-	m_constantBufferDescHeap[0] = nullptr;
-	m_constantBufferDescHeap[1] = nullptr;
-	m_constantBufferDescHeap[2] = nullptr;
-	m_constantBufferUploadHeap[0] = nullptr;
-	m_constantBufferUploadHeap[1] = nullptr;
-	m_constantBufferUploadHeap[2] = nullptr;
-	m_constantBufferGPUAddress[0] = nullptr;
-	m_constantBufferGPUAddress[1] = nullptr;
-	m_constantBufferGPUAddress[2] = nullptr;
 }
 
 ColorShaderClass::ColorShaderClass(const ColorShaderClass& other)
@@ -54,32 +45,7 @@ void ColorShaderClass::Shutdown()
 
 void ColorShaderClass::Frame(int frameIndex)
 {
-	static float redIncrement = 0.00008f;
-	static float greenIncrement = 0.00008f;
-	static float blueIncrement = 0.00009f;
-
-	m_constantBuffer.color.x += redIncrement;
-	m_constantBuffer.color.y += greenIncrement;
-	m_constantBuffer.color.z += blueIncrement;
-
-	if (m_constantBuffer.color.x >= 1.0f || m_constantBuffer.color.x <= 0.0f)
-	{
-		m_constantBuffer.color.x = m_constantBuffer.color.x >= 1.0f ? 1.0f : 0.0f;
-		redIncrement = -redIncrement;
-	}
-	if (m_constantBuffer.color.y >= 1.0f || m_constantBuffer.color.y <= 0.0f)
-	{
-		m_constantBuffer.color.y = m_constantBuffer.color.y >= 1.0f ? 1.0f : 0.0f;
-		greenIncrement = -greenIncrement;
-	}
-	if (m_constantBuffer.color.z >= 1.0f || m_constantBuffer.color.z <= 0.0f)
-	{
-		m_constantBuffer.color.z = m_constantBuffer.color.z >= 1.0f ? 1.0f : 0.0f;
-		blueIncrement = -blueIncrement;
-	}
-
-	//Copy constant buffer instance to the mapped constant buffer resource
-	memcpy(m_constantBufferGPUAddress[frameIndex], &m_constantBuffer, sizeof(m_constantBuffer));
+	return;
 }
 
 ID3D12PipelineState* ColorShaderClass::GetPipelineState()
@@ -95,11 +61,6 @@ ID3D12RootSignature* ColorShaderClass::GetRootSignature()
 CD3DX12_CPU_DESCRIPTOR_HANDLE ColorShaderClass::GetDepthStencilViewHandle()
 {
 	return CD3DX12_CPU_DESCRIPTOR_HANDLE(m_depthStencilDescHeap->GetCPUDescriptorHandleForHeapStart());
-}
-
-ID3D12DescriptorHeap* ColorShaderClass::GetDescriptorHeap(int frameIndex)
-{
-	return m_constantBufferDescHeap[frameIndex].Get();
 }
 
 bool ColorShaderClass::InitializeShader(ID3D12Device* device, HWND hwnd, WCHAR* vsFilename, WCHAR* psFilename, int height, int width)
@@ -187,45 +148,6 @@ bool ColorShaderClass::InitializeShader(ID3D12Device* device, HWND hwnd, WCHAR* 
 	}
 
 	m_rootSignature->SetName(L"Root Signature");
-
-	//Create the constant buffer descriptor heap
-	for (int i = 0; i < frameBufferCount; i++)
-	{
-		D3D12_DESCRIPTOR_HEAP_DESC constantBufferHeapDesc = {};
-		constantBufferHeapDesc.NumDescriptors = 1;
-		constantBufferHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-		constantBufferHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-		result = device->CreateDescriptorHeap(&constantBufferHeapDesc, __uuidof(ID3D12DescriptorHeap), (void**)&m_constantBufferDescHeap[i]);
-		if (FAILED(result))
-		{
-			return false;
-		}
-	}
-
-	//Create the constant buffer resource heap
-	for (int i = 0; i < frameBufferCount; i++)
-	{
-		result = device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), D3D12_HEAP_FLAG_NONE,
-			&CD3DX12_RESOURCE_DESC::Buffer(1024 * 64), D3D12_RESOURCE_STATE_GENERIC_READ,
-			NULL, __uuidof(ID3D12Resource), &m_constantBufferUploadHeap[i]);
-		if (FAILED(result))
-		{
-			return false;
-		}
-
-		m_constantBufferUploadHeap[i].Get()->SetName(L"Constant Buffer Upload Resource Heap");
-
-		D3D12_CONSTANT_BUFFER_VIEW_DESC constantBufferViewDesc = {};
-		constantBufferViewDesc.BufferLocation = m_constantBufferUploadHeap[i].Get()->GetGPUVirtualAddress();
-		constantBufferViewDesc.SizeInBytes = (sizeof(ConstantBuffer) + 255) & ~255;
-
-		device->CreateConstantBufferView(&constantBufferViewDesc, m_constantBufferDescHeap[i].Get()->GetCPUDescriptorHandleForHeapStart());
-
-		ZeroMemory(&m_constantBuffer, sizeof(m_constantBuffer));
-
-		CD3DX12_RANGE readRange(0, 0);
-		result = m_constantBufferUploadHeap[i].Get()->Map(0, &readRange, reinterpret_cast<void**>(&m_constantBufferGPUAddress[i]));
-	}
 
 	//Fill out a depth stencil desc structure
 	depthStencilDesc.DepthEnable = TRUE;
@@ -356,27 +278,6 @@ void ColorShaderClass::ShutdownShaders()
 	if (m_depthStencilDescHeap)
 	{
 		m_depthStencilDescHeap = nullptr;
-	}
-
-	//Release the constant buffer descriptor heap
-	for (int i = 0; i < frameBufferCount; i++)
-	{
-		if (m_constantBufferDescHeap[i])
-			m_constantBufferDescHeap[i] = nullptr;
-	}
-
-	//Release the constant buffer upload heap
-	for (int i = 0; i < frameBufferCount; i++)
-	{
-		if (m_constantBufferUploadHeap[i])
-			m_constantBufferUploadHeap[i] = nullptr;
-	}
-	
-	//Release the constant buffer GPU Address
-	for (int i = 0; i < frameBufferCount; i++)
-	{
-		if (m_constantBufferGPUAddress[i])
-			m_constantBufferGPUAddress[i] = nullptr;
 	}
 
 	return;

@@ -4,7 +4,7 @@ GraphicsClass::GraphicsClass()
 {
 	m_Direct3D = nullptr;
 	m_ColorShader = nullptr;
-	m_Model = nullptr;
+	m_Cube = nullptr;
 }
 
 GraphicsClass::GraphicsClass(const GraphicsClass& other)
@@ -22,22 +22,22 @@ bool GraphicsClass::Initialize(int screenHeight, int screenWidth, HWND hwnd)
 	bool result;
 
 	//Create the Direct3D object
-	m_Direct3D = new Direct3DClass;
+	m_Direct3D = new Direct3DClass();
 	if (!m_Direct3D)
 	{
 		return false;
 	}
 
 	//Create the Color Shader object
-	m_ColorShader = new ColorShaderClass;
+	m_ColorShader = new ColorShaderClass();
 	if (!m_ColorShader)
 	{
 		return false;
 	}
 
 	//Create the Model object
-	m_Model = new ModelClass;
-	if (!m_Model)
+	m_Cube = new CubeClass();
+	if (!m_Cube)
 	{
 		return false;
 	}
@@ -59,7 +59,7 @@ bool GraphicsClass::Initialize(int screenHeight, int screenWidth, HWND hwnd)
 	}
 
 	//Initialize the model object
-	result = m_Model->Initialize(m_Direct3D->GetDevice(), m_Direct3D->GetCommandList());
+	result = m_Cube->Initialize(m_Direct3D->GetDevice(), m_Direct3D->GetCommandList());
 	if (!result)
 	{
 		MessageBox(hwnd, (LPCSTR)L"Could not initialize Model", (LPCSTR)L"Error", MB_OK);
@@ -86,11 +86,10 @@ bool GraphicsClass::Initialize(int screenHeight, int screenWidth, HWND hwnd)
 void GraphicsClass::Shutdown()
 {
 	//Release the Model object
-	if (m_Model)
+	if (m_Cube)
 	{
-		m_Model->Shutdown();
-		delete m_Model;
-		m_Model = nullptr;
+		delete m_Cube;
+		m_Cube = nullptr;
 	}
 
 	//Release the Color Shader object
@@ -150,7 +149,7 @@ bool GraphicsClass::Render()
 
 	if (renderQuad)
 	{
-		m_Model->Render(m_Direct3D->GetCommandList());
+		m_Cube->Render(m_Direct3D->GetCommandList());
 	}
 
 	//Close the command list and execute the commands

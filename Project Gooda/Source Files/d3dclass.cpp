@@ -500,14 +500,9 @@ bool Direct3DClass::BeginScene(ColorShaderClass* shader)
 	color[2] = 0.5;
 	color[3] = 1.0;
 
-	//Set the constant buffer descriptor heap
-	ID3D12DescriptorHeap* descriptorHeaps[] = { shader->GetDescriptorHeap(m_frameIndex) };
-
 	m_commandList->ClearRenderTargetView(renderTargetViewHandle, color, 0, NULL);
 	m_commandList->ClearDepthStencilView(shader->GetDepthStencilViewHandle(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, NULL);
 	m_commandList->SetGraphicsRootSignature(shader->GetRootSignature());
-	m_commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
-	m_commandList->SetGraphicsRootDescriptorTable(0, shader->GetDescriptorHeap(m_frameIndex)->GetGPUDescriptorHandleForHeapStart());
 	m_commandList->RSSetViewports(1, &m_viewport);
 	m_commandList->RSSetScissorRects(1, &m_rect);
 
