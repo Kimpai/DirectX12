@@ -50,7 +50,7 @@ bool Direct3DClass::Initialize(int screenHeight, int screenWidth, HWND hwnd, boo
 	D3D12_DESCRIPTOR_HEAP_DESC renderTargetViewHeapDesc;
 	CD3DX12_CPU_DESCRIPTOR_HANDLE renderTargetViewHandle;
 
-	
+
 	//Store the vsync setting.
 	m_vsync = vsync;
 
@@ -58,23 +58,23 @@ bool Direct3DClass::Initialize(int screenHeight, int screenWidth, HWND hwnd, boo
 	//Note: Not all cards support full DirectX 12, this feature level may need to be reduced on some cards to 12.0.
 	featureLevel = D3D_FEATURE_LEVEL_12_1;
 
-	#if _DEBUG
-		//Get the interface to DirectX 12 debugger
-		ComPtr<ID3D12Debug1> debugController = nullptr;
-		result = D3D12GetDebugInterface(__uuidof(ID3D12Debug), (void**)&debugController);
-		if (FAILED(result))
-		{
-			return false;
-		}
+#if _DEBUG
+	//Get the interface to DirectX 12 debugger
+	ComPtr<ID3D12Debug1> debugController = nullptr;
+	result = D3D12GetDebugInterface(__uuidof(ID3D12Debug), (void**)&debugController);
+	if (FAILED(result))
+	{
+		return false;
+	}
 
-		//Enable debug layer
-		debugController->EnableDebugLayer();
-		//debugController->SetEnableGPUBasedValidation(true);
-		//debugController->SetEnableSynchronizedCommandQueueValidation(true);
+	//Enable debug layer
+	debugController->EnableDebugLayer();
+	//debugController->SetEnableGPUBasedValidation(true);
+	//debugController->SetEnableSynchronizedCommandQueueValidation(true);
 
-		//Release the debug controller now that the debug layer has been enabled
-		debugController = nullptr;
-	#endif
+	//Release the debug controller now that the debug layer has been enabled
+	debugController = nullptr;
+#endif
 
 	//Create the Direct3D 12 device.
 	result = D3D12CreateDevice(NULL, featureLevel, __uuidof(ID3D12Device), (void**)&m_device);
@@ -298,7 +298,7 @@ bool Direct3DClass::Initialize(int screenHeight, int screenWidth, HWND hwnd, boo
 		//Increment the render target view handle by the render target view desc size
 		renderTargetViewHandle.Offset(1, renderTargetViewDescriptorSize);
 	}
-	
+
 	for (int i = 0; i < frameBufferCount; i++)
 	{
 		//Create a command allocator.
@@ -327,7 +327,7 @@ bool Direct3DClass::Initialize(int screenHeight, int screenWidth, HWND hwnd, boo
 
 		m_fenceValue[i] = 0;
 	}
-	
+
 	//Create an event object for the fence.
 	m_fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 	if (m_fenceEvent == NULL)
