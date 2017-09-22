@@ -56,7 +56,7 @@ bool Direct3DClass::Initialize(int screenHeight, int screenWidth, HWND hwnd, boo
 
 	//Set the feature level to DirectX 12.1 to enable using all the DirectX 12 features.
 	//Note: Not all cards support full DirectX 12, this feature level may need to be reduced on some cards to 12.0.
-	featureLevel = D3D_FEATURE_LEVEL_11_1;
+	featureLevel = D3D_FEATURE_LEVEL_12_1;
 
 	#if _DEBUG
 		//Get the interface to DirectX 12 debugger
