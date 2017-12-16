@@ -1,47 +1,70 @@
 #include "inputclass.h"
 
-InputClass::InputClass()
+Input::Input()
+{
+	m_mouse = nullptr;
+	m_keyboard = nullptr;
+}
+
+Input::Input(const Input& other)
 {
 
 }
 
-InputClass::InputClass(const InputClass& other)
+Input::~Input()
 {
 
 }
 
-InputClass::~InputClass()
+void Input::Initialize(HWND hwnd)
 {
+	//Create keyboard object
+	m_keyboard = std::make_unique<Keyboard>();
 
-}
-
-void InputClass::Initialize()
-{
-	//Initialize all the keys to being released
-	for (int i = 0; i < 256; i++)
-	{
-		m_keys[i] = false;
-	}
+	//Create mouse object
+	m_mouse = std::make_unique<Mouse>();
+	m_mouse->SetWindow(hwnd);
 
 	return;
 }
 
-void InputClass::KeyDown(unsigned int input)
+void Input::ProcessKeyboardMessage(UINT message, WPARAM wParam, LPARAM lParam)
 {
-	//If a key is pressed then save that state in the key array
-	m_keys[input] = true;
-	return;
+	m_keyboard->ProcessMessage(message, wParam, lParam);
 }
 
-void InputClass::KeyUp(unsigned int input)
+void Input::ProcessMouseMessage(UINT message, WPARAM wParam, LPARAM lParam)
 {
-	//If a key is released then clear that state in the key array
-	m_keys[input] = false;
-	return;
+	m_mouse->ProcessMessage(message, wParam, lParam);
 }
 
-bool InputClass::IsKeyDown(unsigned int key)
+bool Input::IsKeyPressed(unsigned int key)
+{
+	/*Keyboard::KeyboardStateTracker tracker;
+	tracker.Update(m_keyboard->GetState());
+
+	return tracker.IsKeyPressed((Keyboard::Keys)key);*/
+	return false;
+}
+
+bool Input::IsKeyReleased(unsigned int key)
+{
+	/*Keyboard::KeyboardStateTracker tracker;
+	tracker.Update(m_keyboard->GetState());
+
+	return tracker.IsKeyReleased((Keyboard::Keys)key);*/
+	return true;
+}
+
+bool Input::IsKeyDown(unsigned int key)
 {
 	//Return what state the key is in
-	return m_keys[key];
+	//return m_keyboard->GetState().IsKeyDown((Keyboard::Keys)key);
+	return true;
+}
+
+XMFLOAT2 Input::GetMousePosition()
+{
+	//return XMFLOAT2((float)m_mouse->GetState().x, (float)m_mouse->GetState().y);
+	return XMFLOAT2(0.0f, 0.0f);
 }

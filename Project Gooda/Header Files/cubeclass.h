@@ -11,23 +11,16 @@
 using namespace DirectX;
 using namespace Microsoft::WRL;
 
-class CubeClass : public ModelClass
+class Cube : public Model
 {
 public:
-	CubeClass();
-	CubeClass(const CubeClass&);
-	~CubeClass();
+	Cube();
+	Cube(const Cube&);
+	~Cube();
 
 private:
-	struct ConstantBuffer
-	{
-		XMFLOAT4X4 worldMatrix;
-		XMFLOAT4X4 viewMatrix;
-		XMFLOAT4X4 projectionMatrix;
-	};
-
-	bool InitializeBuffers(ID3D12Device*, ID3D12GraphicsCommandList*);
-	void RenderBuffers(ID3D12GraphicsCommandList*);
+	bool InitializeBuffers(ID3D12Device*, ID3D12GraphicsCommandList*, XMFLOAT4);
+	void RenderBuffers(ID3D12GraphicsCommandList*, int);
 	void ShutdownBuffers();
 
 	ComPtr<ID3D12Resource> m_vertexBuffer;
@@ -36,8 +29,5 @@ private:
 	ComPtr<ID3D12Resource> m_indexBuffer;
 	D3D12_INDEX_BUFFER_VIEW m_indexBufferView;
 	ComPtr<ID3D12Resource> m_indexBufferUploadHeap;
-	ComPtr<ID3D12DescriptorHeap> m_constantBufferDescHeap[frameBufferCount];
-	ComPtr<ID3D12Resource> m_constantBufferUploadHeap[frameBufferCount];
-	ConstantBuffer m_constantBuffer;
-	UINT8* m_constantBufferGPUAddress[frameBufferCount];
+	int m_cubeIndices;
 };

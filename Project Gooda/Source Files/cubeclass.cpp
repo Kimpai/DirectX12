@@ -1,6 +1,6 @@
 #include "cubeclass.h"
 
-CubeClass::CubeClass()
+Cube::Cube()
 {
 	m_vertexBuffer = nullptr;
 	m_vertexBufferUploadHeap = nullptr;
@@ -15,14 +15,15 @@ CubeClass::CubeClass()
 	m_constantBufferGPUAddress[0] = nullptr;
 	m_constantBufferGPUAddress[1] = nullptr;
 	m_constantBufferGPUAddress[2] = nullptr;
+	m_cubeIndices = 0;
 }
 
-CubeClass::CubeClass(const CubeClass& other)
+Cube::Cube(const Cube& other)
 {
 
 }
 
-CubeClass::~CubeClass()
+Cube::~Cube()
 {
 	//Release the vertex buffer
 	if (m_vertexBuffer)
@@ -70,7 +71,7 @@ CubeClass::~CubeClass()
 	}
 }
 
-bool CubeClass::InitializeBuffers(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
+bool Cube::InitializeBuffers(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, XMFLOAT4 origin)
 {
 	HRESULT result;
 	int vertexBufferSize;
@@ -81,10 +82,41 @@ bool CubeClass::InitializeBuffers(ID3D12Device* device, ID3D12GraphicsCommandLis
 	//Create vertex buffer
 	VertexPositionColor vertices[] =
 	{
-		{ XMFLOAT3(-0.5f, 0.5f, 0.5f) , XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) },
-		{ XMFLOAT3(0.5f, -0.5f, 0.5f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
+		//Front face
+		{ XMFLOAT3(-0.5f, 0.5f, -0.5f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) },
+		{ XMFLOAT3(0.5f, -0.5f, -0.5f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) },
+		{ XMFLOAT3(-0.5f, -0.5f, -0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
+		{ XMFLOAT3(0.5f, 0.5f, -0.5f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
+
+		//Rigth face
+		{ XMFLOAT3(0.5f, -0.5f, -0.5f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) },
+		{ XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f) },
+		{ XMFLOAT3(0.5f, -0.5f, 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
+		{ XMFLOAT3(0.5f, 0.5f, -0.5f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
+
+		//Left face
+		{ XMFLOAT3(-0.5f, 0.5f, 0.5f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) },
+		{ XMFLOAT3(-0.5f, -0.5f, -0.5f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
 		{ XMFLOAT3(-0.5f, -0.5f, 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) }
+		{ XMFLOAT3(-0.5f, 0.5f, -0.5f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
+
+		//Back face
+		{ XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) },
+		{ XMFLOAT3(-0.5f, -0.5f, 0.5f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) },
+		{ XMFLOAT3(0.5f, -0.5f, 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
+		{ XMFLOAT3(-0.5f, 0.5f, 0.5f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
+
+		//Top face
+		{ XMFLOAT3(-0.5f, 0.5f, 0.5f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) },
+		{ XMFLOAT3(0.5f, 0.5f, -0.5f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) },
+		{ XMFLOAT3(0.5f, 0.5f, -0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
+		{ XMFLOAT3(-0.5f, 0.5f, 0.5f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
+
+		//Bottom face
+		{ XMFLOAT3(0.5f, -0.5f, 0.5f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) },
+		{ XMFLOAT3(-0.5f, -0.5f, -0.5f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) },
+		{ XMFLOAT3(0.5f, -0.5f, -0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
+		{ XMFLOAT3(-0.5f, -0.5f, 0.5f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) }
 	};
 
 	vertexBufferSize = sizeof(vertices);
@@ -136,9 +168,32 @@ bool CubeClass::InitializeBuffers(ID3D12Device* device, ID3D12GraphicsCommandLis
 	//Create index buffer
 	DWORD indices[] =
 	{
+		//Front face
 		0, 1, 2, //First triangle
-		0, 3, 1 //Second triangle
+		0, 3, 1, //Second triangle
+
+		//Rigth face
+		4, 5, 6,
+		4, 7, 5,
+
+		//Left face
+		8, 9, 10,
+		8, 11, 9,
+
+		//Back face
+		12, 13, 14,
+		12, 15, 13,
+
+		//Top face
+		16, 17, 18,
+		16, 19, 17,
+
+		//Bottom face
+		20, 21, 22,
+		20, 23, 21
 	};
+
+	m_cubeIndices = sizeof(indices) / sizeof(*indices);
 
 	indexBufferSize = sizeof(indices);
 
@@ -181,12 +236,32 @@ bool CubeClass::InitializeBuffers(ID3D12Device* device, ID3D12GraphicsCommandLis
 	m_indexBufferView.Format = DXGI_FORMAT_R32_UINT;
 	m_indexBufferView.SizeInBytes = indexBufferSize;
 
-	return true;
+
+	//Create one resource for each frame buffer
+	//for our cube
+	for (int i = 0; i < frameBufferCount; ++i)
+	{
+		result = device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
+			D3D12_HEAP_FLAG_NONE, &CD3DX12_RESOURCE_DESC::Buffer(1024 * 256), D3D12_RESOURCE_STATE_GENERIC_READ,
+			NULL, __uuidof(ID3D12Resource), (void**)&m_constantBufferUploadHeap[i]);
+		if (FAILED(result))
+		{
+			return false;
+		}
+
+		ZeroMemory(&m_constantBuffer, sizeof(m_constantBuffer));
+
+		CD3DX12_RANGE readRange(0, 0);
+
+		result = m_constantBufferUploadHeap[i]->Map(0, &readRange, reinterpret_cast<void**>(&m_constantBufferGPUAddress[i]));
+
+		memcpy(m_constantBufferGPUAddress[i], &m_constantBuffer, sizeof(m_constantBuffer));
+	}
 
 	return true;
 }
 
-void CubeClass::RenderBuffers(ID3D12GraphicsCommandList* commandList)
+void Cube::RenderBuffers(ID3D12GraphicsCommandList* commandList, int currentFrame)
 {
 	//Set the primitive topology
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -197,11 +272,45 @@ void CubeClass::RenderBuffers(ID3D12GraphicsCommandList* commandList)
 	//Set the index buffer using the index buffer view
 	commandList->IASetIndexBuffer(&m_indexBufferView);
 
+	//Set constant buffer
+	commandList->SetGraphicsRootConstantBufferView(0, m_constantBufferUploadHeap[currentFrame]->GetGPUVirtualAddress());
+
 	//Draw
-	commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
+	commandList->DrawIndexedInstanced(m_cubeIndices, 1, 0, 0, 0);
 }
 
-void CubeClass::ShutdownBuffers()
+void Cube::ShutdownBuffers()
 {
+	if (m_vertexBuffer)
+		m_vertexBuffer = nullptr;
+	
+	if (m_vertexBufferUploadHeap)
+		m_vertexBufferUploadHeap = nullptr;
 
+	if (m_indexBuffer)
+		m_indexBuffer = nullptr;
+	
+	if (m_indexBufferUploadHeap)
+		m_indexBufferUploadHeap = nullptr;
+	
+	if (m_constantBufferDescHeap)
+	{
+		m_constantBufferDescHeap[0] = nullptr;
+		m_constantBufferDescHeap[1] = nullptr;
+		m_constantBufferDescHeap[2] = nullptr;
+	}
+	
+	if (m_constantBufferUploadHeap)
+	{
+		m_constantBufferUploadHeap[0] = nullptr;
+		m_constantBufferUploadHeap[1] = nullptr;
+		m_constantBufferUploadHeap[2] = nullptr;
+	}
+	
+	if (m_constantBufferGPUAddress)
+	{
+		m_constantBufferGPUAddress[0] = nullptr;
+		m_constantBufferGPUAddress[1] = nullptr;
+		m_constantBufferGPUAddress[2] = nullptr;
+	}
 }

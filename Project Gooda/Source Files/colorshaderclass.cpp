@@ -1,6 +1,6 @@
 #include "colorshaderclass.h"
 
-ColorShaderClass::ColorShaderClass()
+ColorShader::ColorShader()
 {
 	m_pipelineState = nullptr;
 	m_rootSignature = nullptr;
@@ -10,17 +10,17 @@ ColorShaderClass::ColorShaderClass()
 	m_depthStencilDescHeap = nullptr;
 }
 
-ColorShaderClass::ColorShaderClass(const ColorShaderClass& other)
+ColorShader::ColorShader(const ColorShader& other)
 {
 
 }
 
-ColorShaderClass::~ColorShaderClass()
+ColorShader::~ColorShader()
 {
 
 }
 
-bool ColorShaderClass::Initialize(ID3D12Device* device, HWND hwnd, int screenHeight, int screenWidth)
+bool ColorShader::Initialize(ID3D12Device* device, HWND hwnd, int screenHeight, int screenWidth)
 {
 	bool result;
 
@@ -34,7 +34,7 @@ bool ColorShaderClass::Initialize(ID3D12Device* device, HWND hwnd, int screenHei
 	return true;
 }
 
-void ColorShaderClass::Shutdown()
+void ColorShader::Shutdown()
 {
 	//Shutdown the vertex and pixel shaders
 	//and all related objects
@@ -43,44 +43,32 @@ void ColorShaderClass::Shutdown()
 	return;
 }
 
-void ColorShaderClass::Frame(int frameIndex)
+void ColorShader::Frame(int frameIndex)
 {
 	return;
 }
 
-ID3D12PipelineState* ColorShaderClass::GetPipelineState()
+ID3D12PipelineState* ColorShader::GetPipelineState()
 {
 	return m_pipelineState.Get();
 }
 
-ID3D12RootSignature* ColorShaderClass::GetRootSignature()
+ID3D12RootSignature* ColorShader::GetRootSignature()
 {
 	return m_rootSignature.Get();
 }
 
-CD3DX12_CPU_DESCRIPTOR_HANDLE ColorShaderClass::GetDepthStencilViewHandle()
+CD3DX12_CPU_DESCRIPTOR_HANDLE ColorShader::GetDepthStencilViewHandle()
 {
 	return CD3DX12_CPU_DESCRIPTOR_HANDLE(m_depthStencilDescHeap->GetCPUDescriptorHandleForHeapStart());
 }
 
-bool ColorShaderClass::InitializeShader(ID3D12Device* device, HWND hwnd, WCHAR* vsFilename, WCHAR* psFilename, int height, int width)
+bool ColorShader::InitializeShader(ID3D12Device* device, HWND hwnd, WCHAR* vsFilename, WCHAR* psFilename, int height, int width)
 {
 	HRESULT result;
-	CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc;
-	D3D12_ROOT_PARAMETER rootParameters[1];
-	D3D12_SHADER_BYTECODE vertexShaderByteCode = {};
-	D3D12_SHADER_BYTECODE pixelShaderByteCode = {};
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC pipelineStateDesc = {};
-	D3D12_DEPTH_STENCIL_DESC depthStencilDesc = {};
-	D3D12_DEPTH_STENCILOP_DESC depthStencilOPDesc = {};
-	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc = {};
-	D3D12_DESCRIPTOR_HEAP_DESC depthStencilViewHeapDesc = {};
-	D3D12_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc = {};
-	D3D12_CLEAR_VALUE depthOptimizedClearValue = {};
 	ComPtr<ID3DBlob> rootsignature;
 	ComPtr<ID3DBlob> errorMessage;
-	D3D12_DESCRIPTOR_RANGE descriptorTableRanges[1];
-	D3D12_ROOT_DESCRIPTOR_TABLE descriptorTable;
+
 
 	//Create vertex and pixel shaders
 	result = D3DCompileFromFile(vsFilename, NULL, NULL, "main", "vs_5_0", D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, 0, &m_vertexShader, &errorMessage);
@@ -96,6 +84,7 @@ bool ColorShaderClass::InitializeShader(ID3D12Device* device, HWND hwnd, WCHAR* 
 
 	//Fill out a shader bytecode structure, which is basically just a pointer
 	//to the shader bytecode and the size of the shader bytecode
+	D3D12_SHADER_BYTECODE vertexShaderByteCode = {};
 	vertexShaderByteCode.BytecodeLength = m_vertexShader->GetBufferSize();
 	vertexShaderByteCode.pShaderBytecode = m_vertexShader->GetBufferPointer();
 
@@ -110,26 +99,23 @@ bool ColorShaderClass::InitializeShader(ID3D12Device* device, HWND hwnd, WCHAR* 
 	}
 
 	//Fill out the shader byteccode structure for the pixel shader
+	D3D12_SHADER_BYTECODE pixelShaderByteCode = {};
 	pixelShaderByteCode.BytecodeLength = m_pixelShader->GetBufferSize();
 	pixelShaderByteCode.pShaderBytecode = m_pixelShader->GetBufferPointer();
 
 	//Fill out a descriptor range
-	descriptorTableRanges[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
-	descriptorTableRanges[0].NumDescriptors = 1;
-	descriptorTableRanges[0].RegisterSpace = 0;
-	descriptorTableRanges[0].BaseShaderRegister = 0;
-	descriptorTableRanges[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-
-	//Create a descriptor table
-	descriptorTable.NumDescriptorRanges = _countof(descriptorTableRanges);
-	descriptorTable.pDescriptorRanges = &descriptorTableRanges[0];
+	D3D12_ROOT_DESCRIPTOR rootCBVDesc;
+	rootCBVDesc.RegisterSpace = 0;
+	rootCBVDesc.ShaderRegister = 0;
 
 	//Fill out a root parameter
-	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-	rootParameters[0].DescriptorTable = descriptorTable;
+	D3D12_ROOT_PARAMETER rootParameters[1];
+	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[0].Descriptor = rootCBVDesc;
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
 
 	//Create root signature
+	CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc;
 	rootSignatureDesc.Init(_countof(rootParameters), rootParameters, 0, NULL, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT | 
 		D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
 		D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
@@ -150,6 +136,7 @@ bool ColorShaderClass::InitializeShader(ID3D12Device* device, HWND hwnd, WCHAR* 
 	m_rootSignature->SetName(L"Root Signature");
 
 	//Fill out a depth stencil desc structure
+	D3D12_DEPTH_STENCIL_DESC depthStencilDesc = {};
 	depthStencilDesc.DepthEnable = TRUE;
 	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
 	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
@@ -158,6 +145,7 @@ bool ColorShaderClass::InitializeShader(ID3D12Device* device, HWND hwnd, WCHAR* 
 	depthStencilDesc.StencilWriteMask = D3D12_DEFAULT_STENCIL_WRITE_MASK;
 
 	//Fill out a stencil operation structure
+	D3D12_DEPTH_STENCILOP_DESC depthStencilOPDesc = {};
 	depthStencilOPDesc.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
 	depthStencilOPDesc.StencilPassOp = D3D12_STENCIL_OP_KEEP;
 	depthStencilOPDesc.StencilFailOp = D3D12_STENCIL_OP_KEEP;
@@ -167,6 +155,7 @@ bool ColorShaderClass::InitializeShader(ID3D12Device* device, HWND hwnd, WCHAR* 
 	depthStencilDesc.BackFace = depthStencilOPDesc;
 
 	//Create a depth stencil descriptor heap so we can get a pointer to the depth stencil buffer
+	D3D12_DESCRIPTOR_HEAP_DESC depthStencilViewHeapDesc = {};
 	depthStencilViewHeapDesc.NumDescriptors = 1;
 	depthStencilViewHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
 	depthStencilViewHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
@@ -177,11 +166,13 @@ bool ColorShaderClass::InitializeShader(ID3D12Device* device, HWND hwnd, WCHAR* 
 	}
 
 	//Fill out a depth stencil desc structure
+	D3D12_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc = {};
 	depthStencilViewDesc.Format = DXGI_FORMAT_D32_FLOAT;
 	depthStencilViewDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
 	depthStencilViewDesc.Flags = D3D12_DSV_FLAG_NONE;
 
 	//Fil out a depth clear value sturcture
+	D3D12_CLEAR_VALUE depthOptimizedClearValue = {};
 	depthOptimizedClearValue.Format = DXGI_FORMAT_D32_FLOAT;
 	depthOptimizedClearValue.DepthStencil.Depth = 1.0f;
 	depthOptimizedClearValue.DepthStencil.Stencil = 0;
@@ -213,10 +204,12 @@ bool ColorShaderClass::InitializeShader(ID3D12Device* device, HWND hwnd, WCHAR* 
 
 	//Fill out an input layout desc structure
 	//Get the number of elements in an array by "sizeof(array) / sizeof(arrayElementType)"
+	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc = {};
 	inputLayoutDesc.NumElements = sizeof(inputElementDesc) / sizeof(D3D12_INPUT_ELEMENT_DESC);
 	inputLayoutDesc.pInputElementDescs = inputElementDesc;
 
 	//Fill in the pipeline state object desc
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC pipelineStateDesc = {};
 	pipelineStateDesc.InputLayout = inputLayoutDesc;
 	pipelineStateDesc.pRootSignature = m_rootSignature.Get();
 	pipelineStateDesc.VS = vertexShaderByteCode;
@@ -242,7 +235,7 @@ bool ColorShaderClass::InitializeShader(ID3D12Device* device, HWND hwnd, WCHAR* 
 	return true;
 }
 
-void ColorShaderClass::ShutdownShaders()
+void ColorShader::ShutdownShaders()
 {
 	//Release the vertex shader
 	if (m_vertexShader)
@@ -283,7 +276,7 @@ void ColorShaderClass::ShutdownShaders()
 	return;
 }
 
-void ColorShaderClass::OutputShaderErrorMessage(ID3DBlob* errorMessage, HWND hwnd, WCHAR* shaderFilename)
+void ColorShader::OutputShaderErrorMessage(ID3DBlob* errorMessage, HWND hwnd, WCHAR* shaderFilename)
 {
 	char* compileErrors;
 	unsigned long long bufferSize;

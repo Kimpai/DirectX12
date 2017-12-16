@@ -160,6 +160,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source Files\cameraclass.cpp" />
     <ClCompile Include="Source Files\colorshaderclass.cpp" />
     <ClCompile Include="Source Files\consoleclass.cpp" />
     <ClCompile Include="Source Files\cubeclass.cpp" />
@@ -172,6 +173,7 @@
     <ClCompile Include="Source Files\systemclass.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Header Files\cameraclass.h" />
     <ClInclude Include="Header Files\colorshaderclass.h" />
     <ClInclude Include="Header Files\consoleclass.h" />
     <ClInclude Include="Header Files\cubeclass.h" />

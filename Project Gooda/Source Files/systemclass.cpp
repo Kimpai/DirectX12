@@ -1,24 +1,25 @@
 #include "systemclass.h"
 
-SystemClass::SystemClass()
+GoodaDevice::GoodaDevice()
 {
 	m_Input = nullptr;
-	m_Graphics = nullptr;
+	m_Driver = nullptr;
 	m_Console = nullptr;
 	m_Lua = nullptr;
+	m_Camera = nullptr;
 }
 
-SystemClass::SystemClass(const SystemClass& other)
+GoodaDevice::GoodaDevice(const GoodaDevice& other)
 {
 
 }
 
-SystemClass::~SystemClass()
+GoodaDevice::~GoodaDevice()
 {
 
 }
 
-bool SystemClass::Initialize()
+bool GoodaDevice::Initialize()
 {
 	int screenHeight, screenWidth;
 	bool result;
@@ -31,25 +32,30 @@ bool SystemClass::Initialize()
 	InitializeWindows(screenHeight, screenWidth);
 
 	//Create the input object
-	m_Input = new InputClass();
+	m_Input = new Input();
 	if (!m_Input)
 		return false;
 
 	//Initialize the input object
-	m_Input->Initialize();
+	m_Input->Initialize(m_hwnd);
+
+	//Create the camera object
+	m_Camera = new Camera();
+	if (!m_Camera)
+		return false;
 
 	//Create the graphics object
-	m_Graphics = new GraphicsClass();
-	if (!m_Graphics)
+	m_Driver = new GoodaDriver();
+	if (!m_Driver)
 		return false;
 
 	//Initialize the graphics object
-	result = m_Graphics->Initialize(screenHeight, screenWidth, m_hwnd);
+	result = m_Driver->Initialize(screenHeight, screenWidth, m_hwnd, m_Camera);
 	if (!result)
 		return false;
 
 	//Create console object
-	m_Console = new ConsoleClass();
+	m_Console = new Console();
 	if (!m_Console)
 		return false;
 
@@ -61,7 +67,7 @@ bool SystemClass::Initialize()
 	}
 
 	//Create lua object
-	m_Lua = new LuaClass();
+	m_Lua = new Lua();
 	if (!m_Lua)
 	{
 		return false;
@@ -72,13 +78,13 @@ bool SystemClass::Initialize()
 
 	m_Lua->PushCFunction(m_Lua->Print);
 	m_Lua->SetGlobal("Print");
-	m_Lua->PushCFunction(m_Graphics->RenderQuad);
+	m_Lua->PushCFunction(m_Driver->RenderQuad);
 	m_Lua->SetGlobal("RenderQuad");
 
 	return true;
 }
 
-void SystemClass::Shutdown()
+void GoodaDevice::Shutdown()
 {
 	//Release the input object
 	if (m_Input)
@@ -88,10 +94,17 @@ void SystemClass::Shutdown()
 	}
 
 	//Release the graphics object
-	if (m_Graphics)
+	if (m_Driver)
 	{
-		delete m_Graphics;
-		m_Graphics = nullptr;
+		delete m_Driver;
+		m_Driver = nullptr;
+	}
+
+	//Release the camera object
+	if (m_Camera)
+	{
+		delete m_Camera;
+		m_Camera = nullptr;
 	}
 
 	//Release console object
@@ -114,7 +127,7 @@ void SystemClass::Shutdown()
 	return;
 }
 
-void SystemClass::Run()
+void GoodaDevice::Run()
 {
 	MSG msg;
 	bool done, result;
@@ -152,7 +165,7 @@ void SystemClass::Run()
 	return;
 }
 
-LRESULT SystemClass::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam)
+LRESULT GoodaDevice::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam)
 {
 	switch (umsg)
 	{
@@ -160,7 +173,7 @@ LRESULT SystemClass::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM 
 		case WM_KEYDOWN:
 		{
 			//If a key is pressed send it to input object so it can record that state
-			m_Input->KeyDown((unsigned int)wparam);
+			m_Input->ProcessKeyboardMessage(umsg, wparam, lparam);
 			break;
 		}
 
@@ -168,7 +181,14 @@ LRESULT SystemClass::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM 
 		case WM_KEYUP:
 		{
 			//If a key has been released then send it to the input object so it can unset the state for that key
-			m_Input->KeyUp((unsigned int)wparam);
+			m_Input->ProcessKeyboardMessage(umsg, wparam, lparam);
+			break;
+		}
+
+		case WM_MOUSEMOVE:
+		{
+			//If mouse was moved send to input object to update the camera
+			m_Input->ProcessMouseMessage(umsg, wparam, lparam);
 			break;
 		}
 	
@@ -182,13 +202,13 @@ LRESULT SystemClass::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM 
 	return 0;
 }
 
-bool SystemClass::Frame()
+bool GoodaDevice::Frame()
 {
 	bool result;
 	std::string input;
 
 	//Check if the user pressed escape and wants to exit the application
-	if (m_Input->IsKeyDown(VK_ESCAPE))
+	if (m_Input->IsKeyPressed(VK_ESCAPE))
 		return false;
 
 	//Do the console frame processing
@@ -198,15 +218,20 @@ bool SystemClass::Frame()
 			std::cout << "Lua Error" << std::endl;
 	}
 
+	//Do the frame processing for the camera object
+	/*std::cout << m_Input->GetMousePosition().x << std::endl;
+	std::cout << "   " << m_Input->GetMousePosition().y << std::endl;
+	m_Camera->Frame(m_Input->GetMousePosition().x, m_Input->GetMousePosition().y);*/
+
 	//Do the frame processing for the graphics object
-	result = m_Graphics->Frame();
+	result = m_Driver->Frame(m_Camera);
 	if (!result)
 		return false;
 
 	return true;
 }
 
-void SystemClass::InitializeWindows(int& screenHeight, int& screenWidth)
+void GoodaDevice::InitializeWindows(int& screenHeight, int& screenWidth)
 {
 	WNDCLASSEX wc;
 	DEVMODE dmScreenSettings;
@@ -286,7 +311,7 @@ void SystemClass::InitializeWindows(int& screenHeight, int& screenWidth)
 	return;
 }
 
-void SystemClass::ShutdownWindows()
+void GoodaDevice::ShutdownWindows()
 {
 	//Show the mouse cursor
 	ShowCursor(true);

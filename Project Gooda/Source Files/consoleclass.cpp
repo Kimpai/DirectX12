@@ -1,18 +1,18 @@
 #include "..\Header Files\consoleclass.h"
 
-ConsoleClass::ConsoleClass()
+Console::Console()
 {
 }
 
-ConsoleClass::ConsoleClass(const ConsoleClass &)
+Console::Console(const Console &)
 {
 }
 
-ConsoleClass::~ConsoleClass()
+Console::~Console()
 {
 }
 
-bool ConsoleClass::Initialize()
+bool Console::Initialize()
 {
 	FILE* fp = nullptr;
 
@@ -56,12 +56,12 @@ bool ConsoleClass::Initialize()
 	return true;
 }
 
-bool ConsoleClass::Frame(std::string& input)
+bool Console::Frame(std::string& input)
 {
 	return InputHandle(input);
 }
 
-bool ConsoleClass::InputHandle(std::string& input)
+bool Console::InputHandle(std::string& input)
 {
 	DWORD result;
 	char inputBuffer[512] = { 0 };

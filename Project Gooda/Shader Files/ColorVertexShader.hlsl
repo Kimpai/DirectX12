@@ -10,10 +10,20 @@ struct VertexShaderOutput
     float4 color : COLOR;
 };
 
+cbuffer ConstantBuffer : register(b0)
+{
+    float4x4 worldMatrix;
+    float4x4 viewMatrix;
+    float4x4 projectionMatrix;
+    float4x4 rotationMatrix;
+}
+
 VertexShaderOutput main( VertexShaderInput input )
 {
     VertexShaderOutput output;
-    output.pos = float4(input.pos, 1.0f);
+    float4x4 wvp = mul(worldMatrix, viewMatrix);
+    wvp = mul(wvp, projectionMatrix);
+    output.pos = mul(float4(input.pos, 1.0f), wvp);
     output.color = input.color;
 
     return output;

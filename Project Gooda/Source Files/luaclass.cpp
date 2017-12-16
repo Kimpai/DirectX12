@@ -1,21 +1,21 @@
 #include "luaclass.h"
 
-LuaClass::LuaClass()
+Lua::Lua()
 {
 	m_luaState = nullptr;
 }
 
-LuaClass::LuaClass(const LuaClass& other)
+Lua::Lua(const Lua& other)
 {
 
 }
 
-LuaClass::~LuaClass()
+Lua::~Lua()
 {
 
 }
 
-void LuaClass::Initialize()
+void Lua::Initialize()
 {
 	m_luaState = luaL_newstate();
 
@@ -26,7 +26,7 @@ void LuaClass::Initialize()
 	return;
 }
 
-void LuaClass::Shutdown()
+void Lua::Shutdown()
 {
 	if (m_luaState)
 	{
@@ -36,21 +36,21 @@ void LuaClass::Shutdown()
 	return;
 }
 
-void LuaClass::PushCFunction(lua_CFunction luaCFunction)
+void Lua::PushCFunction(lua_CFunction luaCFunction)
 {
 	lua_pushcfunction(m_luaState, luaCFunction);
 
 	return;
 }
 
-void LuaClass::SetGlobal(char* luaCFunction)
+void Lua::SetGlobal(char* luaCFunction)
 {
 	lua_setglobal(m_luaState, luaCFunction);
 
 	return;
 }
 
-bool LuaClass::DoString(const char* input)
+bool Lua::DoString(const char* input)
 {
 	if (luaL_dostring(m_luaState, input) != false)
 		return false;
@@ -58,12 +58,12 @@ bool LuaClass::DoString(const char* input)
 	return true;
 }
 
-lua_State* LuaClass::GetState()
+lua_State* Lua::GetState()
 {
 	return m_luaState;
 }
 
-int LuaClass::Print(lua_State* L)
+int Lua::Print(lua_State* L)
 {
 	
 	int n = lua_gettop(L);

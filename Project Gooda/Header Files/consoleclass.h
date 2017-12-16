@@ -5,12 +5,12 @@
 #include <iostream>
 #include <string>
 
-class ConsoleClass
+class Console
 {
 public:
-	ConsoleClass();
-	ConsoleClass(const ConsoleClass&);
-	~ConsoleClass();
+	Console();
+	Console(const Console&);
+	~Console();
 	
 	bool Initialize();
 	bool Frame(std::string&);

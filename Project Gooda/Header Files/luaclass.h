@@ -5,12 +5,12 @@
 #include <string>
 #include <iostream>
 
-class LuaClass
+class Lua
 {
 public:
-	LuaClass();
-	LuaClass(const LuaClass&);
-	~LuaClass();
+	Lua();
+	Lua(const Lua&);
+	~Lua();
 
 	void Initialize();
 	void Shutdown();

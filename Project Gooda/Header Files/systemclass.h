@@ -11,13 +11,14 @@
 #include "graphicsclass.h"
 #include "consoleclass.h"
 #include "luaclass.h"
+#include "cameraclass.h"
 
-class SystemClass
+class GoodaDevice
 {
 public:
-	SystemClass();
-	SystemClass(const SystemClass&);
-	~SystemClass();
+	GoodaDevice();
+	GoodaDevice(const GoodaDevice&);
+	~GoodaDevice();
 
 	bool Initialize();
 	void Shutdown();
@@ -34,11 +35,12 @@ private:
 	HINSTANCE m_hinstance;
 	HWND m_hwnd;
 
-	InputClass* m_Input;
-	GraphicsClass* m_Graphics;
-	ConsoleClass* m_Console;
-	LuaClass* m_Lua;
+	Input* m_Input;
+	GoodaDriver* m_Driver;
+	Console* m_Console;
+	Lua* m_Lua;
+	Camera* m_Camera;
 };
 
 static LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
-static SystemClass* ApplicationHandle = nullptr;
+static GoodaDevice* ApplicationHandle = nullptr;

@@ -9,17 +9,17 @@
 
 using namespace Microsoft::WRL;
 
-class Direct3DClass
+class Direct3D
 {
 public:
-	Direct3DClass();
-	Direct3DClass(const Direct3DClass&);
-	~Direct3DClass();
+	Direct3D();
+	Direct3D(const Direct3D&);
+	~Direct3D();
 
 	bool Initialize(int, int, HWND, bool, bool, float, float);
 	void Shutdown();
 
-	bool BeginScene(ColorShaderClass*);
+	bool BeginScene(ColorShader*);
 	bool EndScene();
 	bool CloseCommandList();
 	bool ResetCommandList(ID3D12PipelineState*);

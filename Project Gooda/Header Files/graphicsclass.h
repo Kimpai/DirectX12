@@ -7,6 +7,7 @@
 #include "d3dclass.h"
 #include "colorshaderclass.h"
 #include "cubeclass.h"
+#include "cameraclass.h"
 
 const bool FULL_SCREEN = false;
 const bool VSYNC_ENABLED = true;
@@ -14,23 +15,23 @@ const float SCREEN_DEPTH = 1000.0f;
 const float SCREEN_NEAR = 0.1f;
 static bool renderQuad = true;
 
-class GraphicsClass
+class GoodaDriver
 {
 public:
-	GraphicsClass();
-	GraphicsClass(const GraphicsClass&);
-	~GraphicsClass();
+	GoodaDriver();
+	GoodaDriver(const GoodaDriver&);
+	~GoodaDriver();
 
-	bool Initialize(int, int, HWND);
+	bool Initialize(int, int, HWND, Camera*);
 	void Shutdown();
-	bool Frame();
+	bool Frame(Camera*);
 
 	static int RenderQuad(lua_State* L);
 
 private:
 	bool Render();
 
-	Direct3DClass* m_Direct3D;
-	ColorShaderClass* m_ColorShader;
-	CubeClass* m_Cube;
+	Direct3D* m_Direct3D;
+	ColorShader* m_ColorShader;
+	Cube* m_Cube;
 };

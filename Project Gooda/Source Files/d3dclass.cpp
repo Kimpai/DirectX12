@@ -1,6 +1,6 @@
 #include "d3dclass.h"
 
-Direct3DClass::Direct3DClass()
+Direct3D::Direct3D()
 {
 	m_device = nullptr;
 	m_commandQueue = nullptr;
@@ -20,19 +20,19 @@ Direct3DClass::Direct3DClass()
 }
 
 
-Direct3DClass::Direct3DClass(const Direct3DClass& other)
+Direct3D::Direct3D(const Direct3D& other)
 {
 
 }
 
 
-Direct3DClass::~Direct3DClass()
+Direct3D::~Direct3D()
 {
 
 }
 
 
-bool Direct3DClass::Initialize(int screenHeight, int screenWidth, HWND hwnd, bool vsync, bool fullscreen, float screenDepth, float screenNear)
+bool Direct3D::Initialize(int screenHeight, int screenWidth, HWND hwnd, bool vsync, bool fullscreen, float screenDepth, float screenNear)
 {
 	D3D_FEATURE_LEVEL featureLevel;
 	HRESULT result;
@@ -353,7 +353,7 @@ bool Direct3DClass::Initialize(int screenHeight, int screenWidth, HWND hwnd, boo
 }
 
 
-void Direct3DClass::Shutdown()
+void Direct3D::Shutdown()
 {
 	//Wait of GPU to finish before releasing com objects
 	for (int i = 0; i < frameBufferCount; i++)
@@ -437,7 +437,7 @@ void Direct3DClass::Shutdown()
 }
 
 
-bool Direct3DClass::BeginScene(ColorShaderClass* shader)
+bool Direct3D::BeginScene(ColorShader* shader)
 {
 	HRESULT result;
 	CD3DX12_CPU_DESCRIPTOR_HANDLE renderTargetViewHandle;
@@ -509,7 +509,7 @@ bool Direct3DClass::BeginScene(ColorShaderClass* shader)
 	return true;
 }
 
-bool Direct3DClass::EndScene()
+bool Direct3D::EndScene()
 {
 	HRESULT result;
 	ID3D12CommandList* ppCommandLists[] = { m_commandList.Get() };
@@ -561,7 +561,7 @@ bool Direct3DClass::EndScene()
 	return true;
 }
 
-bool Direct3DClass::CloseCommandList()
+bool Direct3D::CloseCommandList()
 {
 	HRESULT result;
 
@@ -574,7 +574,7 @@ bool Direct3DClass::CloseCommandList()
 	return true;
 }
 
-bool Direct3DClass::ResetCommandList(ID3D12PipelineState* pipelinestate)
+bool Direct3D::ResetCommandList(ID3D12PipelineState* pipelinestate)
 {
 	HRESULT result;
 
@@ -587,7 +587,7 @@ bool Direct3DClass::ResetCommandList(ID3D12PipelineState* pipelinestate)
 	return true;
 }
 
-bool Direct3DClass::ExecuteCommandList()
+bool Direct3D::ExecuteCommandList()
 {
 	HRESULT result;
 	ID3D12CommandList* ppCommandLists[] = { m_commandList.Get() };
@@ -609,22 +609,22 @@ bool Direct3DClass::ExecuteCommandList()
 	return true;
 }
 
-ID3D12Device* Direct3DClass::GetDevice()
+ID3D12Device* Direct3D::GetDevice()
 {
 	return m_device.Get();
 }
 
-ID3D12GraphicsCommandList* Direct3DClass::GetCommandList()
+ID3D12GraphicsCommandList* Direct3D::GetCommandList()
 {
 	return m_commandList.Get();
 }
 
-int Direct3DClass::GetCurrentFrame()
+int Direct3D::GetCurrentFrame()
 {
 	return m_frameIndex;
 }
 
-bool Direct3DClass::WaitforFrameToFinish()
+bool Direct3D::WaitforFrameToFinish()
 {
 	HRESULT result;
 

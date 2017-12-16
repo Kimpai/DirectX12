@@ -3,27 +3,23 @@
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)
 {
-#if _DEBUG
-	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-#endif
-
-	SystemClass* system;
+	GoodaDevice* device;
 	bool result;
 
-	//Create the system object
-	system = new SystemClass;
-	if (!system)
+	//Create the device object
+	device = new GoodaDevice;
+	if (!device)
 		return 0;
 
-	//Initialize and run the system object
-	result = system->Initialize();
+	//Initialize and run the device object
+	result = device->Initialize();
 	if (result)
-		system->Run();
+		device->Run();
 
-	//Shutdown and release the system object
-	system->Shutdown();
-	delete system;
-	system = nullptr;
+	//Shutdown and release the device object
+	device->Shutdown();
+	delete device;
+	device = nullptr;
 
 	return 0;
 }

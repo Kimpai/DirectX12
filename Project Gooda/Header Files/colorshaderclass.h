@@ -12,12 +12,12 @@
 using namespace DirectX;
 using namespace Microsoft::WRL;
 
-class ColorShaderClass
+class ColorShader
 {
 public:
-	ColorShaderClass();
-	ColorShaderClass(const ColorShaderClass&);
-	~ColorShaderClass();
+	ColorShader();
+	ColorShader(const ColorShader&);
+	~ColorShader();
 
 	bool Initialize(ID3D12Device*, HWND, int, int);
 	void Shutdown();

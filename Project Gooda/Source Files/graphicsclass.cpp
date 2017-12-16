@@ -1,42 +1,42 @@
 #include "graphicsclass.h"
 
-GraphicsClass::GraphicsClass()
+GoodaDriver::GoodaDriver()
 {
 	m_Direct3D = nullptr;
 	m_ColorShader = nullptr;
 	m_Cube = nullptr;
 }
 
-GraphicsClass::GraphicsClass(const GraphicsClass& other)
+GoodaDriver::GoodaDriver(const GoodaDriver& other)
 {
 
 }
 
-GraphicsClass::~GraphicsClass()
+GoodaDriver::~GoodaDriver()
 {
 	
 }
 
-bool GraphicsClass::Initialize(int screenHeight, int screenWidth, HWND hwnd)
+bool GoodaDriver::Initialize(int screenHeight, int screenWidth, HWND hwnd, Camera* camera)
 {
 	bool result;
 
 	//Create the Direct3D object
-	m_Direct3D = new Direct3DClass();
+	m_Direct3D = new Direct3D();
 	if (!m_Direct3D)
 	{
 		return false;
 	}
 
 	//Create the Color Shader object
-	m_ColorShader = new ColorShaderClass();
+	m_ColorShader = new ColorShader();
 	if (!m_ColorShader)
 	{
 		return false;
 	}
 
 	//Create the Model object
-	m_Cube = new CubeClass();
+	m_Cube = new Cube();
 	if (!m_Cube)
 	{
 		return false;
@@ -59,7 +59,7 @@ bool GraphicsClass::Initialize(int screenHeight, int screenWidth, HWND hwnd)
 	}
 
 	//Initialize the model object
-	result = m_Cube->Initialize(m_Direct3D->GetDevice(), m_Direct3D->GetCommandList());
+	result = m_Cube->Initialize(m_Direct3D->GetDevice(), m_Direct3D->GetCommandList(), camera, screenWidth, screenHeight, SCREEN_NEAR, SCREEN_DEPTH, XMFLOAT4(0.0f, 0.0f, 0.5f, 1.0f));
 	if (!result)
 	{
 		MessageBox(hwnd, (LPCSTR)L"Could not initialize Model", (LPCSTR)L"Error", MB_OK);
@@ -83,7 +83,7 @@ bool GraphicsClass::Initialize(int screenHeight, int screenWidth, HWND hwnd)
 	return true;
 }
 
-void GraphicsClass::Shutdown()
+void GoodaDriver::Shutdown()
 {
 	//Release the Model object
 	if (m_Cube)
@@ -111,12 +111,13 @@ void GraphicsClass::Shutdown()
 	return;
 }
 
-bool GraphicsClass::Frame()
+bool GoodaDriver::Frame(Camera* camera)
 {
 	bool result;
 
 	//Update constant buffer
 	m_ColorShader->Frame(m_Direct3D->GetCurrentFrame());
+	m_Cube->Frame(m_Direct3D->GetCurrentFrame(), camera);
 
 	//Render the graphics scene
 	result = Render();
@@ -128,7 +129,7 @@ bool GraphicsClass::Frame()
 	return true;
 }
 
-int GraphicsClass::RenderQuad(lua_State * L)
+int GoodaDriver::RenderQuad(lua_State * L)
 {	
 	if (lua_isboolean(L, 1))
 		renderQuad = lua_toboolean(L, 1);
@@ -136,28 +137,24 @@ int GraphicsClass::RenderQuad(lua_State * L)
 	return 0;
 }
 
-bool GraphicsClass::Render()
+bool GoodaDriver::Render()
 {
 	bool result;
 
 	//Reset the command list and put it in a recording state
 	result = m_Direct3D->BeginScene(m_ColorShader);
 	if (!result)
-	{
 		return false;
-	}
 
 	if (renderQuad)
 	{
-		m_Cube->Render(m_Direct3D->GetCommandList());
+		m_Cube->Render(m_Direct3D->GetCommandList(), m_Direct3D->GetCurrentFrame());
 	}
 
 	//Close the command list and execute the commands
 	result = m_Direct3D->EndScene();
 	if (!result)
-	{
 		return false;
-	}
 
 	return true;
 }
