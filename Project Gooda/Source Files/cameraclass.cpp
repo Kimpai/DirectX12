@@ -13,8 +13,10 @@ Camera::Camera()
 	m_frameTime = 0.0f;
 	m_moveSpeed = 0.0f;
 	m_strafeSpeed = 0.0f;
-	m_turnLeftRightSpeed = 0.05f;
-	m_lookUpDownSpeed = 0.05f;
+	m_turnLeftRightSpeed = 0.0001f;
+	m_lookUpDownSpeed = 0.0001f;
+	m_mouseX = 0.0f;
+	m_mouseY = 0.0f;
 
 	m_moveBackward = false;
 	m_moveForward = false;
@@ -42,22 +44,28 @@ void Camera::SetRotation(float x, float y, float z)
 
 void Camera::Frame(float mouseX, float mouseY)
 {
-	m_pitch += mouseY * m_lookUpDownSpeed;
-	m_yaw += mouseX * m_turnLeftRightSpeed;
+	if (m_mouseX != mouseX || m_mouseY != mouseY)
+	{
+		m_pitch += mouseY * m_lookUpDownSpeed;
+		m_yaw += mouseX * m_turnLeftRightSpeed * -1.0f;
+
+		m_mouseX = mouseX;
+		m_mouseY = mouseY;
+	}
 
 	XMFLOAT4 rotation(m_pitch, m_yaw, 0.0f, 1.0f);
 	XMMATRIX rotationMatrix = XMMatrixRotationRollPitchYawFromVector(XMLoadFloat4(&rotation));
-
 	XMMATRIX rotationMatrixY(XMMatrixRotationY(m_rotation.y));
 	XMVECTOR right = XMVector3TransformCoord(XMLoadFloat4(&m_right), rotationMatrixY);
 	XMVECTOR up = XMVector3TransformCoord(XMLoadFloat4(&m_up), rotationMatrixY);
-	XMVECTOR lookAt = XMVector3TransformCoord(XMLoadFloat4(&m_lookAt), rotationMatrixY);
+	XMVECTOR lookAt = XMVector3TransformCoord(XMLoadFloat4(&m_lookAt), rotationMatrix);
 
 	if (m_moveForward)
 	{
 		XMFLOAT4 dir(0.0f, 0.0f, 1.0f, 1.0f);
 		XMVECTOR position = XMVectorMultiplyAdd(XMLoadFloat4(&dir), lookAt, XMLoadFloat4(&m_position));
 		position *= m_moveSpeed;
+		position = XMVector3Normalize(position);
 		XMStoreFloat4(&m_position, position);
 	}
 
@@ -66,6 +74,7 @@ void Camera::Frame(float mouseX, float mouseY)
 		XMFLOAT4 dir(0.0f, 0.0f, -1.0f, 1.0f);
 		XMVECTOR position = XMVectorMultiplyAdd(XMLoadFloat4(&dir), lookAt, XMLoadFloat4(&m_position));
 		position *= m_moveSpeed;
+		position = XMVector3Normalize(position);
 		XMStoreFloat4(&m_position, position);
 	}
 
@@ -74,6 +83,7 @@ void Camera::Frame(float mouseX, float mouseY)
 		XMFLOAT4 dir(-1.0f, 0.0f, 0.0f, 1.0f);
 		XMVECTOR position = XMVectorMultiplyAdd(XMLoadFloat4(&dir), right, XMLoadFloat4(&m_position));
 		position *= m_strafeSpeed;
+		position = XMVector3Normalize(position);
 		XMStoreFloat4(&m_position, position);
 	}
 
@@ -82,16 +92,15 @@ void Camera::Frame(float mouseX, float mouseY)
 		XMFLOAT4 dir(1.0f, 0.0f, 0.0f, 1.0f);
 		XMVECTOR position = XMVectorMultiplyAdd(XMLoadFloat4(&dir), right, XMLoadFloat4(&m_position));
 		position *= m_strafeSpeed;
+		position = XMVector3Normalize(position);
 		XMStoreFloat4(&m_position, position);
 	}
 
 	lookAt = XMVector3TransformCoord(lookAt, rotationMatrix);
 	lookAt = XMVector3Normalize(lookAt);
-	lookAt = XMVectorAdd(XMLoadFloat4(&m_position), lookAt);
+	lookAt = XMVectorAdd(XMVector3Normalize(XMLoadFloat4(&m_position)), lookAt);
+	lookAt = XMVector3Normalize(lookAt);
 	XMStoreFloat4(&m_lookAt, lookAt);
-
-	m_pitch = 0.0f;
-	m_yaw = 0.0f;
 }
 
 XMFLOAT3 Camera::GetPosition()

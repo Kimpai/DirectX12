@@ -21,9 +21,13 @@ public:
 	bool IsKeyReleased(unsigned int);
 	bool IsKeyDown(unsigned int);
 	XMFLOAT2 GetMousePosition();
+	void SetMouseInputMode(Mouse::Mode);
+	void Frame();
 
 private:
 	std::unique_ptr<Keyboard> m_keyboard;
+	std::unique_ptr<Keyboard::KeyboardStateTracker> m_keyboardTracker;
 	std::unique_ptr<Mouse> m_mouse;
+	std::unique_ptr<Mouse::ButtonStateTracker> m_mouseTracker;
 	
 };

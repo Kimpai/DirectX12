@@ -208,6 +208,7 @@ bool GoodaDevice::Frame()
 	std::string input;
 
 	//Check if the user pressed escape and wants to exit the application
+	m_Input->Frame();
 	if (m_Input->IsKeyPressed(VK_ESCAPE))
 		return false;
 
@@ -219,9 +220,11 @@ bool GoodaDevice::Frame()
 	}
 
 	//Do the frame processing for the camera object
-	/*std::cout << m_Input->GetMousePosition().x << std::endl;
-	std::cout << "   " << m_Input->GetMousePosition().y << std::endl;
-	m_Camera->Frame(m_Input->GetMousePosition().x, m_Input->GetMousePosition().y);*/
+	if (m_hwnd == GetFocus())
+	{
+		m_Camera->Frame(m_Input->GetMousePosition().x, m_Input->GetMousePosition().y);
+		std::cout << m_Input->GetMousePosition().x << "  " << m_Input->GetMousePosition().y << std::endl;
+	}
 
 	//Do the frame processing for the graphics object
 	result = m_Driver->Frame(m_Camera);

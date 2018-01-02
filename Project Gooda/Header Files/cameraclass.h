@@ -25,6 +25,7 @@ public:
 	XMFLOAT3 GetRight();
 	XMFLOAT3 GetLookAt();
 	XMFLOAT3 GetUp();
+
 private:
 	XMFLOAT4 m_position;
 	XMFLOAT4 m_rotation;
@@ -37,6 +38,7 @@ private:
 	float m_moveSpeed, m_strafeSpeed;
 	float m_turnLeftRightSpeed;
 	float m_lookUpDownSpeed;
+	float m_mouseX, m_mouseY;
 
 	bool m_moveForward, m_moveRight;
 	bool m_moveBackward, m_moveLeft;
