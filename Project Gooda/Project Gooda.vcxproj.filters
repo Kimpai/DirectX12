@@ -77,13 +77,16 @@
     <ClInclude Include="Header Files\luaclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Header Files\frame.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Header Files\cubeclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Header Files\cameraclass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Header Files\config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Header Files\frame.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

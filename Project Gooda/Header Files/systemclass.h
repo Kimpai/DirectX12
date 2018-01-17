@@ -5,8 +5,8 @@
 #include <Windows.h>
 #include <stdio.h>
 #include <iostream>
+#include <config.h>
 #include <fstream>
-#include <thread>
 #include "inputclass.h"
 #include "graphicsclass.h"
 #include "consoleclass.h"

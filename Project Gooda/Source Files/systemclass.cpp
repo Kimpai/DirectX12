@@ -50,7 +50,7 @@ bool GoodaDevice::Initialize()
 		return false;
 
 	//Initialize the graphics object
-	result = m_Driver->Initialize(screenHeight, screenWidth, m_hwnd, m_Camera);
+	result = m_Driver->Initialize(m_hwnd, m_Camera);
 	if (!result)
 		return false;
 
@@ -207,11 +207,6 @@ bool GoodaDevice::Frame()
 	bool result;
 	std::string input;
 
-	//Check if the user pressed escape and wants to exit the application
-	m_Input->Frame();
-	if (m_Input->IsKeyPressed(VK_ESCAPE))
-		return false;
-
 	//Do the console frame processing
 	if (m_Console->Frame(input))
 	{
@@ -219,13 +214,31 @@ bool GoodaDevice::Frame()
 			std::cout << "Lua Error" << std::endl;
 	}
 
-	//Do the frame processing for the camera object
+	//Do the frame processing for input and camera
 	if (m_hwnd == GetFocus())
 	{
-		m_Camera->Frame(m_Input->GetMousePosition().x, m_Input->GetMousePosition().y);
-		std::cout << m_Input->GetMousePosition().x << "  " << m_Input->GetMousePosition().y << std::endl;
-	}
+		//Update the mouse and keyboard
+		m_Input->Frame();
 
+		//Check if user wan't to exit application
+		if (m_Input->IsKeyPressed(VK_ESCAPE))
+			return false;
+
+		if (m_Input->IsKeyPressed(VK_W) || m_Input->IsKeyDown(VK_W))
+			m_Camera->MoveForward();
+
+		if (m_Input->IsKeyPressed(VK_A) || m_Input->IsKeyDown(VK_A))
+			m_Camera->MoverLeft();
+
+		if (m_Input->IsKeyPressed(VK_S) || m_Input->IsKeyDown(VK_S))
+			m_Camera->MoveBackward();
+
+		if (m_Input->IsKeyPressed(VK_D) || m_Input->IsKeyDown(VK_D))
+			m_Camera->MoverRight();
+
+		m_Camera->Frame(m_Input->GetMousePosition());
+	}
+	
 	//Do the frame processing for the graphics object
 	result = m_Driver->Frame(m_Camera);
 	if (!result)
@@ -290,8 +303,8 @@ void GoodaDevice::InitializeWindows(int& screenHeight, int& screenWidth)
 	else
 	{
 		//If windowed then set it 800x600 resolution
-		screenWidth = 800;
-		screenHeight = 600;
+		screenWidth = SCREEN_WIDTH;
+		screenHeight = SCREEN_HEIGHT;
 
 		//Place the window in the middle of the screen
 		posX = (GetSystemMetrics(SM_CXSCREEN) - screenWidth) / 2;

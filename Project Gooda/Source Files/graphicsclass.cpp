@@ -17,7 +17,7 @@ GoodaDriver::~GoodaDriver()
 	
 }
 
-bool GoodaDriver::Initialize(int screenHeight, int screenWidth, HWND hwnd, Camera* camera)
+bool GoodaDriver::Initialize(HWND hwnd, Camera* camera)
 {
 	bool result;
 
@@ -43,7 +43,7 @@ bool GoodaDriver::Initialize(int screenHeight, int screenWidth, HWND hwnd, Camer
 	}
 
 	//Initialize the Direct3D object
-	result = m_Direct3D->Initialize(screenHeight, screenWidth, hwnd, VSYNC_ENABLED, FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR);
+	result = m_Direct3D->Initialize(SCREEN_HEIGHT, SCREEN_HEIGHT, hwnd, VSYNC_ENABLED, FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR);
 	if (!result)
 	{
 		MessageBox(hwnd, (LPCSTR)L"Could not initialize Direct3D", (LPCSTR)L"Error", MB_OK);
@@ -51,7 +51,7 @@ bool GoodaDriver::Initialize(int screenHeight, int screenWidth, HWND hwnd, Camer
 	}
 
 	//Initialize the Color Shader object
-	result = m_ColorShader->Initialize(m_Direct3D->GetDevice(), hwnd, screenHeight, screenWidth);
+	result = m_ColorShader->Initialize(m_Direct3D->GetDevice(), hwnd, SCREEN_HEIGHT, SCREEN_WIDTH);
 	if (!result)
 	{
 		MessageBox(hwnd, (LPCSTR)L"Could not initialize Color Shader", (LPCSTR)L"Error", MB_OK);
@@ -59,7 +59,7 @@ bool GoodaDriver::Initialize(int screenHeight, int screenWidth, HWND hwnd, Camer
 	}
 
 	//Initialize the model object
-	result = m_Cube->Initialize(m_Direct3D->GetDevice(), m_Direct3D->GetCommandList(), camera, screenWidth, screenHeight, SCREEN_NEAR, SCREEN_DEPTH, XMFLOAT4(0.0f, 0.0f, 0.5f, 1.0f));
+	result = m_Cube->Initialize(m_Direct3D->GetDevice(), m_Direct3D->GetCommandList(), camera, SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_NEAR, SCREEN_DEPTH, XMFLOAT4(0.0f, 0.0f, 0.5f, 1.0f));
 	if (!result)
 	{
 		MessageBox(hwnd, (LPCSTR)L"Could not initialize Model", (LPCSTR)L"Error", MB_OK);

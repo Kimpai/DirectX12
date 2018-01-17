@@ -1,9 +1,15 @@
 #pragma once
 
+#pragma comment(lib, "d3d12.lib")
+#pragma comment(lib, "dxgi.lib")
+#pragma comment(lib, "d3dcompiler.lib")
+
 #include <d3d12.h>
-#include <dxgi1_4.h>
-#include <d3dx12.h>
+#include <dxgi1_5.h>
+#include <d3dcompiler.h>
 #include <wrl.h>
+#include <assert.h>
+
 #include "colorshaderclass.h"
 #include "frame.h"
 
@@ -16,21 +22,27 @@ public:
 	Direct3D(const Direct3D&);
 	~Direct3D();
 
-	bool Initialize(int, int, HWND, bool, bool, float, float);
-	void Shutdown();
+	bool Initialize(int, int, HWND, bool, float, float);
 
 	bool BeginScene(ColorShader*);
 	bool EndScene();
 	bool CloseCommandList();
 	bool ResetCommandList(ID3D12PipelineState*);
 	bool ExecuteCommandList();
+
 	ID3D12Device* GetDevice();
 	ID3D12GraphicsCommandList* GetCommandList();
 	int GetCurrentFrame();
 
 private:
-	bool WaitforFrameToFinish();
+	bool DeviceSynchronize();
+	void CreateDirect3DDevice(HWND);
+	void CreateViewPortAndScissorRect(int, int);
+	bool CreateFenceAndEventHandle();
+	void CreateCommandInterfaceAndSwapChain(HWND, int, int, bool);
+	void CreateRenderTargets();
 
+private:
 	bool m_vsync;
 	ComPtr<ID3D12Device> m_device;
 	ComPtr<ID3D12CommandQueue> m_commandQueue;

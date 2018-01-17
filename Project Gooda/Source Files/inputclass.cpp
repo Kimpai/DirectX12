@@ -6,6 +6,8 @@ Input::Input()
 	m_keyboard = nullptr;
 	m_keyboardTracker = nullptr;
 	m_mouseTracker = nullptr;
+	m_mouseX = 0.0f;
+	m_mouseY = 0.0f;
 }
 
 Input::Input(const Input& other)
@@ -67,7 +69,7 @@ bool Input::IsKeyDown(unsigned int key)
 
 XMFLOAT2 Input::GetMousePosition()
 {
-	return XMFLOAT2((float)m_mouse->GetState().x, (float)m_mouse->GetState().y);
+	return XMFLOAT2(m_mouseX, m_mouseY);
 }
 
 void Input::SetMouseInputMode(Mouse::Mode mode)
@@ -82,4 +84,21 @@ void Input::Frame()
 
 	//Update the mouse state
 	m_mouseTracker->Update(m_mouse->GetState());
+
+	//Update the location of the mouse
+	m_mouseX += (float)m_mouse->GetState().x;
+	m_mouseY += (float)m_mouse->GetState().y;
+
+	//Ensure the mouse location doesn't exceed the screen width and height
+	if (m_mouseX < 0.0f)
+		m_mouseX = 0.0f;
+
+	if (m_mouseY < 0.0f)
+		m_mouseY = 0.0f;
+
+	if (m_mouseX > SCREEN_WIDTH)
+		m_mouseX = SCREEN_WIDTH;
+
+	if (m_mouseY > SCREEN_HEIGHT)
+		m_mouseY = SCREEN_HEIGHT;
 }

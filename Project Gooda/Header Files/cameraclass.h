@@ -1,7 +1,6 @@
 #pragma once
 
 #include <DirectXMath.h>
-
 using namespace DirectX;
 
 class Camera
@@ -13,33 +12,30 @@ public:
 
 	void SetPosition(float, float, float);
 	void SetRotation(float, float, float);
-	void Frame(float, float);
-
-	void MoveForward();
-	void MoveBackward();
-	void MoverLeft();
-	void MoverRight();
 
 	XMFLOAT3 GetPosition();
 	XMFLOAT3 GetRotation();
-	XMFLOAT3 GetRight();
-	XMFLOAT3 GetLookAt();
-	XMFLOAT3 GetUp();
+	
+	void Frame();
+	void GetViewMatrix(XMMATRIX&);
+	void GetBaseViewMatrix(XMMATRIX&);
+
+	void MoveForward(bool);
+	void MoveBackward(bool);
+	void MoveRight(bool);
+	void MoveLeft(bool);
+	void Turn();
 
 private:
-	XMFLOAT4 m_position;
-	XMFLOAT4 m_rotation;
-	XMFLOAT4 m_right;
-	XMFLOAT4 m_lookAt;
-	XMFLOAT4 m_up;
+	void BuildBaseViewMatrix();
 
-	float m_pitch, m_yaw;
+	XMFLOAT3 m_position;
+	XMFLOAT3 m_rotation;
+	XMMATRIX m_viewMatrix;
+	XMMATRIX m_baseViewMatrix;
+
+	float m_forwardSpeed, m_backwardSpeed;
+	float m_rightSpeed, m_leftSpeed;
+	float m_turnSpeed;
 	float m_frameTime;
-	float m_moveSpeed, m_strafeSpeed;
-	float m_turnLeftRightSpeed;
-	float m_lookUpDownSpeed;
-	float m_mouseX, m_mouseY;
-
-	bool m_moveForward, m_moveRight;
-	bool m_moveBackward, m_moveLeft;
 };
