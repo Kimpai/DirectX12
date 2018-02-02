@@ -40,7 +40,7 @@ bool GoodaDevice::Initialize()
 	m_Input->Initialize(m_hwnd);
 
 	//Create the camera object
-	m_Camera = new Camera();
+	m_Camera = new Camera(m_Input);
 	if (!m_Camera)
 		return false;
 
@@ -224,19 +224,7 @@ bool GoodaDevice::Frame()
 		if (m_Input->IsKeyPressed(VK_ESCAPE))
 			return false;
 
-		if (m_Input->IsKeyPressed(VK_W) || m_Input->IsKeyDown(VK_W))
-			m_Camera->MoveForward();
-
-		if (m_Input->IsKeyPressed(VK_A) || m_Input->IsKeyDown(VK_A))
-			m_Camera->MoverLeft();
-
-		if (m_Input->IsKeyPressed(VK_S) || m_Input->IsKeyDown(VK_S))
-			m_Camera->MoveBackward();
-
-		if (m_Input->IsKeyPressed(VK_D) || m_Input->IsKeyDown(VK_D))
-			m_Camera->MoverRight();
-
-		m_Camera->Frame(m_Input->GetMousePosition());
+		m_Camera->Frame();
 	}
 	
 	//Do the frame processing for the graphics object

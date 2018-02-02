@@ -1,6 +1,6 @@
 #include "cameraclass.h"
 
-Camera::Camera()
+Camera::Camera(Input* inputHandler) : m_inputHandler(inputHandler)
 {
 	m_position = XMFLOAT3(0.0f, 0.0f, -2.0f);
 	m_rotation = XMFLOAT3(0.0f, 0.0f, 0.0f);
@@ -155,12 +155,12 @@ void Camera::GetBaseViewMatrix(XMMATRIX& baseViewMatrix)
 	baseViewMatrix = m_baseViewMatrix;
 }
 
-void Camera::MoveForward(bool input)
+void Camera::MoveForward()
 {
 	float radians;
 
 	//Update forward speed
-	if (input)
+	if (m_inputHandler->IsKeyDown(VK_W))
 	{
 		m_forwardSpeed += m_frameTime * 1.0f;
 		if (m_forwardSpeed > (m_frameTime * 50.0f))
@@ -181,16 +181,40 @@ void Camera::MoveForward(bool input)
 	m_position.z += cosf(radians) * m_forwardSpeed;
 }
 
-void Camera::MoveBackward(bool input)
+void Camera::MoveBackward()
 {
+	float radians;
 
+	if (m_inputHandler->IsKeyDown(VK_S))
+	{
+		m_backwardSpeed += m_frameTime * 1.0f;
+
+		if (m_backwardSpeed > (m_frameTime * 50.0f))
+		{
+			m_backwardSpeed = m_frameTime * 50.0f;
+		}
+	}
+	else
+	{
+		m_backwardSpeed -= m_frameTime * 0.5f;
+
+		if (m_backwardSpeed < 0.0f)
+		{
+			m_backwardSpeed = 0.0f;
+		}
+	}
+
+	radians = m_rotation.y * 0.0174532925f;
+
+	m_position.x -= sinf(radians) * m_backwardSpeed;
+	m_position.z -= cosf(radians) * m_backwardSpeed;
 }
 
-void Camera::MoveRight(bool)
+void Camera::MoveRight()
 {
 }
 
-void Camera::MoveLeft(bool)
+void Camera::MoveLeft()
 {
 }
 

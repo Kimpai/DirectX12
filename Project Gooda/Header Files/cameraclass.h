@@ -1,12 +1,14 @@
 #pragma once
 
 #include <DirectXMath.h>
+#include "inputclass.h"
+
 using namespace DirectX;
 
 class Camera
 {
 public:
-	Camera();
+	Camera(Input*);
 	Camera(const Camera&);
 	~Camera();
 
@@ -20,14 +22,14 @@ public:
 	void GetViewMatrix(XMMATRIX&);
 	void GetBaseViewMatrix(XMMATRIX&);
 
-	void MoveForward(bool);
-	void MoveBackward(bool);
-	void MoveRight(bool);
-	void MoveLeft(bool);
-	void Turn();
-
 private:
 	void BuildBaseViewMatrix();
+
+	void MoveForward();
+	void MoveBackward();
+	void MoveRight();
+	void MoveLeft();
+	void Turn();
 
 	XMFLOAT3 m_position;
 	XMFLOAT3 m_rotation;
@@ -38,4 +40,6 @@ private:
 	float m_rightSpeed, m_leftSpeed;
 	float m_turnSpeed;
 	float m_frameTime;
+
+	Input* m_inputHandler;
 };
