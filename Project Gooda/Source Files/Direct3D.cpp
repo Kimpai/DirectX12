@@ -85,7 +85,7 @@ Direct3D::~Direct3D()
 }
 
 
-bool Direct3D::Initialize(int screenHeight, int screenWidth, HWND hwnd, bool fullscreen, float screenDepth, float screenNear)
+void Direct3D::Initialize(int screenHeight, int screenWidth, HWND hwnd, bool fullscreen, float screenDepth, float screenNear)
 {
 	CreateDirect3DDevice(hwnd);
 
@@ -94,17 +94,14 @@ bool Direct3D::Initialize(int screenHeight, int screenWidth, HWND hwnd, bool ful
 	//Initialize the frameIndex to the current back buffer index
 	m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
 
-	if (!CreateFenceAndEventHandle())
-		return false;
+	CreateFenceAndEventHandle();
 
 	CreateRenderTargets();
 
 	CreateViewPortAndScissorRect(screenWidth, screenHeight);
-
-	return true;
 }
 
-bool Direct3D::BeginScene(ColorShader* shader)
+void Direct3D::BeginScene(ColorShader* shader)
 {
 	//Swap the current render target view buffer index so drawing is don on the correct buffer
 	m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
@@ -159,11 +156,9 @@ bool Direct3D::BeginScene(ColorShader* shader)
 	m_commandList->SetGraphicsRootSignature(shader->GetRootSignature());
 	m_commandList->RSSetViewports(1, &m_viewport);
 	m_commandList->RSSetScissorRects(1, &m_rect);
-
-	return true;
 }
 
-bool Direct3D::EndScene()
+void Direct3D::EndScene()
 {
 	HRESULT result;
 	ID3D12CommandList* ppCommandLists[] = { m_commandList.Get() };
@@ -173,11 +168,7 @@ bool Direct3D::EndScene()
 		D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 
 	//Close the list of commands.
-	result = m_commandList->Close();
-	if (FAILED(result))
-	{
-		return false;
-	}
+	assert(!m_commandList->Close());
 
 	//Load the command list array (only one command list for now).
 	ppCommandLists[0] = m_commandList.Get();
@@ -186,64 +177,33 @@ bool Direct3D::EndScene()
 	m_commandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
 
 	//Signal and increment the fence value.
-	result = m_commandQueue->Signal(m_fence[m_frameIndex].Get(), m_fenceValue[m_frameIndex]);
-	if (FAILED(result))
-	{
-		return false;
-	}
+	assert(!m_commandQueue->Signal(m_fence[m_frameIndex].Get(), m_fenceValue[m_frameIndex]));
 
 	//Finally present the back buffer to the screen since rendering is complete.
 	if (VSYNC_ENABLED)
 	{
 		//Lock to screen refresh rate.
-		result = m_swapChain->Present(1, 0);
-		if (FAILED(result))
-		{
-			return false;
-		}
+		assert(!m_swapChain->Present(1, 0));
 	}
 	else
 	{
 		//Present as fast as possible.
-		result = m_swapChain->Present(0, 0);
-		if (FAILED(result))
-		{
-			return false;
-		}
+		assert(!m_swapChain->Present(0, 0));
 	}
-
-	return true;
 }
 
-bool Direct3D::CloseCommandList()
+void Direct3D::CloseCommandList()
 {
-	HRESULT result;
-
-	result = m_commandList->Close();
-	if (FAILED(result))
-	{
-		return false;
-	}
-
-	return true;
+	assert(!m_commandList->Close());
 }
 
-bool Direct3D::ResetCommandList(ID3D12PipelineState* pipelinestate)
+void Direct3D::ResetCommandList(ID3D12PipelineState* pipelinestate)
 {
-	HRESULT result;
-
-	result = m_commandList->Reset(m_commandAllocator[m_frameIndex].Get(), pipelinestate);
-	if (FAILED(result))
-	{
-		return false;
-	}
-
-	return true;
+	assert(!m_commandList->Reset(m_commandAllocator[m_frameIndex].Get(), pipelinestate));
 }
 
-bool Direct3D::ExecuteCommandList()
+void Direct3D::ExecuteCommandList()
 {
-	HRESULT result;
 	ID3D12CommandList* ppCommandLists[] = { m_commandList.Get() };
 
 	//Load the command list array (only one command list for now).
@@ -254,13 +214,7 @@ bool Direct3D::ExecuteCommandList()
 
 	//Signal and increment the fence value.
 	m_fenceValue[m_frameIndex]++;
-	result = m_commandQueue->Signal(m_fence[m_frameIndex].Get(), m_fenceValue[m_frameIndex]);
-	if (FAILED(result))
-	{
-		return false;
-	}
-
-	return true;
+	assert(!m_commandQueue->Signal(m_fence[m_frameIndex].Get(), m_fenceValue[m_frameIndex]));
 }
 
 ID3D12Device* Direct3D::GetDevice()
@@ -278,10 +232,8 @@ int Direct3D::GetCurrentFrame()
 	return m_frameIndex;
 }
 
-bool Direct3D::DeviceSynchronize()
+void Direct3D::DeviceSynchronize()
 {
-	HRESULT result;
-
 	//Swap the current render target view buffer index so drawing is don on the correct buffer
 	m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
 
@@ -289,11 +241,7 @@ bool Direct3D::DeviceSynchronize()
 	//the command queue since it has not reached the "m_commandQueue->Signal" command
 	if (m_fence[m_frameIndex]->GetCompletedValue() < m_fenceValue[m_frameIndex])
 	{
-		result = m_fence[m_frameIndex]->SetEventOnCompletion(m_fenceValue[m_frameIndex], m_fenceEvent);
-		if (FAILED(result))
-		{
-			return false;
-		}
+		assert(!m_fence[m_frameIndex]->SetEventOnCompletion(m_fenceValue[m_frameIndex], m_fenceEvent));
 
 		//Wait until the fence has triggered the correct fence event
 		WaitForSingleObject(m_fenceEvent, INFINITE);
@@ -301,8 +249,6 @@ bool Direct3D::DeviceSynchronize()
 
 	//Increment m_fenceValue for next frame
 	m_fenceValue[m_frameIndex]++;
-
-	return true;
 }
 
 void Direct3D::CreateDirect3DDevice(HWND hwnd)
@@ -365,7 +311,7 @@ void Direct3D::CreateViewPortAndScissorRect(int screenWidth, int screenHeight)
 	m_rect.bottom = screenHeight;
 }
 
-bool Direct3D::CreateFenceAndEventHandle()
+void Direct3D::CreateFenceAndEventHandle()
 {
 	for (int i = 0; i < frameBufferCount; i++)
 	{
@@ -377,10 +323,6 @@ bool Direct3D::CreateFenceAndEventHandle()
 
 	//Create an event object for the fence.
 	m_fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-	if (!m_fenceEvent)
-		return false;
-
-	return true;
 }
 
 void Direct3D::CreateCommandInterfaceAndSwapChain(HWND hwnd, int screenWidth, int screenHeight, bool fullscreen)

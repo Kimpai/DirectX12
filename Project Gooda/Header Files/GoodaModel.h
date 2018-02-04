@@ -26,9 +26,8 @@ public:
 	Model(const Model&);
 	virtual ~Model();
 
-	bool Initialize(ID3D12Device*, ID3D12GraphicsCommandList*, Camera*, int, int, float, float, XMFLOAT4);
+	void Initialize(ID3D12Device*, ID3D12GraphicsCommandList*, Camera*, int, int, float, float, XMFLOAT4);
 	void Render(ID3D12GraphicsCommandList*, int);
-	void Shutdown();
 	virtual void BuildWorlViewProjectionMatrix(Camera*, int , int, float, float, XMFLOAT4);
 	virtual void Frame(int, Camera*);
 
@@ -39,6 +38,6 @@ public:
 
 private:
 	virtual void ShutdownBuffers() = 0;
-	virtual bool InitializeBuffers(ID3D12Device*, ID3D12GraphicsCommandList*, XMFLOAT4) = 0;
+	virtual void InitializeBuffers(ID3D12Device*, ID3D12GraphicsCommandList*, XMFLOAT4) = 0;
 	virtual void RenderBuffers(ID3D12GraphicsCommandList*, int) = 0;
 };

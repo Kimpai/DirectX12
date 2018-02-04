@@ -19,10 +19,9 @@ GoodaDevice::~GoodaDevice()
 
 }
 
-bool GoodaDevice::Initialize()
+void GoodaDevice::Initialize()
 {
 	int screenHeight, screenWidth;
-	bool result;
 
 	//Initialize the width and height of the screen to zero
 	screenHeight = 0;
@@ -33,45 +32,33 @@ bool GoodaDevice::Initialize()
 
 	//Create the input object
 	m_Input = new Input();
-	if (!m_Input)
-		return false;
+	assert(m_Input);
 
 	//Initialize the input object
 	m_Input->Initialize(m_hwnd);
 
 	//Create the camera object
 	m_Camera = new Camera(m_Input);
-	if (!m_Camera)
-		return false;
+	assert(m_Camera);
 
 	//Create the graphics object
 	m_Driver = new GoodaDriver();
-	if (!m_Driver)
-		return false;
+	assert(m_Driver);
 
 	//Initialize the graphics object
-	result = m_Driver->Initialize(m_hwnd, m_Camera);
-	if (!result)
-		return false;
+	m_Driver->Initialize(m_hwnd, m_Camera);
 
 	//Create console object
 	m_Console = new Console();
-	if (!m_Console)
-		return false;
+	assert(m_Console);
 
 	//Initialize console object
-	result = m_Console->Initialize();
-	if (!result)
-	{
-		return false;
-	}
+	m_Console->Initialize();
+
 
 	//Create lua object
 	m_Lua = new Lua();
-	if (!m_Lua)
-	{
-		return false;
-	}
+	assert(m_Lua);
 
 	//Initialize lua object
 	m_Lua->Initialize();
@@ -80,8 +67,6 @@ bool GoodaDevice::Initialize()
 	m_Lua->SetGlobal("Print");
 	m_Lua->PushCFunction(m_Driver->RenderQuad);
 	m_Lua->SetGlobal("RenderQuad");
-
-	return true;
 }
 
 void GoodaDevice::Shutdown()
@@ -204,7 +189,6 @@ LRESULT GoodaDevice::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM 
 
 bool GoodaDevice::Frame()
 {
-	bool result;
 	std::string input;
 
 	//Do the console frame processing
@@ -228,9 +212,7 @@ bool GoodaDevice::Frame()
 	}
 	
 	//Do the frame processing for the graphics object
-	result = m_Driver->Frame(m_Camera);
-	if (!result)
-		return false;
+	m_Driver->Frame(m_Camera);
 
 	return true;
 }

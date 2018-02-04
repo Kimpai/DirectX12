@@ -20,7 +20,7 @@ public:
 	GoodaDevice(const GoodaDevice&);
 	~GoodaDevice();
 
-	bool Initialize();
+	void Initialize();
 	void Shutdown();
 	void Run();
 

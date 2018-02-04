@@ -255,7 +255,7 @@ void Camera::MoveLeft()
 {
 	float radians;
 
-	if (m_inputHandler->IsKeyDown(VK_S))
+	if (m_inputHandler->IsKeyDown(VK_A))
 	{
 		m_leftSpeed += m_frameTime * 1.0f;
 

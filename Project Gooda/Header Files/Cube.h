@@ -19,7 +19,7 @@ public:
 	~Cube();
 
 private:
-	bool InitializeBuffers(ID3D12Device*, ID3D12GraphicsCommandList*, XMFLOAT4);
+	void InitializeBuffers(ID3D12Device*, ID3D12GraphicsCommandList*, XMFLOAT4);
 	void RenderBuffers(ID3D12GraphicsCommandList*, int);
 	void ShutdownBuffers();
 

@@ -11,32 +11,19 @@ Model::Model(const Model& other)
 
 Model::~Model()
 {
-	
+
 }
 
-bool Model::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, Camera* camera, int width, int height, float nearplane, float farplane, XMFLOAT4 origin)
+void Model::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, Camera* camera, int width, int height, float nearplane, float farplane, XMFLOAT4 origin)
 {
-	bool result;
-
-	result = InitializeBuffers(device, commandList, origin);
-	if (!result)
-	{
-		return false;
-	}
+	InitializeBuffers(device, commandList, origin);
 
 	BuildWorlViewProjectionMatrix(camera, width, height, nearplane, farplane, origin);
-
-	return true;
 }
 
 void Model::Render(ID3D12GraphicsCommandList* commandList, int currentFrame)
 {
 	RenderBuffers(commandList, currentFrame);
-}
-
-void Model::Shutdown()
-{
-	ShutdownBuffers();
 }
 
 void Model::BuildWorlViewProjectionMatrix(Camera* camera, int width, int height, float nearPlane, float farPlane, XMFLOAT4 origin)
@@ -56,8 +43,6 @@ void Model::BuildWorlViewProjectionMatrix(Camera* camera, int width, int height,
 	//Build world matrix
 	matrix = XMMatrixTranslationFromVector(XMLoadFloat4(&origin));
 	XMStoreFloat4x4(&m_constantBuffer.worldMatrix, matrix);
-
-	return;
 }
 
 void Model::Frame(int currentFrame, Camera* camera)

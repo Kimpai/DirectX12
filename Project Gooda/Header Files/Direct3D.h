@@ -23,23 +23,23 @@ public:
 	Direct3D(const Direct3D&);
 	~Direct3D();
 
-	bool Initialize(int, int, HWND, bool, float, float);
+	void Initialize(int, int, HWND, bool, float, float);
 
-	bool BeginScene(ColorShader*);
-	bool EndScene();
-	bool CloseCommandList();
-	bool ResetCommandList(ID3D12PipelineState*);
-	bool ExecuteCommandList();
+	void BeginScene(ColorShader*);
+	void EndScene();
+	void CloseCommandList();
+	void ResetCommandList(ID3D12PipelineState*);
+	void ExecuteCommandList();
 
 	ID3D12Device* GetDevice();
 	ID3D12GraphicsCommandList* GetCommandList();
 	int GetCurrentFrame();
 
 private:
-	bool DeviceSynchronize();
+	void DeviceSynchronize();
 	void CreateDirect3DDevice(HWND);
 	void CreateViewPortAndScissorRect(int, int);
-	bool CreateFenceAndEventHandle();
+	void CreateFenceAndEventHandle();
 	void CreateCommandInterfaceAndSwapChain(HWND, int, int, bool);
 	void CreateRenderTargets();
 

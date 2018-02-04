@@ -19,7 +19,7 @@ public:
 	ColorShader(const ColorShader&);
 	~ColorShader();
 
-	bool Initialize(ID3D12Device*, HWND, int, int);
+	void Initialize(ID3D12Device*, HWND, int, int);
 	void Shutdown();
 	void Frame(int);
 	ID3D12PipelineState* GetPipelineState();
@@ -27,9 +27,8 @@ public:
 	CD3DX12_CPU_DESCRIPTOR_HANDLE GetDepthStencilViewHandle();
 
 private:
-	bool InitializeShader(ID3D12Device*, HWND, WCHAR*, WCHAR*, int, int);
+	void InitializeShader(ID3D12Device*, HWND, WCHAR*, WCHAR*, int, int);
 	void ShutdownShaders();
-	void OutputShaderErrorMessage(ID3DBlob*, HWND, WCHAR*);
 
 	ComPtr<ID3D12PipelineState> m_pipelineState;
 	ComPtr<ID3D12RootSignature> m_rootSignature;

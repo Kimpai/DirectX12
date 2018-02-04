@@ -25,55 +25,42 @@ Cube::Cube(const Cube& other)
 
 Cube::~Cube()
 {
+	ShutdownBuffers();
+
 	//Release the vertex buffer
 	if (m_vertexBuffer)
-	{
 		m_vertexBuffer = nullptr;
-	}
 
 	//Release the index buffer
 	if (m_indexBuffer)
-	{
 		m_indexBuffer = nullptr;
-	}
 
 	//Release the vertex buffer upload heap
 	if (m_vertexBufferUploadHeap)
-	{
 		m_vertexBufferUploadHeap = nullptr;
-	}
 
 	//Release the index buffer upload heap
 	if (m_indexBufferUploadHeap)
-	{
 		m_indexBufferUploadHeap = nullptr;
-	}
 
 	//Release the constant buffer descriptor heap
 	for (int i = 0; i < frameBufferCount; i++)
-	{
 		if (m_constantBufferDescHeap[i])
 			m_constantBufferDescHeap[i] = nullptr;
-	}
 
 	//Release the constant buffer upload heap
 	for (int i = 0; i < frameBufferCount; i++)
-	{
 		if (m_constantBufferUploadHeap[i])
 			m_constantBufferUploadHeap[i] = nullptr;
-	}
 
 	//Release the constant buffer GPU Address
 	for (int i = 0; i < frameBufferCount; i++)
-	{
 		if (m_constantBufferGPUAddress[i])
 			m_constantBufferGPUAddress[i] = nullptr;
-	}
 }
 
-bool Cube::InitializeBuffers(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, XMFLOAT4 origin)
+void Cube::InitializeBuffers(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, XMFLOAT4 origin)
 {
-	HRESULT result;
 	int vertexBufferSize;
 	int indexBufferSize;
 	D3D12_SUBRESOURCE_DATA vertexData = {};
@@ -124,12 +111,8 @@ bool Cube::InitializeBuffers(ID3D12Device* device, ID3D12GraphicsCommandList* co
 	//Create default heap
 	//default heap is memory on the GPU. Only GPU have access to this memory
 	//To get data into this heap upload the data using an upload heap
-	result = device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE,
-		&CD3DX12_RESOURCE_DESC::Buffer(vertexBufferSize), D3D12_RESOURCE_STATE_COPY_DEST, NULL, __uuidof(ID3D12Resource), (void**)&m_vertexBuffer);
-	if (FAILED(result))
-	{
-		return false;
-	}
+	assert(!device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE,
+		&CD3DX12_RESOURCE_DESC::Buffer(vertexBufferSize), D3D12_RESOURCE_STATE_COPY_DEST, NULL, __uuidof(ID3D12Resource), (void**)&m_vertexBuffer));
 
 	//Give resource heaps a name so when debugging with the graphics debugger
 	//we know what we are looking at
@@ -137,12 +120,8 @@ bool Cube::InitializeBuffers(ID3D12Device* device, ID3D12GraphicsCommandList* co
 
 	//Create the upload heap
 	//Upload heaps are used to upload data to the GPU. CPU can write to it, GPU can read from it
-	result = device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), D3D12_HEAP_FLAG_NONE,
-		&CD3DX12_RESOURCE_DESC::Buffer(vertexBufferSize), D3D12_RESOURCE_STATE_GENERIC_READ, NULL, __uuidof(ID3D12Resource), (void**)&m_vertexBufferUploadHeap);
-	if (FAILED(result))
-	{
-		return false;
-	}
+	assert(!device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), D3D12_HEAP_FLAG_NONE,
+		&CD3DX12_RESOURCE_DESC::Buffer(vertexBufferSize), D3D12_RESOURCE_STATE_GENERIC_READ, NULL, __uuidof(ID3D12Resource), (void**)&m_vertexBufferUploadHeap));
 
 	//Give vertex buffer upload heap a name for debugging purposes
 	m_vertexBufferUploadHeap->SetName(L"Vertex Buffer Upload Resource Heap");
@@ -198,23 +177,15 @@ bool Cube::InitializeBuffers(ID3D12Device* device, ID3D12GraphicsCommandList* co
 	indexBufferSize = sizeof(indices);
 
 	//Create default heap to hold index buffer
-	result = device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE,
-		&CD3DX12_RESOURCE_DESC::Buffer(indexBufferSize), D3D12_RESOURCE_STATE_COPY_DEST, NULL, __uuidof(ID3D12Resource), (void**)&m_indexBuffer);
-	if (FAILED(result))
-	{
-		return false;
-	}
+	assert(!device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE,
+		&CD3DX12_RESOURCE_DESC::Buffer(indexBufferSize), D3D12_RESOURCE_STATE_COPY_DEST, NULL, __uuidof(ID3D12Resource), (void**)&m_indexBuffer));
 
 	//Give the resource a name for debugging purposes
 	m_indexBuffer->SetName(L"Index Buffer Resource Heap");
 
 	//Create upload heap to upload index buffer
-	result = device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), D3D12_HEAP_FLAG_NONE,
-		&CD3DX12_RESOURCE_DESC::Buffer(indexBufferSize), D3D12_RESOURCE_STATE_GENERIC_READ, NULL, __uuidof(ID3D12Resource), (void**)&m_indexBufferUploadHeap);
-	if (FAILED(result))
-	{
-		return false;
-	}
+	assert(!device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), D3D12_HEAP_FLAG_NONE,
+		&CD3DX12_RESOURCE_DESC::Buffer(indexBufferSize), D3D12_RESOURCE_STATE_GENERIC_READ, NULL, __uuidof(ID3D12Resource), (void**)&m_indexBufferUploadHeap));
 
 	//Give the index buffer upload heap a name for debugging purposes
 	m_indexBufferUploadHeap->SetName(L"Index Buffer Upload Resource Heap");
@@ -241,24 +212,16 @@ bool Cube::InitializeBuffers(ID3D12Device* device, ID3D12GraphicsCommandList* co
 	//for our cube
 	for (int i = 0; i < frameBufferCount; ++i)
 	{
-		result = device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
+		assert(!device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
 			D3D12_HEAP_FLAG_NONE, &CD3DX12_RESOURCE_DESC::Buffer(1024 * 256), D3D12_RESOURCE_STATE_GENERIC_READ,
-			NULL, __uuidof(ID3D12Resource), (void**)&m_constantBufferUploadHeap[i]);
-		if (FAILED(result))
-		{
-			return false;
-		}
+			NULL, __uuidof(ID3D12Resource), (void**)&m_constantBufferUploadHeap[i]));
 
 		ZeroMemory(&m_constantBuffer, sizeof(m_constantBuffer));
 
 		CD3DX12_RANGE readRange(0, 0);
-
-		result = m_constantBufferUploadHeap[i]->Map(0, &readRange, reinterpret_cast<void**>(&m_constantBufferGPUAddress[i]));
-
+		assert(!m_constantBufferUploadHeap[i]->Map(0, &readRange, reinterpret_cast<void**>(&m_constantBufferGPUAddress[i])));
 		memcpy(m_constantBufferGPUAddress[i], &m_constantBuffer, sizeof(m_constantBuffer));
 	}
-
-	return true;
 }
 
 void Cube::RenderBuffers(ID3D12GraphicsCommandList* commandList, int currentFrame)

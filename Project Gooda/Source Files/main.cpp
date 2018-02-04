@@ -4,7 +4,6 @@
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)
 {
 	GoodaDevice* device;
-	bool result;
 
 	//Create the device object
 	device = new GoodaDevice;
@@ -12,9 +11,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 		return 0;
 
 	//Initialize and run the device object
-	result = device->Initialize();
-	if (result)
-		device->Run();
+	device->Initialize();
+	device->Run();
 
 	//Shutdown and release the device object
 	device->Shutdown();

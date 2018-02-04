@@ -17,70 +17,34 @@ GoodaDriver::~GoodaDriver()
 	
 }
 
-bool GoodaDriver::Initialize(HWND hwnd, Camera* camera)
+void GoodaDriver::Initialize(HWND hwnd, Camera* camera)
 {
-	bool result;
-
 	//Create the Direct3D object
 	m_Direct3D = new Direct3D();
-	if (!m_Direct3D)
-	{
-		return false;
-	}
+	assert(m_Direct3D);
 
 	//Create the Color Shader object
 	m_ColorShader = new ColorShader();
-	if (!m_ColorShader)
-	{
-		return false;
-	}
+	assert(m_ColorShader);
 
 	//Create the Model object
 	m_Cube = new Cube();
-	if (!m_Cube)
-	{
-		return false;
-	}
+	assert(m_Cube);
 
 	//Initialize the Direct3D object
-	result = m_Direct3D->Initialize(SCREEN_HEIGHT, SCREEN_HEIGHT, hwnd, FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR);
-	if (!result)
-	{
-		MessageBox(hwnd, (LPCSTR)L"Could not initialize Direct3D", (LPCSTR)L"Error", MB_OK);
-		return false;
-	}
+	m_Direct3D->Initialize(SCREEN_HEIGHT, SCREEN_HEIGHT, hwnd, FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR);
 
 	//Initialize the Color Shader object
-	result = m_ColorShader->Initialize(m_Direct3D->GetDevice(), hwnd, SCREEN_HEIGHT, SCREEN_WIDTH);
-	if (!result)
-	{
-		MessageBox(hwnd, (LPCSTR)L"Could not initialize Color Shader", (LPCSTR)L"Error", MB_OK);
-		return false;
-	}
+	m_ColorShader->Initialize(m_Direct3D->GetDevice(), hwnd, SCREEN_HEIGHT, SCREEN_WIDTH);
 
 	//Initialize the model object
-	result = m_Cube->Initialize(m_Direct3D->GetDevice(), m_Direct3D->GetCommandList(), camera, SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_NEAR, SCREEN_DEPTH, XMFLOAT4(0.0f, 0.0f, 0.5f, 1.0f));
-	if (!result)
-	{
-		MessageBox(hwnd, (LPCSTR)L"Could not initialize Model", (LPCSTR)L"Error", MB_OK);
-		return false;
-	}
+	m_Cube->Initialize(m_Direct3D->GetDevice(), m_Direct3D->GetCommandList(), camera, SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_NEAR, SCREEN_DEPTH, XMFLOAT4(0.0f, 0.0f, 0.5f, 1.0f));
 
 	//Close the command list now that all the commands have been recorded
-	result = m_Direct3D->CloseCommandList();
-	if (!result)
-	{
-		return false;
-	}
+	m_Direct3D->CloseCommandList();
 
 	//Execute the command list
-	result = m_Direct3D->ExecuteCommandList();
-	if (!result)
-	{
-		return false;
-	}
-
-	return true;
+	m_Direct3D->ExecuteCommandList();
 }
 
 void GoodaDriver::Shutdown()
@@ -110,22 +74,14 @@ void GoodaDriver::Shutdown()
 	return;
 }
 
-bool GoodaDriver::Frame(Camera* camera)
+void GoodaDriver::Frame(Camera* camera)
 {
-	bool result;
-
 	//Update constant buffer
 	m_ColorShader->Frame(m_Direct3D->GetCurrentFrame());
 	m_Cube->Frame(m_Direct3D->GetCurrentFrame(), camera);
 
 	//Render the graphics scene
-	result = Render();
-	if (!result)
-	{
-		return false;
-	}
-
-	return true;
+	Render();
 }
 
 int GoodaDriver::RenderQuad(lua_State * L)
@@ -136,24 +92,16 @@ int GoodaDriver::RenderQuad(lua_State * L)
 	return 0;
 }
 
-bool GoodaDriver::Render()
+void GoodaDriver::Render()
 {
-	bool result;
-
 	//Reset the command list and put it in a recording state
-	result = m_Direct3D->BeginScene(m_ColorShader);
-	if (!result)
-		return false;
+	m_Direct3D->BeginScene(m_ColorShader);
 
-	if (renderQuad)
+	if (true)
 	{
 		m_Cube->Render(m_Direct3D->GetCommandList(), m_Direct3D->GetCurrentFrame());
 	}
 
 	//Close the command list and execute the commands
-	result = m_Direct3D->EndScene();
-	if (!result)
-		return false;
-
-	return true;
+	m_Direct3D->EndScene();
 }
