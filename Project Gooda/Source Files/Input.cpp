@@ -86,8 +86,8 @@ void Input::Frame()
 	m_mouseTracker->Update(m_mouse->GetState());
 
 	//Update the location of the mouse
-	m_mouseX += (float)m_mouse->GetState().x;
-	m_mouseY += (float)m_mouse->GetState().y;
+	m_mouseX = (float)m_mouseTracker->GetLastState().x;
+	m_mouseY = (float)m_mouseTracker->GetLastState().y;
 
 	//Ensure the mouse location doesn't exceed the screen width and height
 	if (m_mouseX < 0.0f)

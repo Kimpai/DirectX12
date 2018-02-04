@@ -32,7 +32,7 @@ void GoodaDriver::Initialize(HWND hwnd, Camera* camera)
 	assert(m_Cube);
 
 	//Initialize the Direct3D object
-	m_Direct3D->Initialize(SCREEN_HEIGHT, SCREEN_HEIGHT, hwnd, FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR);
+	m_Direct3D->Initialize(SCREEN_HEIGHT, SCREEN_WIDTH, hwnd, FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR);
 
 	//Initialize the Color Shader object
 	m_ColorShader->Initialize(m_Direct3D->GetDevice(), hwnd, SCREEN_HEIGHT, SCREEN_WIDTH);

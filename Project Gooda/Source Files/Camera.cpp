@@ -9,7 +9,7 @@ Camera::Camera(Input* inputHandler) : m_inputHandler(inputHandler)
 	m_rightSpeed = 0.0f;
 	m_leftSpeed = 0.0f;
 	m_turnSpeed = 0.0f;
-	m_frameTime = 0.0f;
+	m_frameTime = 0.0001f;
 	m_mouse.x = m_inputHandler->GetMousePosition().x;
 	m_mouse.y = m_inputHandler->GetMousePosition().y;
 }
@@ -45,12 +45,17 @@ XMFLOAT3 Camera::GetRotation()
 void Camera::Frame()
 {
 	Turn();
-	MoveBackward();
+
+	
 	MoveForward();
+	
+	MoveBackward();
+	
 	MoveRight();
+
 	MoveLeft();
 
-	BuildBaseViewMatrix();
+	BuildViewMatrix();
 }
 
 void Camera::GetViewMatrix(XMMATRIX& viewMatrix)
@@ -284,10 +289,19 @@ void Camera::Turn()
 {
 	if (m_inputHandler->GetMousePosition().x != m_mouse.x || m_inputHandler->GetMousePosition().y != m_mouse.y)
 	{
-		m_rotation.y += m_inputHandler->GetMousePosition().x * 0.001f;
-		m_rotation.x += m_inputHandler->GetMousePosition().y * 0.001f;
+		if (m_inputHandler->GetMousePosition().x < SCREEN_WIDTH / 2)
+			m_rotation.y -= m_inputHandler->GetMousePosition().x * 0.001f;
+		else
+			m_rotation.y += m_inputHandler->GetMousePosition().x * 0.001f;
+
+		if (m_inputHandler->GetMousePosition().y < SCREEN_HEIGHT / 2)
+			m_rotation.x -= m_inputHandler->GetMousePosition().y * 0.001f;
+		else
+			m_rotation.x += m_inputHandler->GetMousePosition().y * 0.001f;
 
 		m_mouse.x = m_inputHandler->GetMousePosition().x;
 		m_mouse.y = m_inputHandler->GetMousePosition().y;
+
+		std::cout << m_inputHandler->GetMousePosition().x << "	" << m_inputHandler->GetMousePosition().y << std::endl;
 	}
 }
