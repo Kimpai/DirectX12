@@ -7,7 +7,7 @@
 #include <fstream>
 #include <iostream>
 #include <wrl.h>
-#include "frame.h"
+#include <frame.h>
 
 using namespace DirectX;
 using namespace Microsoft::WRL;

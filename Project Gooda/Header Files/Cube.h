@@ -6,7 +6,7 @@
 #include <wrl.h>
 #include <VertexTypes.h>
 #include "frame.h"
-#include "modelclass.h"
+#include "GoodaModel.h"
 
 using namespace DirectX;
 using namespace Microsoft::WRL;

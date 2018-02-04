@@ -5,10 +5,10 @@
 #include <lauxlib.h>
 #include <config.h>
 #include <iostream>
-#include "d3dclass.h"
-#include "colorshaderclass.h"
-#include "cubeclass.h"
-#include "cameraclass.h"
+#include "Direct3D.h"
+#include "Colorshader.h"
+#include "Cube.h"
+#include "Camera.h"
 
 static bool renderQuad = true;
 

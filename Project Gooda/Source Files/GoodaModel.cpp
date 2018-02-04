@@ -1,4 +1,4 @@
-#include "modelclass.h"
+#include "GoodaModel.h"
 
 Model::Model()
 {
@@ -47,20 +47,14 @@ void Model::BuildWorlViewProjectionMatrix(Camera* camera, int width, int height,
 	XMStoreFloat4x4(&m_constantBuffer.projectionMatrix, matrix);
 
 	//Build view matrix
-	XMVECTOR pos = XMLoadFloat4(&XMFLOAT4(camera->GetPosition().x, camera->GetPosition().y, camera->GetPosition().z, 1.0f));
-	XMVECTOR lookAt = XMLoadFloat4(&XMFLOAT4(camera->GetLookAt().x, camera->GetLookAt().y, camera->GetLookAt().z, 1.0f));
-	XMVECTOR up = XMLoadFloat4(&XMFLOAT4(camera->GetUp().x, camera->GetUp().y, camera->GetUp().z, 1.0f));
-	
-	matrix = XMMatrixLookAtLH(pos, lookAt, up);
+	camera->GetViewMatrix(matrix);
 	XMStoreFloat4x4(&m_constantBuffer.viewMatrix, matrix);
 
 	//Build rotation matrix
 	XMStoreFloat4x4(&m_constantBuffer.rotationMatrix, XMMatrixIdentity());
 
 	//Build world matrix
-	pos = XMLoadFloat4(&origin);
-
-	matrix = XMMatrixTranslationFromVector(pos);
+	matrix = XMMatrixTranslationFromVector(XMLoadFloat4(&origin));
 	XMStoreFloat4x4(&m_constantBuffer.worldMatrix, matrix);
 
 	return;
@@ -69,11 +63,8 @@ void Model::BuildWorlViewProjectionMatrix(Camera* camera, int width, int height,
 void Model::Frame(int currentFrame, Camera* camera)
 {
 	//Build view matrix
-	XMVECTOR pos = XMLoadFloat4(&XMFLOAT4(camera->GetPosition().x, camera->GetPosition().y, camera->GetPosition().z, 1.0f));
-	XMVECTOR lookAt = XMLoadFloat4(&XMFLOAT4(camera->GetLookAt().x, camera->GetLookAt().y, camera->GetLookAt().z, 1.0f));
-	XMVECTOR up = XMLoadFloat4(&XMFLOAT4(camera->GetUp().x, camera->GetUp().y, camera->GetUp().z, 1.0f));
-
-	XMMATRIX matrix = XMMatrixLookAtLH(pos, lookAt, up);
+	XMMATRIX matrix = XMMatrixIdentity();
+	camera->GetViewMatrix(matrix);
 	XMStoreFloat4x4(&m_constantBuffer.viewMatrix, matrix);
 
 	//Transpose the matrices before sending them to the GPU

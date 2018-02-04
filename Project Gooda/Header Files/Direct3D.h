@@ -9,9 +9,10 @@
 #include <d3dcompiler.h>
 #include <wrl.h>
 #include <assert.h>
+#include <frame.h>
+#include <config.h>
 
-#include "colorshaderclass.h"
-#include "frame.h"
+#include "Colorshader.h"
 
 using namespace Microsoft::WRL;
 
@@ -43,7 +44,6 @@ private:
 	void CreateRenderTargets();
 
 private:
-	bool m_vsync;
 	ComPtr<ID3D12Device> m_device;
 	ComPtr<ID3D12CommandQueue> m_commandQueue;
 	char m_videoCardDescription[128];

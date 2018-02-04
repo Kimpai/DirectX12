@@ -1,7 +1,7 @@
 #pragma once
 
 #include <DirectXMath.h>
-#include "inputclass.h"
+#include "Input.h"
 
 using namespace DirectX;
 
@@ -24,6 +24,7 @@ public:
 
 private:
 	void BuildBaseViewMatrix();
+	void BuildViewMatrix();
 
 	void MoveForward();
 	void MoveBackward();
@@ -40,6 +41,7 @@ private:
 	float m_rightSpeed, m_leftSpeed;
 	float m_turnSpeed;
 	float m_frameTime;
+	XMFLOAT2 m_mouse;
 
 	Input* m_inputHandler;
 };

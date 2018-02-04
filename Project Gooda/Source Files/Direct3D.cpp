@@ -1,4 +1,4 @@
-#include "d3dclass.h"
+#include "Direct3D.h"
 
 Direct3D::Direct3D()
 {
@@ -193,7 +193,7 @@ bool Direct3D::EndScene()
 	}
 
 	//Finally present the back buffer to the screen since rendering is complete.
-	if (m_vsync)
+	if (VSYNC_ENABLED)
 	{
 		//Lock to screen refresh rate.
 		result = m_swapChain->Present(1, 0);
@@ -460,6 +460,7 @@ void Direct3D::CreateCommandInterfaceAndSwapChain(HWND hwnd, int screenWidth, in
 
 	//Finally create the swap chain using the swap chain description.	
 	ComPtr<IDXGIFactory5> factory = nullptr;
+	CreateDXGIFactory(__uuidof(IDXGIFactory5), (void**)&factory);
 	assert(!factory->CreateSwapChain(m_commandQueue.Get(), &swapChainDesc, &swapChain));
 
 	//Next upgrade the IDXGISwapChain to a IDXGISwapChain3 interface and store it in a private member variable named m_swapChain.

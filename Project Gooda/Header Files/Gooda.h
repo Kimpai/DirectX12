@@ -7,11 +7,11 @@
 #include <iostream>
 #include <config.h>
 #include <fstream>
-#include "inputclass.h"
-#include "graphicsclass.h"
-#include "consoleclass.h"
-#include "luaclass.h"
-#include "cameraclass.h"
+#include "Input.h"
+#include "GoodaDriver.h"
+#include "Console.h"
+#include "LuaScript.h"
+#include "Camera.h"
 
 class GoodaDevice
 {

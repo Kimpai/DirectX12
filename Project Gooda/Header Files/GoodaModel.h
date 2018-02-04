@@ -4,9 +4,9 @@
 #include <d3dx12.h>
 #include <DirectXMath.h>
 #include <wrl.h>
+#include <frame.h>
 
-#include "cameraclass.h"
-#include "frame.h"
+#include "Camera.h"
 
 using namespace DirectX;
 using namespace Microsoft::WRL;

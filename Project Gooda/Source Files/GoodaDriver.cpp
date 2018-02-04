@@ -1,4 +1,4 @@
-#include "graphicsclass.h"
+#include "GoodaDriver.h"
 
 GoodaDriver::GoodaDriver()
 {
@@ -43,7 +43,7 @@ bool GoodaDriver::Initialize(HWND hwnd, Camera* camera)
 	}
 
 	//Initialize the Direct3D object
-	result = m_Direct3D->Initialize(SCREEN_HEIGHT, SCREEN_HEIGHT, hwnd, VSYNC_ENABLED, FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR);
+	result = m_Direct3D->Initialize(SCREEN_HEIGHT, SCREEN_HEIGHT, hwnd, FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR);
 	if (!result)
 	{
 		MessageBox(hwnd, (LPCSTR)L"Could not initialize Direct3D", (LPCSTR)L"Error", MB_OK);
@@ -103,7 +103,6 @@ void GoodaDriver::Shutdown()
 	//Release the Direct3D object
 	if (m_Direct3D)
 	{
-		m_Direct3D->Shutdown();
 		delete m_Direct3D;
 		m_Direct3D = nullptr;
 	}

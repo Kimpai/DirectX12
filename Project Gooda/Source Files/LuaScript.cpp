@@ -1,4 +1,4 @@
-#include "luaclass.h"
+#include "LuaScript.h"
 
 Lua::Lua()
 {

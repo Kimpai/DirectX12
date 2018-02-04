@@ -1,4 +1,4 @@
-#include "..\Header Files\consoleclass.h"
+#include "Console.h"
 
 Console::Console()
 {
@@ -18,6 +18,7 @@ bool Console::Initialize()
 
 	//Allocate a console
 	AllocConsole();
+	AttachConsole(GetCurrentProcessId());
 
 	//Redirect unbuffered STDOUT to the console
 	m_stdOutputHandle = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -29,25 +30,25 @@ bool Console::Initialize()
 	freopen_s(&fp, "CONOUT$", "w", stdout);
 	setvbuf(stdout, NULL, _IONBF, 0);
 
-	//Redirect unbuffered STDIN to the console
-	m_stdInputHandle = GetStdHandle(STD_INPUT_HANDLE);
-	if (m_stdInputHandle == INVALID_HANDLE_VALUE)
-	{
-		return false;
-	}
-	
-	freopen_s(&fp, "CONIN$", "r", stdin);
-	setvbuf(stdin, NULL, _IONBF, 0);
+	////Redirect unbuffered STDIN to the console
+	//m_stdInputHandle = GetStdHandle(STD_INPUT_HANDLE);
+	//if (m_stdInputHandle == INVALID_HANDLE_VALUE)
+	//{
+	//	return false;
+	//}
+	//
+	//freopen_s(&fp, "CONIN$", "r", stdin);
+	////setvbuf(stdin, NULL, _IONBF, 0);
 
-	//Redirect unbuffered STDERR to the console
-	m_stdErrorHandle = GetStdHandle(STD_ERROR_HANDLE);
-	if (m_stdErrorHandle == INVALID_HANDLE_VALUE)
-	{
-		return false;
-	}
-	
-	freopen_s(&fp, "CONOUT$", "w", stderr);
-	setvbuf(stderr, NULL, _IONBF, 0);
+	////Redirect unbuffered STDERR to the console
+	//m_stdErrorHandle = GetStdHandle(STD_ERROR_HANDLE);
+	//if (m_stdErrorHandle == INVALID_HANDLE_VALUE)
+	//{
+	//	return false;
+	//}
+	//
+	//freopen_s(&fp, "CONOUT$", "w", stderr);
+	////setvbuf(stderr, NULL, _IONBF, 0);
 
 	//Make cout, wcout, cin, wcin, wcerr, cerr, wclog and clog 
 	//point to console as well
