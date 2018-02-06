@@ -287,17 +287,11 @@ void Camera::MoveLeft()
 
 void Camera::Turn()
 {
-	if (m_inputHandler->GetMousePosition().x != m_mouse.x || m_inputHandler->GetMousePosition().y != m_mouse.y)
+	if ((m_inputHandler->GetMousePosition().x != m_mouse.x) || (m_inputHandler->GetMousePosition().y != m_mouse.y))
 	{
-		if (m_inputHandler->GetMousePosition().x < SCREEN_WIDTH / 2)
-			m_rotation.y -= m_inputHandler->GetMousePosition().x * 0.001f;
-		else
-			m_rotation.y += m_inputHandler->GetMousePosition().x * 0.001f;
-
-		if (m_inputHandler->GetMousePosition().y < SCREEN_HEIGHT / 2)
-			m_rotation.x -= m_inputHandler->GetMousePosition().y * 0.001f;
-		else
-			m_rotation.x += m_inputHandler->GetMousePosition().y * 0.001f;
+		
+		m_rotation.y += m_mouse.x * 0.01f;
+		m_rotation.x += m_mouse.y * 0.01f;
 
 		m_mouse.x = m_inputHandler->GetMousePosition().x;
 		m_mouse.y = m_inputHandler->GetMousePosition().y;

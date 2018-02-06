@@ -31,7 +31,7 @@ void Input::Initialize(HWND hwnd)
 	//Create mouse object
 	m_mouse = std::make_unique<Mouse>();
 	m_mouse->SetWindow(hwnd);
-	m_mouse->SetMode(Mouse::MODE_ABSOLUTE);
+	m_mouse->SetMode(Mouse::MODE_RELATIVE);
 
 	//Create a keyboard state tracker
 	m_keyboardTracker = std::make_unique<Keyboard::KeyboardStateTracker>();
@@ -89,16 +89,4 @@ void Input::Frame()
 	m_mouseX = (float)m_mouseTracker->GetLastState().x;
 	m_mouseY = (float)m_mouseTracker->GetLastState().y;
 
-	//Ensure the mouse location doesn't exceed the screen width and height
-	if (m_mouseX < 0.0f)
-		m_mouseX = 0.0f;
-
-	if (m_mouseY < 0.0f)
-		m_mouseY = 0.0f;
-
-	if (m_mouseX > SCREEN_WIDTH)
-		m_mouseX = SCREEN_WIDTH;
-
-	if (m_mouseY > SCREEN_HEIGHT)
-		m_mouseY = SCREEN_HEIGHT;
 }

@@ -10,6 +10,7 @@
 #include <DirectXMath.h>
 #include <Keyboard.h>
 #include <config.h>
+#include <iostream>
 
 using namespace DirectX;
 
