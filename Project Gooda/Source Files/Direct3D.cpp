@@ -160,7 +160,6 @@ void Direct3D::BeginScene(ColorShader* shader)
 
 void Direct3D::EndScene()
 {
-	HRESULT result;
 	ID3D12CommandList* ppCommandLists[] = { m_commandList.Get() };
 
 	//Indicate that the back buffer will now be used to present.
@@ -350,6 +349,61 @@ void Direct3D::CreateCommandInterfaceAndSwapChain(HWND hwnd, int screenWidth, in
 	//Create a basic command list.
 	assert(!m_device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_commandAllocator[0].Get(), NULL, __uuidof(ID3D12GraphicsCommandList), (void**)&m_commandList));
 
+	//Create temporary factory to use when creating swapchain
+	ComPtr<IDXGIFactory5> factory = nullptr;
+	CreateDXGIFactory(__uuidof(IDXGIFactory5), (void**)&factory);
+
+	//Use the factory to create an adapter for the primary graphics card
+	ComPtr<IDXGIAdapter1> adapter = nullptr;
+	assert(!factory->EnumAdapters1(0, &adapter));
+
+	//Enumerate the primary monitor
+	ComPtr<IDXGIOutput> adapterOutput = nullptr;
+	assert(!adapter->EnumOutputs(0, &adapterOutput));
+
+	//Get the number of modes
+	unsigned int numModes = 0;
+	assert(!adapterOutput->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numModes, NULL));
+
+	//Create and hold all the possible display modes for this monitor/graphcis card combination
+	DXGI_MODE_DESC* displayModeList = new DXGI_MODE_DESC[numModes];
+
+	//Now fill thr display mode list struct
+	assert(!adapterOutput->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numModes, displayModeList));
+
+	//Now go through all the display modes and find one that matches the screen height and width
+	//When a match is found  store the numerator and denominator of the refresh rate for thr monitor
+	unsigned int numerator, denominator;
+	for (unsigned int i = 0; i < numModes; i++)
+	{
+		if (displayModeList[i].Height == (unsigned int)screenHeight)
+		{
+			if (displayModeList[i].Width == (unsigned int)screenWidth)
+			{
+				numerator = displayModeList[i].RefreshRate.Numerator;
+				denominator = displayModeList[i].RefreshRate.Denominator;
+			}
+		}
+	}
+
+	if (displayModeList)
+	{
+		delete[] displayModeList;
+		displayModeList = nullptr;
+	}
+
+	//Get the adapter desc
+	DXGI_ADAPTER_DESC adapterDesc = {};
+	assert(!adapter->GetDesc(&adapterDesc));
+
+	//Store the dedicated video card memory in megabytes
+	unsigned long long videoCardMemory = 0;
+	videoCardMemory = (int)(adapterDesc.DedicatedVideoMemory / 1024 / 1024);
+	
+	//Convert the name of the video card to a char array to store it
+	size_t stringLength = 0;
+	wcstombs_s(&stringLength, m_videoCardDescription, 128, adapterDesc.Description, 128);
+	
 	DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
 	ComPtr<IDXGISwapChain> swapChain = nullptr;
 
@@ -400,9 +454,20 @@ void Direct3D::CreateCommandInterfaceAndSwapChain(HWND hwnd, int screenWidth, in
 		swapChainDesc.Windowed = true;
 	}
 
+	//Set the refresh rate of the back buffer
+	if (VSYNC_ENABLED)
+	{
+		swapChainDesc.BufferDesc.RefreshRate.Numerator = numerator;
+		swapChainDesc.BufferDesc.RefreshRate.Denominator = denominator;
+	}
+	else
+	{
+		swapChainDesc.BufferDesc.RefreshRate.Numerator = 0;
+		swapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
+	}
+
 	//Finally create the swap chain using the swap chain description.	
-	ComPtr<IDXGIFactory5> factory = nullptr;
-	CreateDXGIFactory(__uuidof(IDXGIFactory5), (void**)&factory);
+	
 	assert(!factory->CreateSwapChain(m_commandQueue.Get(), &swapChainDesc, &swapChain));
 
 	//Next upgrade the IDXGISwapChain to a IDXGISwapChain3 interface and store it in a private member variable named m_swapChain.
