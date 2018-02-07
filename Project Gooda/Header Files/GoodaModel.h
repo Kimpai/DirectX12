@@ -38,6 +38,6 @@ public:
 
 private:
 	virtual void ShutdownBuffers() = 0;
-	virtual void InitializeBuffers(ID3D12Device*, ID3D12GraphicsCommandList*, XMFLOAT4) = 0;
+	virtual void InitializeBuffers(ID3D12Device*, ID3D12GraphicsCommandList*) = 0;
 	virtual void RenderBuffers(ID3D12GraphicsCommandList*, int) = 0;
 };

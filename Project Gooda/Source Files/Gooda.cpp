@@ -65,8 +65,6 @@ void GoodaDevice::Initialize()
 
 	m_Lua->PushCFunction(m_Lua->Print);
 	m_Lua->SetGlobal("Print");
-	m_Lua->PushCFunction(m_Driver->RenderQuad);
-	m_Lua->SetGlobal("RenderQuad");
 }
 
 void GoodaDevice::Shutdown()

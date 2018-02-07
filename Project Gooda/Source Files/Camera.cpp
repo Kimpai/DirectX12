@@ -2,7 +2,7 @@
 
 Camera::Camera(Input* inputHandler) : m_inputHandler(inputHandler)
 {
-	m_position = XMFLOAT3(0.0f, 0.0f, -2.0f);
+	m_position = XMFLOAT3(0.0f, 1.0f, 0.0f);
 	m_rotation = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	m_forwardSpeed = 0.0f;
 	m_backwardSpeed = 0.0f;

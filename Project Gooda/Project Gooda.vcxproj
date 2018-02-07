@@ -170,6 +170,7 @@
     <ClCompile Include="Source Files\main.cpp" />
     <ClCompile Include="Source Files\GoodaModel.cpp" />
     <ClCompile Include="Source Files\Gooda.cpp" />
+    <ClCompile Include="Source Files\Terrain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Header Files\Camera.h" />
@@ -184,6 +185,7 @@
     <ClInclude Include="Header Files\LuaScript.h" />
     <ClInclude Include="Header Files\GoodaModel.h" />
     <ClInclude Include="Header Files\Gooda.h" />
+    <ClInclude Include="Header Files\Terrain.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shader Files\ColorPixelShader.hlsl">

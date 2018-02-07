@@ -1,24 +1,16 @@
-#include "Cube.h"
+#include "Terrain.h"
 
-Cube::Cube()
+Terrain::Terrain(int height, int width)
 {
 	m_vertexBuffer = nullptr;
 	m_vertexBufferUploadHeap = nullptr;
 	m_indexBuffer = nullptr;
 	m_indexBufferUploadHeap = nullptr;
-	m_constantBufferDescHeap[0] = nullptr;
-	m_constantBufferDescHeap[1] = nullptr;
-	m_constantBufferDescHeap[2] = nullptr;
-	m_constantBufferUploadHeap[0] = nullptr;
-	m_constantBufferUploadHeap[1] = nullptr;
-	m_constantBufferUploadHeap[2] = nullptr;
-	m_constantBufferGPUAddress[0] = nullptr;
-	m_constantBufferGPUAddress[1] = nullptr;
-	m_constantBufferGPUAddress[2] = nullptr;
-	m_cubeIndices = 0;
+	m_height = height;
+	m_width = width;
 }
 
-Cube::~Cube()
+Terrain::~Terrain()
 {
 	ShutdownBuffers();
 
@@ -54,54 +46,102 @@ Cube::~Cube()
 			m_constantBufferGPUAddress[i] = nullptr;
 }
 
-void Cube::InitializeBuffers(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, XMFLOAT4 origin)
+void Terrain::InitializeBuffers(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
 {
-	int vertexBufferSize;
-	int indexBufferSize;
 	D3D12_SUBRESOURCE_DATA vertexData = {};
 	D3D12_SUBRESOURCE_DATA indexData = {};
+	int vertexBufferSize;
+	int indexBufferSize;
 
-	//Create vertex buffer
-	VertexPositionColor vertices[] =
+	const int size = (m_width - 1) * (m_height - 1) * 8;
+	VertexPositionColor* vertices = new VertexPositionColor[size];
+	XMFLOAT4 color = { 0.0f, 0.0f, 0.0f, 1.0f };
+	unsigned int* indices = new unsigned int[size];
+	
+	float positionX, positionZ;
+	// Initialize the index into the vertex and index arrays.
+	int index = 0;
+
+	// Load the vertex array and index array with data.
+	for (int j = 0; j < (m_height - 1); j++)
 	{
-		//Front face
-		{ XMFLOAT3(origin.x - 0.5f, origin.y + 0.5f, origin.z - 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ XMFLOAT3(origin.x + 0.5f, origin.y - 0.5f, origin.z - 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ XMFLOAT3(origin.x - 0.5f, origin.y - 0.5f, origin.z - 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ XMFLOAT3(origin.x + 0.5f, origin.y + 0.5f, origin.z - 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
+		for (int i = 0; i < (m_width - 1); i++)
+		{
+			// Line 1 - Upper left.
+			positionX = (float)i;
+			positionZ = (float)(j + 1);
 
-		//Rigth face
-		{ XMFLOAT3(0.5f, -0.5f, -0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ XMFLOAT3(0.5f, -0.5f, 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ XMFLOAT3(0.5f, 0.5f, -0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
+			vertices[index].position = XMFLOAT3(positionX, 0.0f, positionZ);
+			vertices[index].color = color;
+			indices[index] = index;
+			index++;
 
-		//Left face
-		{ XMFLOAT3(-0.5f, 0.5f, 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ XMFLOAT3(-0.5f, -0.5f, -0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ XMFLOAT3(-0.5f, -0.5f, 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ XMFLOAT3(-0.5f, 0.5f, -0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
+			// Line 1 - Upper right.
+			positionX = (float)(i + 1);
+			positionZ = (float)(j + 1);
 
-		//Back face
-		{ XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ XMFLOAT3(-0.5f, -0.5f, 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ XMFLOAT3(0.5f, -0.5f, 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ XMFLOAT3(-0.5f, 0.5f, 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
+			vertices[index].position = XMFLOAT3(positionX, 0.0f, positionZ);
+			vertices[index].color = color;
+			indices[index] = index;
+			index++;
 
-		//Top face
-		{ XMFLOAT3(-0.5f, 0.5f, 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ XMFLOAT3(0.5f, 0.5f, -0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ XMFLOAT3(0.5f, 0.5f, -0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ XMFLOAT3(-0.5f, 0.5f, 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
+			// Line 2 - Upper right
+			positionX = (float)(i + 1);
+			positionZ = (float)(j + 1);
 
-		//Bottom face
-		{ XMFLOAT3(0.5f, -0.5f, 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ XMFLOAT3(-0.5f, -0.5f, -0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ XMFLOAT3(0.5f, -0.5f, -0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ XMFLOAT3(-0.5f, -0.5f, 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) }
-	};
+			vertices[index].position = XMFLOAT3(positionX, 0.0f, positionZ);
+			vertices[index].color = color;
+			indices[index] = index;
+			index++;
 
-	vertexBufferSize = sizeof(vertices);
+			// Line 2 - Bottom right.
+			positionX = (float)(i + 1);
+			positionZ = (float)j;
+
+			vertices[index].position = XMFLOAT3(positionX, 0.0f, positionZ);
+			vertices[index].color = color;
+			indices[index] = index;
+			index++;
+
+			// Line 3 - Bottom right.
+			positionX = (float)(i + 1);
+			positionZ = (float)j;
+
+			vertices[index].position = XMFLOAT3(positionX, 0.0f, positionZ);
+			vertices[index].color = color;
+			indices[index] = index;
+			index++;
+
+			// Line 3 - Bottom left.
+			positionX = (float)i;
+			positionZ = (float)j;
+
+			vertices[index].position = XMFLOAT3(positionX, 0.0f, positionZ);
+			vertices[index].color = color;
+			indices[index] = index;
+			index++;
+
+			// Line 4 - Bottom left.
+			positionX = (float)i;
+			positionZ = (float)j;
+
+			vertices[index].position = XMFLOAT3(positionX, 0.0f, positionZ);
+			vertices[index].color = color;
+			indices[index] = index;
+			index++;
+
+			// Line 4 - Upper left.
+			positionX = (float)i;
+			positionZ = (float)(j + 1);
+
+			vertices[index].position = XMFLOAT3(positionX, 0.0f, positionZ);
+			vertices[index].color = color;
+			indices[index] = index;
+			index++;
+		}
+	}
+
+	vertexBufferSize = size * 4;
 
 	//Create default heap
 	//default heap is memory on the GPU. Only GPU have access to this memory
@@ -139,37 +179,9 @@ void Cube::InitializeBuffers(ID3D12Device* device, ID3D12GraphicsCommandList* co
 	m_vertexBufferView.StrideInBytes = sizeof(VertexPositionColor);
 	m_vertexBufferView.SizeInBytes = vertexBufferSize;
 
-	//Create index buffer
-	DWORD indices[] =
-	{
-		//Front face
-		0, 1, 2, //First triangle
-		0, 3, 1, //Second triangle
+	indexBufferSize = size * 4;
 
-		//Rigth face
-		4, 5, 6,
-		4, 7, 5,
-
-		//Left face
-		8, 9, 10,
-		8, 11, 9,
-
-		//Back face
-		12, 13, 14,
-		12, 15, 13,
-
-		//Top face
-		16, 17, 18,
-		16, 19, 17,
-
-		//Bottom face
-		20, 21, 22,
-		20, 23, 21
-	};
-
-	m_cubeIndices = sizeof(indices) / sizeof(*indices);
-
-	indexBufferSize = sizeof(indices);
+	m_terrainIndices = size;
 
 	//Create default heap to hold index buffer
 	assert(!device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE,
@@ -204,7 +216,6 @@ void Cube::InitializeBuffers(ID3D12Device* device, ID3D12GraphicsCommandList* co
 
 
 	//Create one resource for each frame buffer
-	//for our cube
 	for (int i = 0; i < frameBufferCount; ++i)
 	{
 		assert(!device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
@@ -219,7 +230,7 @@ void Cube::InitializeBuffers(ID3D12Device* device, ID3D12GraphicsCommandList* co
 	}
 }
 
-void Cube::RenderBuffers(ID3D12GraphicsCommandList* commandList, int currentFrame)
+void Terrain::RenderBuffers(ID3D12GraphicsCommandList* commandList, int currentFrame)
 {
 	//Set the primitive topology
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -234,37 +245,37 @@ void Cube::RenderBuffers(ID3D12GraphicsCommandList* commandList, int currentFram
 	commandList->SetGraphicsRootConstantBufferView(0, m_constantBufferUploadHeap[currentFrame]->GetGPUVirtualAddress());
 
 	//Draw
-	commandList->DrawIndexedInstanced(m_cubeIndices, 1, 0, 0, 0);
+	commandList->DrawIndexedInstanced(m_terrainIndices, 1, 0, 0, 0);
 }
 
-void Cube::ShutdownBuffers()
+void Terrain::ShutdownBuffers()
 {
 	if (m_vertexBuffer)
 		m_vertexBuffer = nullptr;
-	
+
 	if (m_vertexBufferUploadHeap)
 		m_vertexBufferUploadHeap = nullptr;
 
 	if (m_indexBuffer)
 		m_indexBuffer = nullptr;
-	
+
 	if (m_indexBufferUploadHeap)
 		m_indexBufferUploadHeap = nullptr;
-	
+
 	if (m_constantBufferDescHeap)
 	{
 		m_constantBufferDescHeap[0] = nullptr;
 		m_constantBufferDescHeap[1] = nullptr;
 		m_constantBufferDescHeap[2] = nullptr;
 	}
-	
+
 	if (m_constantBufferUploadHeap)
 	{
 		m_constantBufferUploadHeap[0] = nullptr;
 		m_constantBufferUploadHeap[1] = nullptr;
 		m_constantBufferUploadHeap[2] = nullptr;
 	}
-	
+
 	if (m_constantBufferGPUAddress)
 	{
 		m_constantBufferGPUAddress[0] = nullptr;

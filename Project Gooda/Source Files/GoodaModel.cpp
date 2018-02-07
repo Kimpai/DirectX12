@@ -16,7 +16,7 @@ Model::~Model()
 
 void Model::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, Camera* camera, int width, int height, float nearplane, float farplane, XMFLOAT4 origin)
 {
-	InitializeBuffers(device, commandList, origin);
+	InitializeBuffers(device, commandList);
 
 	BuildWorlViewProjectionMatrix(camera, width, height, nearplane, farplane, origin);
 }

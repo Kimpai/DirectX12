@@ -5,10 +5,12 @@
 #include <lauxlib.h>
 #include <config.h>
 #include <iostream>
+#include <vector>
 
 #include "Direct3D.h"
 #include "Colorshader.h"
 #include "Cube.h"
+#include "Terrain.h"
 #include "Camera.h"
 
 static bool renderQuad = true;
@@ -24,12 +26,11 @@ public:
 	void Shutdown();
 	void Frame(Camera*);
 
-	static int RenderQuad(lua_State* L);
-
 private:
 	void Render();
 
 	Direct3D* m_Direct3D;
 	ColorShader* m_ColorShader;
-	Cube* m_Cube;
+	std::vector<Model*> m_Models;
+	
 };
