@@ -24,7 +24,7 @@ void GoodaDriver::Initialize(HWND hwnd, Camera* camera)
 
 	//Create the Color Shader object
 	m_ColorShader = new ColorShader();
-	assert(m_ColorShader);
+	assert(&m_ColorShader);
 
 	//Create the Model object
 	m_Models.push_back(new Cube(XMFLOAT3(0.0f, 1.0f, 3.0f)));
@@ -35,7 +35,11 @@ void GoodaDriver::Initialize(HWND hwnd, Camera* camera)
 	m_Direct3D->Initialize(SCREEN_HEIGHT, SCREEN_WIDTH, hwnd, FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR);
 
 	//Initialize the Color Shader object
-	m_ColorShader->Initialize(m_Direct3D->GetDevice(), hwnd, SCREEN_HEIGHT, SCREEN_WIDTH);
+	m_ColorShader->Initialize({ { ShaderType::Type::VS, L"Shader Files/ColorVertexShader.hlsl" }, { ShaderType::Type::PS, L"Shader Files/ColorPixelShader.hlsl" } });
+
+	m_Direct3D->SetRootParameters(m_ColorShader->GetRootParameters());
+	m_Direct3D->CreateRootSignature();
+	m_ColorShader->CreatPipelineState(m_Direct3D->GetDevice(), m_Direct3D->GetRootSignature(), SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	//Initialize the model object
 	for (auto model : m_Models)
@@ -61,7 +65,6 @@ void GoodaDriver::Shutdown()
 	//Release the Color Shader object
 	if (m_ColorShader)
 	{
-		m_ColorShader->Shutdown();
 		delete m_ColorShader;
 		m_ColorShader = nullptr;
 	}

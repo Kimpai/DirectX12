@@ -4,34 +4,30 @@
 #include <d3dx12.h>
 #include <d3dcompiler.h>
 #include <DirectXMath.h>
-#include <fstream>
-#include <iostream>
 #include <wrl.h>
 #include <frame.h>
+
+#include "Shader.h"
 
 using namespace DirectX;
 using namespace Microsoft::WRL;
 
-class ColorShader
+class ColorShader : public Shader
 {
 public:
 	ColorShader();
-	ColorShader(const ColorShader&);
 	~ColorShader();
 
-	void Initialize(ID3D12Device*, HWND, int, int);
-	void Shutdown();
-	void Frame(int);
+	void CreatPipelineState(ID3D12Device*, ID3D12RootSignature*, int, int);
 	ID3D12PipelineState* GetPipelineState();
-	ID3D12RootSignature* GetRootSignature();
 	CD3DX12_CPU_DESCRIPTOR_HANDLE GetDepthStencilViewHandle();
-
 private:
-	void InitializeShader(ID3D12Device*, HWND, WCHAR*, WCHAR*, int, int);
-	void ShutdownShaders();
+	void CompileShader(ShaderType);
+	void SetRootParameters();
+	void CreateDepthStencil(ID3D12Device*, int, int, D3D12_DEPTH_STENCIL_DESC&);
+	void CreateInputLayout(D3D12_INPUT_LAYOUT_DESC&);
 
 	ComPtr<ID3D12PipelineState> m_pipelineState;
-	ComPtr<ID3D12RootSignature> m_rootSignature;
 	ComPtr<ID3DBlob> m_vertexShader;
 	ComPtr<ID3DBlob> m_pixelShader;
 	ComPtr<ID3D12Resource> m_depthStencilBuffer;
