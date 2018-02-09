@@ -15,11 +15,11 @@ using namespace Microsoft::WRL;
 class Cube : public Model
 {
 public:
-	Cube();
+	Cube(XMFLOAT3 origin);
 	~Cube();
 
 private:
-	void InitializeBuffers(ID3D12Device*, ID3D12GraphicsCommandList*, XMFLOAT4);
+	void InitializeBuffers(ID3D12Device*, ID3D12GraphicsCommandList*);
 	void RenderBuffers(ID3D12GraphicsCommandList*, int);
 	void ShutdownBuffers();
 
@@ -29,5 +29,7 @@ private:
 	ComPtr<ID3D12Resource> m_indexBuffer;
 	D3D12_INDEX_BUFFER_VIEW m_indexBufferView;
 	ComPtr<ID3D12Resource> m_indexBufferUploadHeap;
+	
 	int m_cubeIndices;
+	XMFLOAT3 m_origin;
 };

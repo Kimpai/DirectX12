@@ -27,7 +27,8 @@ void GoodaDriver::Initialize(HWND hwnd, Camera* camera)
 	assert(m_ColorShader);
 
 	//Create the Model object
-	m_Models.push_back(new Terrain(256, 256));
+	m_Models.push_back(new Cube(XMFLOAT3(0.0f, 1.0f, 3.0f)));
+	//m_Models.push_back(new Terrain(256, 256));
 	assert(&m_Models);
 
 	//Initialize the Direct3D object

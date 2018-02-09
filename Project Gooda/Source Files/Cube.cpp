@@ -1,6 +1,6 @@
 #include "Cube.h"
 
-Cube::Cube()
+Cube::Cube(XMFLOAT3 origin)
 {
 	m_vertexBuffer = nullptr;
 	m_vertexBufferUploadHeap = nullptr;
@@ -16,6 +16,7 @@ Cube::Cube()
 	m_constantBufferGPUAddress[1] = nullptr;
 	m_constantBufferGPUAddress[2] = nullptr;
 	m_cubeIndices = 0;
+	m_origin = origin;
 }
 
 Cube::~Cube()
@@ -54,7 +55,7 @@ Cube::~Cube()
 			m_constantBufferGPUAddress[i] = nullptr;
 }
 
-void Cube::InitializeBuffers(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, XMFLOAT4 origin)
+void Cube::InitializeBuffers(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
 {
 	int vertexBufferSize;
 	int indexBufferSize;
@@ -65,40 +66,40 @@ void Cube::InitializeBuffers(ID3D12Device* device, ID3D12GraphicsCommandList* co
 	VertexPositionColor vertices[] =
 	{
 		//Front face
-		{ XMFLOAT3(origin.x - 0.5f, origin.y + 0.5f, origin.z - 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ XMFLOAT3(origin.x + 0.5f, origin.y - 0.5f, origin.z - 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ XMFLOAT3(origin.x - 0.5f, origin.y - 0.5f, origin.z - 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ XMFLOAT3(origin.x + 0.5f, origin.y + 0.5f, origin.z - 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
+		{ XMFLOAT3(m_origin.x - 0.5f, m_origin.y + 0.5f, m_origin.z - 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
+		{ XMFLOAT3(m_origin.x + 0.5f, m_origin.y - 0.5f, m_origin.z - 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
+		{ XMFLOAT3(m_origin.x - 0.5f, m_origin.y - 0.5f, m_origin.z - 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
+		{ XMFLOAT3(m_origin.x + 0.5f, m_origin.y + 0.5f, m_origin.z - 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
 
 		//Rigth face
-		{ XMFLOAT3(0.5f, -0.5f, -0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ XMFLOAT3(0.5f, -0.5f, 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ XMFLOAT3(0.5f, 0.5f, -0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
+		{ XMFLOAT3(m_origin.x + 0.5f, m_origin.y - 0.5f, m_origin.z - 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
+		{ XMFLOAT3(m_origin.x + 0.5f, m_origin.y + 0.5f, m_origin.z + 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
+		{ XMFLOAT3(m_origin.x + 0.5f, m_origin.y - 0.5f, m_origin.z + 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
+		{ XMFLOAT3(m_origin.x + 0.5f, m_origin.y + 0.5f, m_origin.z - 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
 
 		//Left face
-		{ XMFLOAT3(-0.5f, 0.5f, 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ XMFLOAT3(-0.5f, -0.5f, -0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ XMFLOAT3(-0.5f, -0.5f, 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ XMFLOAT3(-0.5f, 0.5f, -0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
+		{ XMFLOAT3(m_origin.x - 0.5f, m_origin.y + 0.5f, m_origin.z + 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
+		{ XMFLOAT3(m_origin.x - 0.5f, m_origin.y - 0.5f, m_origin.z - 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
+		{ XMFLOAT3(m_origin.x - 0.5f, m_origin.y - 0.5f, m_origin.z + 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
+		{ XMFLOAT3(m_origin.x - 0.5f, m_origin.y + 0.5f, m_origin.z - 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
 
 		//Back face
-		{ XMFLOAT3(0.5f, 0.5f, 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ XMFLOAT3(-0.5f, -0.5f, 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ XMFLOAT3(0.5f, -0.5f, 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ XMFLOAT3(-0.5f, 0.5f, 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
+		{ XMFLOAT3(m_origin.x + 0.5f, m_origin.y + 0.5f, m_origin.z + 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
+		{ XMFLOAT3(m_origin.x - 0.5f, m_origin.y - 0.5f, m_origin.z + 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
+		{ XMFLOAT3(m_origin.x + 0.5f, m_origin.y - 0.5f, m_origin.z + 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
+		{ XMFLOAT3(m_origin.x - 0.5f, m_origin.y + 0.5f, m_origin.z + 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
 
 		//Top face
-		{ XMFLOAT3(-0.5f, 0.5f, 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ XMFLOAT3(0.5f, 0.5f, -0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ XMFLOAT3(0.5f, 0.5f, -0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ XMFLOAT3(-0.5f, 0.5f, 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
+		{ XMFLOAT3(m_origin.x - 0.5f, m_origin.y + 0.5f, m_origin.z + 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
+		{ XMFLOAT3(m_origin.x + 0.5f, m_origin.y + 0.5f, m_origin.z - 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
+		{ XMFLOAT3(m_origin.x + 0.5f, m_origin.y + 0.5f, m_origin.z - 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
+		{ XMFLOAT3(m_origin.x - 0.5f, m_origin.y + 0.5f, m_origin.z +  0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
 
 		//Bottom face
-		{ XMFLOAT3(0.5f, -0.5f, 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ XMFLOAT3(-0.5f, -0.5f, -0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ XMFLOAT3(0.5f, -0.5f, -0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ XMFLOAT3(-0.5f, -0.5f, 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) }
+		{ XMFLOAT3(m_origin.x + 0.5f, m_origin.y - 0.5f, m_origin.z + 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
+		{ XMFLOAT3(m_origin.x - 0.5f, m_origin.y - 0.5f, m_origin.z - 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
+		{ XMFLOAT3(m_origin.x + 0.5f, m_origin.y - 0.5f, m_origin.z - 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
+		{ XMFLOAT3(m_origin.x - 0.5f, m_origin.y - 0.5f, m_origin.z + 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) }
 	};
 
 	vertexBufferSize = sizeof(vertices);
