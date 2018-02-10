@@ -58,9 +58,9 @@ void Camera::Frame()
 	BuildViewMatrix();
 }
 
-void Camera::GetViewMatrix(XMMATRIX& viewMatrix)
+XMMATRIX Camera::GetViewMatrix()
 {
-	viewMatrix = m_viewMatrix;
+	return m_viewMatrix;
 }
 
 void Camera::BuildBaseViewMatrix()
@@ -167,9 +167,9 @@ void Camera::BuildViewMatrix()
 	m_viewMatrix = XMMatrixLookAtLH(positionVector, lookAtVector, upVector);
 }
 
-void Camera::GetBaseViewMatrix(XMMATRIX& baseViewMatrix)
+XMMATRIX Camera::GetBaseViewMatrix()
 {
-	baseViewMatrix = m_baseViewMatrix;
+	return m_baseViewMatrix;
 }
 
 void Camera::MoveForward()

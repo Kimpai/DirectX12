@@ -1,18 +1,8 @@
 #include "Cube.h"
 
-Cube::Cube(XMFLOAT3 origin)
+Cube::Cube(XMFLOAT3 origin) : m_origin(origin)
 {
-	m_constantBufferDescHeap[0] = nullptr;
-	m_constantBufferDescHeap[1] = nullptr;
-	m_constantBufferDescHeap[2] = nullptr;
-	m_constantBufferUploadHeap[0] = nullptr;
-	m_constantBufferUploadHeap[1] = nullptr;
-	m_constantBufferUploadHeap[2] = nullptr;
-	m_constantBufferGPUAddress[0] = nullptr;
-	m_constantBufferGPUAddress[1] = nullptr;
-	m_constantBufferGPUAddress[2] = nullptr;
 	m_Indices = 0;
-	m_origin = origin;
 }
 
 Cube::~Cube()
@@ -27,6 +17,12 @@ Cube::~Cube()
 	{
 		delete m_indexBuffer;
 		m_indexBuffer = nullptr;
+	}
+
+	if (m_constantBuffer)
+	{
+		delete m_constantBuffer;
+		m_constantBuffer = nullptr;
 	}
 }
 
@@ -113,23 +109,11 @@ void Cube::InitializeBuffers(ID3D12Device* device, ID3D12GraphicsCommandList* co
 	//Create an index buffer
 	m_indexBuffer = new IndexBuffer(indices, indexBufferSize, sizeof(DWORD), device, commandList);
 
-	//Create one resource for each frame buffer
-	//for our cube
-	for (int i = 0; i < frameBufferCount; ++i)
-	{
-		assert(!device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
-			D3D12_HEAP_FLAG_NONE, &CD3DX12_RESOURCE_DESC::Buffer(1024 * 256), D3D12_RESOURCE_STATE_GENERIC_READ,
-			NULL, __uuidof(ID3D12Resource), (void**)&m_constantBufferUploadHeap[i]));
-
-		ZeroMemory(&m_constantBuffer, sizeof(m_constantBuffer));
-
-		CD3DX12_RANGE readRange(0, 0);
-		assert(!m_constantBufferUploadHeap[i]->Map(0, &readRange, reinterpret_cast<void**>(&m_constantBufferGPUAddress[i])));
-		memcpy(m_constantBufferGPUAddress[i], &m_constantBuffer, sizeof(m_constantBuffer));
-	}
+	//Create a constant buffer for the world, view and projection matrices
+	m_constantBuffer = new ConstantBuffer(&m_constantBufferData, sizeof(ConstantBufferData), device, commandList);
 }
 
-void Cube::RenderBuffers(ID3D12GraphicsCommandList* commandList, int currentFrame)
+void Cube::Render(ID3D12GraphicsCommandList* commandList, int currentFrame)
 {
 	//Set the primitive topology
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -141,7 +125,7 @@ void Cube::RenderBuffers(ID3D12GraphicsCommandList* commandList, int currentFram
 	m_indexBuffer->SetIndexBuffer();
 
 	//Set constant buffer
-	commandList->SetGraphicsRootConstantBufferView(0, m_constantBufferUploadHeap[currentFrame]->GetGPUVirtualAddress());
+	commandList->SetGraphicsRootConstantBufferView(0, m_constantBuffer->GetBufferLocation(currentFrame));
 
 	//Draw
 	commandList->DrawIndexedInstanced(m_Indices, 1, 0, 0, 0);

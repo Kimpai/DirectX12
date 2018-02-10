@@ -20,7 +20,7 @@ public:
 
 private:
 	void InitializeBuffers(ID3D12Device*, ID3D12GraphicsCommandList*);
-	void RenderBuffers(ID3D12GraphicsCommandList*, int);
+	void Render(ID3D12GraphicsCommandList*, int);
 	
 	int m_Indices;
 	XMFLOAT3 m_origin;

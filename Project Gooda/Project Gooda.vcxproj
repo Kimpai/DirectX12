@@ -162,6 +162,7 @@
     <ClCompile Include="Source Files\Camera.cpp" />
     <ClCompile Include="Source Files\Colorshader.cpp" />
     <ClCompile Include="Source Files\Console.cpp" />
+    <ClCompile Include="Source Files\ConstantBuffer.cpp" />
     <ClCompile Include="Source Files\Cube.cpp" />
     <ClCompile Include="Source Files\Direct3D.cpp" />
     <ClCompile Include="Source Files\GoodaDriver.cpp" />
@@ -180,6 +181,7 @@
     <ClInclude Include="Header Files\Colorshader.h" />
     <ClInclude Include="Header Files\config.h" />
     <ClInclude Include="Header Files\Console.h" />
+    <ClInclude Include="Header Files\ConstantBuffer.h" />
     <ClInclude Include="Header Files\Cube.h" />
     <ClInclude Include="Header Files\Direct3D.h" />
     <ClInclude Include="Header Files\frame.h" />

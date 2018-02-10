@@ -5,10 +5,11 @@
 #include <DirectXMath.h>
 #include <wrl.h>
 #include <frame.h>
+#include <config.h>
 
-#include "Camera.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
+#include "ConstantBuffer.h"
 
 using namespace DirectX;
 using namespace Microsoft::WRL;
@@ -16,31 +17,35 @@ using namespace Microsoft::WRL;
 class Model
 {
 public:
-	struct ConstantBuffer
+	ConstantBuffer* m_constantBuffer;
+	VertexBuffer* m_vertexBuffer;
+	IndexBuffer* m_indexBuffer;
+	
+	struct ConstantBufferData
 	{
 		XMFLOAT4X4 worldMatrix;
 		XMFLOAT4X4 viewMatrix;
 		XMFLOAT4X4 projectionMatrix;
 		XMFLOAT4X4 rotationMatrix;
-	}m_constantBuffer;
 
-	VertexBuffer* m_vertexBuffer;
-	IndexBuffer* m_indexBuffer;
+	} m_constantBufferData;
 
 	Model();
 	virtual ~Model() = 0;
 
-	void Initialize(ID3D12Device*, ID3D12GraphicsCommandList*, Camera*, int, int, float, float, XMFLOAT4);
-	void Render(ID3D12GraphicsCommandList*, int);
-	virtual void BuildWorlViewProjectionMatrix(Camera*, int , int, float, float, XMFLOAT4);
-	virtual void Frame(int, Camera*);
-
-	ComPtr<ID3D12DescriptorHeap> m_constantBufferDescHeap[frameBufferCount];
-	ComPtr<ID3D12Resource> m_constantBufferUploadHeap[frameBufferCount];
-	UINT8* m_constantBufferGPUAddress[frameBufferCount];
-	const int ConstantBufferPerObjectAlignedSize = (sizeof(ConstantBuffer) + 255) & ~255;
+	void Initialize(ID3D12Device*, ID3D12GraphicsCommandList*, XMMATRIX, XMFLOAT4);
+	virtual void Render(ID3D12GraphicsCommandList*, int) = 0;
+	virtual void Frame(int, XMMATRIX);
 
 private:
+	XMFLOAT4X4 m_worldMatrix;
+	XMFLOAT4X4 m_viewMatrix;
+	XMFLOAT4X4 m_projectionMatrix;
+	XMFLOAT4X4 m_rotationMatrix;
+
+	const int ConstantBufferPerObjectAlignedSize = (sizeof(m_constantBufferData) + 255) & ~255;
+
+	void UpdateMatrices(XMMATRIX viewMatrix);
+	virtual void BuildWorlViewProjectionMatrix(XMMATRIX, XMFLOAT4);
 	virtual void InitializeBuffers(ID3D12Device*, ID3D12GraphicsCommandList*) = 0;
-	virtual void RenderBuffers(ID3D12GraphicsCommandList*, int) = 0;
 };

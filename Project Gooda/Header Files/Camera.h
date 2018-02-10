@@ -21,8 +21,8 @@ public:
 	XMFLOAT3 GetRotation();
 	
 	void Frame();
-	void GetViewMatrix(XMMATRIX&);
-	void GetBaseViewMatrix(XMMATRIX&);
+	XMMATRIX GetViewMatrix();
+	XMMATRIX GetBaseViewMatrix();
 
 private:
 	void BuildBaseViewMatrix();

@@ -10,57 +10,61 @@ Model::~Model()
 
 }
 
-void Model::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, Camera* camera, int width, int height, float nearplane, float farplane, XMFLOAT4 origin)
+void Model::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, XMMATRIX viewMatrix, XMFLOAT4 origin)
 {
 	InitializeBuffers(device, commandList);
 
-	BuildWorlViewProjectionMatrix(camera, width, height, nearplane, farplane, origin);
+	BuildWorlViewProjectionMatrix(viewMatrix, origin);
 }
 
-void Model::Render(ID3D12GraphicsCommandList* commandList, int currentFrame)
+void Model::UpdateMatrices(XMMATRIX viewMatrix)
 {
-	RenderBuffers(commandList, currentFrame);
+	//Get current view matrix from camera
+	XMStoreFloat4x4(&m_viewMatrix, viewMatrix);
+
+	//Transpose the matrices before sending them to the GPU
+	XMMATRIX transposed = XMMatrixTranspose(XMLoadFloat4x4(&m_projectionMatrix));
+	XMStoreFloat4x4(&m_projectionMatrix, transposed);
+
+	transposed = XMMatrixTranspose(XMLoadFloat4x4(&m_viewMatrix));
+	XMStoreFloat4x4(&m_viewMatrix, transposed);
+
+	transposed = XMMatrixTranspose(XMLoadFloat4x4(&m_rotationMatrix));
+	XMStoreFloat4x4(&m_rotationMatrix, transposed);
+
+	transposed = XMMatrixTranspose(XMLoadFloat4x4(&m_worldMatrix));
+	XMStoreFloat4x4(&m_worldMatrix, transposed);
+
+	//Fill the constant buffer with the matrices
+	m_constantBufferData.worldMatrix = m_worldMatrix;
+	m_constantBufferData.viewMatrix = m_viewMatrix;
+	m_constantBufferData.projectionMatrix = m_projectionMatrix;
+	m_constantBufferData.rotationMatrix = m_rotationMatrix;
 }
 
-void Model::BuildWorlViewProjectionMatrix(Camera* camera, int width, int height, float nearPlane, float farPlane, XMFLOAT4 origin)
+void Model::BuildWorlViewProjectionMatrix(XMMATRIX viewMatrix, XMFLOAT4 origin)
 {
 	//Build projection matrix
-	XMMATRIX matrix = XMMatrixPerspectiveFovLH(45.0f*(3.14f/180.0f), (float)width / (float)height,
-		nearPlane, farPlane);
-	XMStoreFloat4x4(&m_constantBuffer.projectionMatrix, matrix);
+	XMMATRIX matrix = XMMatrixPerspectiveFovLH(45.0f*(3.14f/180.0f), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT,
+		SCREEN_NEAR, SCREEN_DEPTH);
+	XMStoreFloat4x4(&m_projectionMatrix, matrix);
 
 	//Build view matrix
-	camera->GetViewMatrix(matrix);
-	XMStoreFloat4x4(&m_constantBuffer.viewMatrix, matrix);
+	XMStoreFloat4x4(&m_viewMatrix, viewMatrix);
 
 	//Build rotation matrix
-	XMStoreFloat4x4(&m_constantBuffer.rotationMatrix, XMMatrixIdentity());
+	XMStoreFloat4x4(&m_rotationMatrix, XMMatrixIdentity());
 
 	//Build world matrix
 	matrix = XMMatrixTranslationFromVector(XMLoadFloat4(&origin));
-	XMStoreFloat4x4(&m_constantBuffer.worldMatrix, matrix);
+	XMStoreFloat4x4(&m_worldMatrix, matrix);
 }
 
-void Model::Frame(int currentFrame, Camera* camera)
+void Model::Frame(int currentFrame, XMMATRIX viewMatrix)
 {
-	//Build view matrix
-	XMMATRIX matrix = XMMatrixIdentity();
-	camera->GetViewMatrix(matrix);
-	XMStoreFloat4x4(&m_constantBuffer.viewMatrix, matrix);
+	//Update the matrices before copying them to the GPU
+	UpdateMatrices(viewMatrix);
 
-	//Transpose the matrices before sending them to the GPU
-	XMMATRIX transposed = XMMatrixTranspose(XMLoadFloat4x4(&m_constantBuffer.projectionMatrix));
-	XMStoreFloat4x4(&m_constantBuffer.projectionMatrix, transposed);
-
-	transposed = XMMatrixTranspose(XMLoadFloat4x4(&m_constantBuffer.viewMatrix));
-	XMStoreFloat4x4(&m_constantBuffer.viewMatrix, transposed);
-
-	transposed = XMMatrixTranspose(XMLoadFloat4x4(&m_constantBuffer.rotationMatrix));
-	XMStoreFloat4x4(&m_constantBuffer.rotationMatrix, transposed);
-
-	transposed = XMMatrixTranspose(XMLoadFloat4x4(&m_constantBuffer.worldMatrix));
-	XMStoreFloat4x4(&m_constantBuffer.worldMatrix, transposed);
-
-	//Copy the ConstantBuffer instance to the mapped constant buffer resource
-	memcpy(m_constantBufferGPUAddress[currentFrame], &m_constantBuffer, sizeof(m_constantBuffer));
+	//Update the constant buffer data
+	m_constantBuffer->UpdateConstantBufferData(currentFrame);
 }

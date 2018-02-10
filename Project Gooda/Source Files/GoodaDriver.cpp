@@ -43,7 +43,7 @@ void GoodaDriver::Initialize(HWND hwnd, Camera* camera)
 
 	//Initialize the model object
 	for (auto model : m_Models)
-		model->Initialize(m_Direct3D->GetDevice(), m_Direct3D->GetCommandList(), camera, SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_NEAR, SCREEN_DEPTH, XMFLOAT4(0.0f, 0.0f, 0.5f, 1.0f));
+		model->Initialize(m_Direct3D->GetDevice(), m_Direct3D->GetCommandList(), camera->GetViewMatrix(), XMFLOAT4(0.0f, 0.0f, 0.5f, 1.0f));
 
 	//Close the command list now that all the commands have been recorded
 	m_Direct3D->CloseCommandList();
@@ -85,7 +85,7 @@ void GoodaDriver::Frame(Camera* camera)
 	m_ColorShader->Frame(m_Direct3D->GetCurrentFrame());
 
 	for (auto model : m_Models)
-		model->Frame(m_Direct3D->GetCurrentFrame(), camera);
+		model->Frame(m_Direct3D->GetCurrentFrame(), camera->GetViewMatrix());
 
 	//Render the graphics scene
 	Render();
