@@ -75,8 +75,6 @@ void ColorShader::CreatPipelineState(ID3D12Device* device, ID3D12RootSignature* 
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc = {};
 	CreateDepthStencil(device, screenWidth, screenHeight, depthStencilDesc);
 
-	//Create the input layout
-	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc = {};
 	//Create input layout
 	//The input layout is used by the Input Assembler so that it knows
 	//how to read the vertex data bound to it
@@ -88,6 +86,7 @@ void ColorShader::CreatPipelineState(ID3D12Device* device, ID3D12RootSignature* 
 
 	//Fill out an input layout desc structure
 	//Get the number of elements in an array by "sizeof(array) / sizeof(arrayElementType)"
+	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc = {};
 	inputLayoutDesc.NumElements = sizeof(inputElementDesc) / sizeof(D3D12_INPUT_ELEMENT_DESC);
 	inputLayoutDesc.pInputElementDescs = inputElementDesc;
 
@@ -162,21 +161,4 @@ void ColorShader::CreateDepthStencil(ID3D12Device* device, int screenWidth, int 
 
 	//Create the depth stencil view
 	device->CreateDepthStencilView(m_depthStencilBuffer.Get(), &depthStencilViewDesc, m_depthStencilDescHeap->GetCPUDescriptorHandleForHeapStart());
-}
-
-void ColorShader::CreateInputLayout(D3D12_INPUT_LAYOUT_DESC& inputLayoutDesc)
-{
-	//Create input layout
-	//The input layout is used by the Input Assembler so that it knows
-	//how to read the vertex data bound to it
-	D3D12_INPUT_ELEMENT_DESC inputElementDesc[] =
-	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
-	};
-
-	//Fill out an input layout desc structure
-	//Get the number of elements in an array by "sizeof(array) / sizeof(arrayElementType)"
-	inputLayoutDesc.NumElements = sizeof(inputElementDesc) / sizeof(D3D12_INPUT_ELEMENT_DESC);
-	inputLayoutDesc.pInputElementDescs = inputElementDesc;
 }

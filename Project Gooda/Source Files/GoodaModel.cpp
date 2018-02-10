@@ -5,10 +5,6 @@ Model::Model()
 
 }
 
-Model::Model(const Model& other)
-{
-}
-
 Model::~Model()
 {
 

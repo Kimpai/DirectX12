@@ -25,7 +25,6 @@ private:
 	void CompileShader(ShaderType);
 	void SetRootParameters();
 	void CreateDepthStencil(ID3D12Device*, int, int, D3D12_DEPTH_STENCIL_DESC&);
-	void CreateInputLayout(D3D12_INPUT_LAYOUT_DESC&);
 
 	ComPtr<ID3D12PipelineState> m_pipelineState;
 	ComPtr<ID3DBlob> m_vertexShader;

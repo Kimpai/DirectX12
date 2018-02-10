@@ -165,6 +165,7 @@
     <ClCompile Include="Source Files\Cube.cpp" />
     <ClCompile Include="Source Files\Direct3D.cpp" />
     <ClCompile Include="Source Files\GoodaDriver.cpp" />
+    <ClCompile Include="Source Files\IndexBuffer.cpp" />
     <ClCompile Include="Source Files\Input.cpp" />
     <ClCompile Include="Source Files\LuaScript.cpp" />
     <ClCompile Include="Source Files\main.cpp" />
@@ -172,6 +173,7 @@
     <ClCompile Include="Source Files\Gooda.cpp" />
     <ClCompile Include="Source Files\Shader.cpp" />
     <ClCompile Include="Source Files\Terrain.cpp" />
+    <ClCompile Include="Source Files\VertexBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Header Files\Camera.h" />
@@ -182,12 +184,14 @@
     <ClInclude Include="Header Files\Direct3D.h" />
     <ClInclude Include="Header Files\frame.h" />
     <ClInclude Include="Header Files\GoodaDriver.h" />
+    <ClInclude Include="Header Files\IndexBuffer.h" />
     <ClInclude Include="Header Files\Input.h" />
     <ClInclude Include="Header Files\LuaScript.h" />
     <ClInclude Include="Header Files\GoodaModel.h" />
     <ClInclude Include="Header Files\Gooda.h" />
     <ClInclude Include="Header Files\Shader.h" />
     <ClInclude Include="Header Files\Terrain.h" />
+    <ClInclude Include="Header Files\VertexBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shader Files\ColorPixelShader.hlsl">

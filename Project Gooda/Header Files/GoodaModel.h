@@ -7,6 +7,8 @@
 #include <frame.h>
 
 #include "Camera.h"
+#include "VertexBuffer.h"
+#include "IndexBuffer.h"
 
 using namespace DirectX;
 using namespace Microsoft::WRL;
@@ -22,9 +24,11 @@ public:
 		XMFLOAT4X4 rotationMatrix;
 	}m_constantBuffer;
 
+	VertexBuffer* m_vertexBuffer;
+	IndexBuffer* m_indexBuffer;
+
 	Model();
-	Model(const Model&);
-	virtual ~Model();
+	virtual ~Model() = 0;
 
 	void Initialize(ID3D12Device*, ID3D12GraphicsCommandList*, Camera*, int, int, float, float, XMFLOAT4);
 	void Render(ID3D12GraphicsCommandList*, int);
@@ -37,7 +41,6 @@ public:
 	const int ConstantBufferPerObjectAlignedSize = (sizeof(ConstantBuffer) + 255) & ~255;
 
 private:
-	virtual void ShutdownBuffers() = 0;
 	virtual void InitializeBuffers(ID3D12Device*, ID3D12GraphicsCommandList*) = 0;
 	virtual void RenderBuffers(ID3D12GraphicsCommandList*, int) = 0;
 };
