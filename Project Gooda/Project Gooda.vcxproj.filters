@@ -16,108 +16,147 @@
     <Filter Include="Shader Files">
       <UniqueIdentifier>{e98864d3-d581-4897-9301-a2f433da8b4b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Buffers">
+      <UniqueIdentifier>{947eba7a-1a28-41e3-b367-e7022a1bfc18}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Utils">
+      <UniqueIdentifier>{b34356c1-72f3-4abb-a140-359875819725}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Graphics">
+      <UniqueIdentifier>{f1c72f06-9611-4f1e-977c-2e1c1c502d14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Models">
+      <UniqueIdentifier>{fd406214-bb7c-4ebc-b47a-6cbe27a91fc1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Shaders">
+      <UniqueIdentifier>{3306a257-84ea-48dd-8b70-d21a7146ced1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Abstract">
+      <UniqueIdentifier>{c0431fdf-7ef0-4183-a046-9dd94eb5f2c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Engine">
+      <UniqueIdentifier>{95a1d2fa-7c85-4ca7-889f-7368e5eeb48b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Buffers">
+      <UniqueIdentifier>{31576516-c6e0-46a1-b00f-d68ce4459fcf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Graphics">
+      <UniqueIdentifier>{4bf7de8e-f558-4a4e-8b09-b892eae5d5e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Models">
+      <UniqueIdentifier>{0bf9b7db-5997-406d-b846-be16b037a7d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Abstarct">
+      <UniqueIdentifier>{7c88cb68-bd30-405a-9f83-b40833c30f04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Engine">
+      <UniqueIdentifier>{cb4614df-ef88-4947-83ca-c57a3996611b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Shaders">
+      <UniqueIdentifier>{a1bd7b28-60c8-46b3-8ef6-6f40d0f87b65}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source Files\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source Files\Camera.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Engine</Filter>
     </ClCompile>
     <ClCompile Include="Source Files\Colorshader.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Shaders</Filter>
     </ClCompile>
     <ClCompile Include="Source Files\Console.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source Files\Cube.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source Files\Direct3D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source Files\GoodaDriver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source Files\Input.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source Files\LuaScript.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source Files\GoodaModel.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source Files\Gooda.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source Files\Terrain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source Files\Shader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source Files\VertexBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source Files\IndexBuffer.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Engine</Filter>
     </ClCompile>
     <ClCompile Include="Source Files\ConstantBuffer.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="Source Files\Cube.cpp">
+      <Filter>Source Files\Models</Filter>
+    </ClCompile>
+    <ClCompile Include="Source Files\Direct3D.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source Files\Gooda.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Source Files\GoodaDriver.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Source Files\GoodaModel.cpp">
+      <Filter>Source Files\Abstarct</Filter>
+    </ClCompile>
+    <ClCompile Include="Source Files\IndexBuffer.cpp">
+      <Filter>Source Files\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="Source Files\Input.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Source Files\LuaScript.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Source Files\Shader.cpp">
+      <Filter>Source Files\Abstarct</Filter>
+    </ClCompile>
+    <ClCompile Include="Source Files\Terrain.cpp">
+      <Filter>Source Files\Models</Filter>
+    </ClCompile>
+    <ClCompile Include="Source Files\VertexBuffer.cpp">
+      <Filter>Source Files\Buffers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Header Files\config.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Header Files\frame.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Header Files\Camera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Header Files\Colorshader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Header Files\Console.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Header Files\Cube.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Header Files\Direct3D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Header Files\GoodaDriver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Header Files\Input.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Header Files\LuaScript.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Header Files\GoodaModel.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Header Files\Gooda.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Header Files\Terrain.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Header Files\Shader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Header Files\VertexBuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Header Files\IndexBuffer.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Buffers</Filter>
     </ClInclude>
     <ClInclude Include="Header Files\ConstantBuffer.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="Header Files\IndexBuffer.h">
+      <Filter>Header Files\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="Header Files\frame.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Header Files\config.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Header Files\Direct3D.h">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Header Files\Cube.h">
+      <Filter>Header Files\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="Header Files\Terrain.h">
+      <Filter>Header Files\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="Header Files\Colorshader.h">
+      <Filter>Header Files\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="Header Files\Shader.h">
+      <Filter>Header Files\Abstract</Filter>
+    </ClInclude>
+    <ClInclude Include="Header Files\GoodaModel.h">
+      <Filter>Header Files\Abstract</Filter>
+    </ClInclude>
+    <ClInclude Include="Header Files\Input.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Header Files\LuaScript.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Header Files\Gooda.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Header Files\GoodaDriver.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Header Files\Console.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Header Files\Camera.h">
+      <Filter>Header Files\Engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
