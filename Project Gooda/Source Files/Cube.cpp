@@ -2,7 +2,7 @@
 
 Cube::Cube(XMFLOAT3 origin) : m_origin(origin)
 {
-	m_Indices = 0;
+	m_indices = 0;
 }
 
 Cube::~Cube()
@@ -56,10 +56,10 @@ void Cube::InitializeBuffers(ID3D12Device* device, ID3D12GraphicsCommandList* co
 		{ XMFLOAT3(m_origin.x - 0.5f, m_origin.y + 0.5f, m_origin.z + 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
 
 		//Top face
+		{ XMFLOAT3(m_origin.x - 0.5f, m_origin.y + 0.5f, m_origin.z - 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
+		{ XMFLOAT3(m_origin.x + 0.5f, m_origin.y + 0.5f, m_origin.z + 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
+		{ XMFLOAT3(m_origin.x + 0.5f, m_origin.y + 0.5f, m_origin.z - 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
 		{ XMFLOAT3(m_origin.x - 0.5f, m_origin.y + 0.5f, m_origin.z + 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ XMFLOAT3(m_origin.x + 0.5f, m_origin.y + 0.5f, m_origin.z - 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ XMFLOAT3(m_origin.x + 0.5f, m_origin.y + 0.5f, m_origin.z - 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ XMFLOAT3(m_origin.x - 0.5f, m_origin.y + 0.5f, m_origin.z +  0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
 
 		//Bottom face
 		{ XMFLOAT3(m_origin.x + 0.5f, m_origin.y - 0.5f, m_origin.z + 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
@@ -97,11 +97,11 @@ void Cube::InitializeBuffers(ID3D12Device* device, ID3D12GraphicsCommandList* co
 	};
 
 	//Determine how many indices to draw
-	m_Indices = sizeof(indices) / sizeof(*indices);
+	m_indices = sizeof(indices) / sizeof(*indices);
 
 	//Determine the size of the vertex and index buffer
-	int vertexBufferSize = sizeof(vertices);
-	int indexBufferSize = sizeof(indices);
+	int vertexBufferSize = _countof(vertices) * sizeof(VertexPositionColor);
+	int indexBufferSize = _countof(indices) * sizeof(DWORD);
 
 	//Create a vertex buffer
 	m_vertexBuffer = new VertexBuffer(vertices, vertexBufferSize, sizeof(VertexPositionColor), device, commandList);
@@ -128,7 +128,7 @@ void Cube::Render(ID3D12GraphicsCommandList* commandList, int currentFrame)
 	commandList->SetGraphicsRootConstantBufferView(0, m_constantBuffer->GetBufferLocation(currentFrame));
 
 	//Draw
-	commandList->DrawIndexedInstanced(m_Indices, 1, 0, 0, 0);
+	commandList->DrawIndexedInstanced(m_indices, 1, 0, 0, 0);
 }
 
 

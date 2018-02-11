@@ -27,8 +27,8 @@ void GoodaDriver::Initialize(HWND hwnd, Camera* camera)
 	assert(&m_ColorShader);
 
 	//Create the Model object
-	m_Models.push_back(new Cube(XMFLOAT3(0.0f, 1.0f, 3.0f)));
-	//m_Models.push_back(new Terrain(256, 256));
+	m_Models.push_back(new Cube(XMFLOAT3(3.0f, 3.0f, 5.0f)));
+	m_Models.push_back(new Terrain("Resource Files/heightmap.bmp", 257, 257, 12.0f));
 	assert(&m_Models);
 
 	//Initialize the Direct3D object

@@ -2,14 +2,14 @@
 
 Camera::Camera(Input* inputHandler) : m_inputHandler(inputHandler)
 {
-	m_position = XMFLOAT3(0.0f, 1.0f, 0.0f);
+	m_position = XMFLOAT3(0.0f, 3.0f, 0.0f);
 	m_rotation = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	m_forwardSpeed = 0.0f;
 	m_backwardSpeed = 0.0f;
 	m_rightSpeed = 0.0f;
 	m_leftSpeed = 0.0f;
 	m_turnSpeed = 0.0f;
-	m_frameTime = 0.0001f;
+	m_frameTime = 0.01f;
 	m_mouse.x = m_inputHandler->GetMousePosition().x;
 	m_mouse.y = m_inputHandler->GetMousePosition().y;
 }
@@ -251,9 +251,10 @@ void Camera::MoveRight()
 	}
 
 	radians = m_rotation.y * 0.0174532925f;
+	radians += (XM_PI * 0.5f);
 
-	m_position.x += cosf(radians) * m_rightSpeed;
-	m_position.z += sinf(radians) * m_rightSpeed;
+	m_position.x += sinf(radians) * m_rightSpeed;
+	m_position.z += cosf(radians) * m_rightSpeed;
 }
 
 void Camera::MoveLeft()
@@ -280,9 +281,10 @@ void Camera::MoveLeft()
 	}
 
 	radians = m_rotation.y * 0.0174532925f;
+	radians += (XM_PI * 0.5f);
 
-	m_position.x -= cosf(radians) * m_leftSpeed;
-	m_position.z -= sinf(radians) * m_leftSpeed;
+	m_position.x -= sinf(radians) * m_leftSpeed;
+	m_position.z -= cosf(radians) * m_leftSpeed;
 }
 
 void Camera::Turn()
@@ -290,8 +292,8 @@ void Camera::Turn()
 	if ((m_inputHandler->GetMousePosition().x != m_mouse.x) || (m_inputHandler->GetMousePosition().y != m_mouse.y))
 	{
 		
-		m_rotation.y += m_mouse.x * 0.01f;
-		m_rotation.x += m_mouse.y * 0.01f;
+		m_rotation.y += m_mouse.x * m_frameTime * 5.0f;
+		m_rotation.x += m_mouse.y * m_frameTime * 5.0f;
 
 		m_mouse.x = m_inputHandler->GetMousePosition().x;
 		m_mouse.y = m_inputHandler->GetMousePosition().y;

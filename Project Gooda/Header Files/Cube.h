@@ -22,6 +22,6 @@ private:
 	void InitializeBuffers(ID3D12Device*, ID3D12GraphicsCommandList*);
 	void Render(ID3D12GraphicsCommandList*, int);
 	
-	int m_Indices;
+	int m_indices;
 	XMFLOAT3 m_origin;
 };

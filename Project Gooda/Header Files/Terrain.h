@@ -4,6 +4,7 @@
 #include <DirectXMath.h>
 #include <VertexTypes.h>
 #include <wrl.h>
+#include <fstream>
 
 #include "GoodaModel.h"
 
@@ -13,13 +14,22 @@ using namespace Microsoft::WRL;
 class Terrain : public Model
 {
 public:
-	Terrain(int, int);
+	Terrain(char*, int, int, float);
 	~Terrain();
 
 private:
 	void InitializeBuffers(ID3D12Device*, ID3D12GraphicsCommandList*);
 	void Render(ID3D12GraphicsCommandList*, int);
 
+	void LoadBitmapHeightMap();
+	void SetCoordinates();
+	void Build(VertexPositionColor*);
+
 	int m_height, m_width;
-	int m_Indices;
+	float m_scale;
+	char* m_file;
+	int m_indices;
+
+	XMFLOAT3* m_heightMap;
+
 };
