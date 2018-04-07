@@ -32,7 +32,7 @@ void GoodaDriver::Initialize(HWND hwnd, Camera* camera)
 	assert(&m_Models);
 
 	//Create the light object
-	m_Lights.push_back(new DirectionalLight(XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f)));
+	m_Lights.push_back(new DirectionalLight(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT4(0.15f, 0.15f, 0.15f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f)));
 	assert(&m_Lights);
 
 	m_Shader->SetRootParameter(0, D3D12_ROOT_PARAMETER_TYPE_CBV, D3D12_SHADER_VISIBILITY_VERTEX);

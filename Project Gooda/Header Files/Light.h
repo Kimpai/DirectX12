@@ -14,6 +14,7 @@ public:
 
 	struct ConstantBufferData
 	{
+		XMFLOAT4 ambientColor;
 		XMFLOAT4 diffuseColor;
 		XMFLOAT3 lightDirection;
 		float padding = 0.0f;

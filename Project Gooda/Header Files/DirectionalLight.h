@@ -5,7 +5,7 @@
 class DirectionalLight : public Light
 {
 public:
-	DirectionalLight(XMFLOAT4, XMFLOAT3);
+	DirectionalLight(XMFLOAT4, XMFLOAT4, XMFLOAT3);
 	~DirectionalLight();
 	void Render(ID3D12GraphicsCommandList*, int);
 

@@ -1,7 +1,8 @@
 #include "DirectionalLight.h"
 
-DirectionalLight::DirectionalLight(XMFLOAT4 diffuseColor, XMFLOAT3 lightDirection)
+DirectionalLight::DirectionalLight(XMFLOAT4 diffuseColor, XMFLOAT4 ambientColor, XMFLOAT3 lightDirection)
 {
+	m_constantBufferData.ambientColor = ambientColor,
 	m_constantBufferData.diffuseColor = diffuseColor;
 	m_constantBufferData.lightDirection = lightDirection;
 }
