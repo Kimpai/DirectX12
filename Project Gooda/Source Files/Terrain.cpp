@@ -1,6 +1,6 @@
 #include "Terrain.h"
 
-Terrain::Terrain(char* file, int height, int width, float scale)
+Terrain::Terrain(char* file, int width, int height, float scale)
 {
 	m_height = height;
 	m_width = width;
@@ -131,7 +131,8 @@ void Terrain::LoadBitmapHeightMap()
 	assert(std::fread(&bitmapInfoHeader, sizeof(BITMAPINFOHEADER), 1, fileptr));
 
 	//Make sure the hight map dimensions are the same as the terrain dimensions
-	assert(!(bitmapInfoHeader.biHeight != m_height) || !(bitmapInfoHeader.biWidth != m_width));
+	m_height = bitmapInfoHeader.biHeight;
+	m_width = bitmapInfoHeader.biWidth;
 
 	//Calculate the size of the bitmap image data
 	int imageSize = m_height * ((m_width * 3) + 1);
@@ -160,7 +161,9 @@ void Terrain::LoadBitmapHeightMap()
 			index = (m_width * (m_height - 1 - j)) + i;
 
 			//Get the grey scale pixel value from the bitmap image data at this location
-			unsigned char height = bitmapImage[k];
+			//unsigned char height = bitmapImage[k];
+
+			float height = 1.0f;
 
 			//Store the pixel value as the height at this point in the height map array
 			m_heightMap[index].y = (float)height;

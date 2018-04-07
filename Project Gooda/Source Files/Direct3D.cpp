@@ -1,22 +1,19 @@
 #include "Direct3D.h"
 
-Direct3D::Direct3D()
+Direct3D::Direct3D(int screenHeight, int screenWidth, HWND hwnd, bool fullscreen, float screenDepth, float screenNear)
 {
-	m_device = nullptr;
-	m_commandQueue = nullptr;
-	m_swapChain = nullptr;
-	m_renderTargetViewDescHeap = nullptr;
-	m_backBufferRenderTarget[0] = nullptr;
-	m_backBufferRenderTarget[1] = nullptr;
-	m_backBufferRenderTarget[2] = nullptr;
-	m_commandAllocator[0] = nullptr;
-	m_commandAllocator[1] = nullptr;
-	m_commandAllocator[2] = nullptr;
-	m_commandList = nullptr;
-	m_fence[0] = nullptr;
-	m_fence[1] = nullptr;
-	m_fence[2] = nullptr;
-	m_fenceEvent = nullptr;
+	CreateDirect3DDevice(hwnd);
+
+	CreateCommandInterfaceAndSwapChain(hwnd, screenWidth, screenHeight, fullscreen);
+
+	//Initialize the frameIndex to the current back buffer index
+	m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
+
+	CreateFenceAndEventHandle();
+
+	CreateRenderTargets();
+
+	CreateViewPortAndScissorRect(screenWidth, screenHeight);
 }
 
 
@@ -84,23 +81,6 @@ Direct3D::~Direct3D()
 		m_device = nullptr;
 }
 
-
-void Direct3D::Initialize(int screenHeight, int screenWidth, HWND hwnd, bool fullscreen, float screenDepth, float screenNear)
-{
-	CreateDirect3DDevice(hwnd);
-
-	CreateCommandInterfaceAndSwapChain(hwnd, screenWidth, screenHeight, fullscreen);
-
-	//Initialize the frameIndex to the current back buffer index
-	m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
-
-	CreateFenceAndEventHandle();
-
-	CreateRenderTargets();
-
-	CreateViewPortAndScissorRect(screenWidth, screenHeight);
-}
-
 void Direct3D::BeginScene(Shader* shader)
 {
 	//Swap the current render target view buffer index so drawing is don on the correct buffer
@@ -125,7 +105,7 @@ void Direct3D::BeginScene(Shader* shader)
 
 	//Reset the command list so that it can start recording again.
 	//Only one command list can record at a given time.
-	assert(!m_commandList->Reset(m_commandAllocator[m_frameIndex].Get(), shader->GetPipelineState()));
+	assert(!m_commandList->Reset(m_commandAllocator[m_frameIndex].Get(), shader->GetPipelineState(ShaderPipelineType::COLOR)));
 
 	//Record commands in the command list now.
 	//Start by setting the resource barrier.
@@ -153,7 +133,7 @@ void Direct3D::BeginScene(Shader* shader)
 
 	m_commandList->ClearRenderTargetView(renderTargetViewHandle, color, 0, NULL);
 	m_commandList->ClearDepthStencilView(shader->GetDepthStencilViewHandle(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, NULL);
-	m_commandList->SetGraphicsRootSignature(m_rootSignature.Get());
+	m_commandList->SetGraphicsRootSignature(shader->GetRootSignature());
 	m_commandList->RSSetViewports(1, &m_viewport);
 	m_commandList->RSSetScissorRects(1, &m_rect);
 }
@@ -216,12 +196,6 @@ void Direct3D::ExecuteCommandList()
 	assert(!m_commandQueue->Signal(m_fence[m_frameIndex].Get(), m_fenceValue[m_frameIndex]));
 }
 
-void Direct3D::SetRootParameters(std::vector<D3D12_ROOT_PARAMETER> rootParameters)
-{
-	for (auto rootParamter : rootParameters)
-		m_rootParameters.push_back(rootParamter);
-}
-
 ID3D12Device* Direct3D::GetDevice()
 {
 	return m_device.Get();
@@ -230,11 +204,6 @@ ID3D12Device* Direct3D::GetDevice()
 ID3D12GraphicsCommandList* Direct3D::GetCommandList()
 {
 	return m_commandList.Get();
-}
-
-ID3D12RootSignature* Direct3D::GetRootSignature()
-{
-	return m_rootSignature.Get();
 }
 
 int Direct3D::GetCurrentFrame()
@@ -259,24 +228,6 @@ void Direct3D::DeviceSynchronize()
 
 	//Increment m_fenceValue for next frame
 	m_fenceValue[m_frameIndex]++;
-}
-
-void Direct3D::CreateRootSignature()
-{
-	ComPtr<ID3DBlob> rootsignature;
-
-	//Create root signature
-	CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc;
-	rootSignatureDesc.Init((UINT)m_rootParameters.size(), &m_rootParameters[0], 0, NULL, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
-		D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
-		D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
-		D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS |
-		D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS);
-	assert(!D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &rootsignature, NULL));
-
-	assert(!m_device->CreateRootSignature(0, rootsignature->GetBufferPointer(), rootsignature->GetBufferSize(), IID_PPV_ARGS(m_rootSignature.GetAddressOf())));
-
-	m_rootSignature->SetName(L"Root Signature");
 }
 
 void Direct3D::CreateDirect3DDevice(HWND hwnd)

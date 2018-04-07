@@ -20,21 +20,42 @@ struct ShaderType
 	ShaderType(Type type, WCHAR* shader) : m_type(type), m_shader(shader) {};
 };
 
+enum class ShaderPipelineType { COLOR, TEXTURE, INVALID };
+
 class Shader
 {
 public:
+	struct ShaderPipeline
+	{
+		ShaderPipelineType m_type;
+		ComPtr<ID3D12PipelineState> m_pipelineState;
+
+		ShaderPipeline(ShaderPipelineType type, ID3D12PipelineState* pipelinestate) : m_type(type), m_pipelineState(pipelinestate) {};
+	};
+
 	Shader();
 	~Shader();
 
-	void Initialize(std::vector<ShaderType>);
 	void Frame(int);
 
-	virtual ID3D12PipelineState* GetPipelineState() { return nullptr; };
-	virtual CD3DX12_CPU_DESCRIPTOR_HANDLE GetDepthStencilViewHandle() { return CD3DX12_CPU_DESCRIPTOR_HANDLE(D3D12_DEFAULT); };
-	std::vector<D3D12_ROOT_PARAMETER> GetRootParameters() { return m_rootParameters; };
+	ID3D12PipelineState* GetPipelineState(ShaderPipelineType);
+	void CreatPipelineState(std::vector<ShaderType>, ID3D12Device*, int, int, ShaderPipelineType);
 
-	std::vector<D3D12_ROOT_PARAMETER> m_rootParameters;
+	CD3DX12_CPU_DESCRIPTOR_HANDLE GetDepthStencilViewHandle();
+	void SetRootParameter(UINT, D3D12_ROOT_PARAMETER_TYPE, D3D12_SHADER_VISIBILITY);
+	std::vector<D3D12_ROOT_PARAMETER> GetRootParameters() { return m_rootParameters; };
+	ID3D12RootSignature* GetRootSignature() { return m_rootSignature.Get(); };
+	void CreateRootSignature(ID3D12Device*);
+
 private:
-	virtual void CompileShader(ShaderType) = 0;
-	virtual void SetRootParameters() { return; };
+	void CompileShader(ShaderType);
+	void CreateDepthStencil(ID3D12Device*, int, int, D3D12_DEPTH_STENCIL_DESC&);
+
+	ComPtr<ID3DBlob> m_vertexShader;
+	ComPtr<ID3DBlob> m_pixelShader;
+	ComPtr<ID3D12RootSignature> m_rootSignature;
+	std::vector<D3D12_ROOT_PARAMETER> m_rootParameters;
+	std::vector<ShaderPipeline> m_pipelines;
+	ComPtr<ID3D12Resource> m_depthStencilBuffer;
+	ComPtr<ID3D12DescriptorHeap> m_depthStencilDescHeap;
 };

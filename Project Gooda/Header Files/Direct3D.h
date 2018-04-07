@@ -12,28 +12,23 @@
 #include <frame.h>
 #include <config.h>
 
-#include "colorShader.h"
+#include "Shader.h"
 
 using namespace Microsoft::WRL;
 
 class Direct3D
 {
 public:
-	Direct3D();
+	Direct3D(int, int , HWND, bool, float, float);
 	Direct3D(const Direct3D&);
 	~Direct3D();
-
-	void Initialize(int, int, HWND, bool, float, float);
 
 	void BeginScene(Shader*);
 	void EndScene();
 	void CloseCommandList();
 	void ResetCommandList(ID3D12PipelineState*);
 	void ExecuteCommandList();
-	void CreateRootSignature();
-	void SetRootParameters(std::vector<D3D12_ROOT_PARAMETER>);
 
-	ID3D12RootSignature* GetRootSignature();
 	ID3D12Device* GetDevice();
 	ID3D12GraphicsCommandList* GetCommandList();
 	int GetCurrentFrame();
@@ -49,8 +44,6 @@ private:
 private:
 	ComPtr<ID3D12Device> m_device;
 	ComPtr<ID3D12CommandQueue> m_commandQueue;
-	ComPtr<ID3D12RootSignature> m_rootSignature;
-	std::vector<D3D12_ROOT_PARAMETER> m_rootParameters;
 	char m_videoCardDescription[128];
 	ComPtr<IDXGISwapChain3> m_swapChain;
 	ComPtr<ID3D12DescriptorHeap> m_renderTargetViewDescHeap;

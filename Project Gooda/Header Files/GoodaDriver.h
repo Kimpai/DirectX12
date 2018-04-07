@@ -8,10 +8,11 @@
 #include <vector>
 
 #include "Direct3D.h"
-#include "Colorshader.h"
+#include "Shader.h"
 #include "Cube.h"
 #include "Terrain.h"
 #include "Camera.h"
+#include "DirectionalLight.h"
 
 static bool renderQuad = true;
 
@@ -30,7 +31,7 @@ private:
 	void Render();
 
 	Direct3D* m_Direct3D;
-	ColorShader* m_ColorShader;
+	Shader* m_Shader;
 	std::vector<Model*> m_Models;
-	
+	std::vector<Light*> m_Lights;
 };

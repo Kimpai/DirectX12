@@ -55,6 +55,12 @@
     <Filter Include="Source Files\Shaders">
       <UniqueIdentifier>{a1bd7b28-60c8-46b3-8ef6-6f40d0f87b65}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Lights">
+      <UniqueIdentifier>{a788a477-6d9f-4c3c-be19-e3af660449c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Lights">
+      <UniqueIdentifier>{85ecb57a-c8d5-45ed-ba52-5c9a636e0df4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source Files\main.cpp">
@@ -62,9 +68,6 @@
     </ClCompile>
     <ClCompile Include="Source Files\Camera.cpp">
       <Filter>Source Files\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Source Files\Colorshader.cpp">
-      <Filter>Source Files\Shaders</Filter>
     </ClCompile>
     <ClCompile Include="Source Files\Console.cpp">
       <Filter>Source Files\Engine</Filter>
@@ -96,14 +99,20 @@
     <ClCompile Include="Source Files\LuaScript.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Source Files\Shader.cpp">
-      <Filter>Source Files\Abstarct</Filter>
-    </ClCompile>
     <ClCompile Include="Source Files\Terrain.cpp">
       <Filter>Source Files\Models</Filter>
     </ClCompile>
     <ClCompile Include="Source Files\VertexBuffer.cpp">
       <Filter>Source Files\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="Source Files\Light.cpp">
+      <Filter>Source Files\Abstarct</Filter>
+    </ClCompile>
+    <ClCompile Include="Source Files\DirectionalLight.cpp">
+      <Filter>Source Files\Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="Source Files\Shader.cpp">
+      <Filter>Source Files\Shaders</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -131,12 +140,6 @@
     <ClInclude Include="Header Files\Terrain.h">
       <Filter>Header Files\Models</Filter>
     </ClInclude>
-    <ClInclude Include="Header Files\Colorshader.h">
-      <Filter>Header Files\Shaders</Filter>
-    </ClInclude>
-    <ClInclude Include="Header Files\Shader.h">
-      <Filter>Header Files\Abstract</Filter>
-    </ClInclude>
     <ClInclude Include="Header Files\GoodaModel.h">
       <Filter>Header Files\Abstract</Filter>
     </ClInclude>
@@ -158,12 +161,27 @@
     <ClInclude Include="Header Files\Camera.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
+    <ClInclude Include="Header Files\Light.h">
+      <Filter>Header Files\Abstract</Filter>
+    </ClInclude>
+    <ClInclude Include="Header Files\DirectionalLight.h">
+      <Filter>Header Files\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="Header Files\Shader.h">
+      <Filter>Header Files\Shaders</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shader Files\ColorVertexShader.hlsl">
       <Filter>Shader Files</Filter>
     </FxCompile>
     <FxCompile Include="Shader Files\ColorPixelShader.hlsl">
+      <Filter>Shader Files</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader Files\TexturePixelShader.hlsl">
+      <Filter>Shader Files</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader Files\TextureVertexShader.hlsl">
       <Filter>Shader Files</Filter>
     </FxCompile>
   </ItemGroup>
