@@ -17,6 +17,7 @@ public:
 	~ConstantBuffer();
 
 	void UpdateConstantBufferData(int);
+	int GetConstantBufferSize();
 	D3D12_GPU_VIRTUAL_ADDRESS GetBufferLocation(int);
 private:
 	void CreateUploadHeap();

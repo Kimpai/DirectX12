@@ -35,12 +35,6 @@ void GoodaDriver::Initialize(HWND hwnd, Camera* camera)
 	m_Lights.push_back(new DirectionalLight(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT4(0.15f, 0.15f, 0.15f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f)));
 	assert(&m_Lights);
 
-	m_Shader->SetRootParameter(0, D3D12_ROOT_PARAMETER_TYPE_CBV, D3D12_SHADER_VISIBILITY_VERTEX);
-	m_Shader->SetRootParameter(1, D3D12_ROOT_PARAMETER_TYPE_CBV, D3D12_SHADER_VISIBILITY_PIXEL);
-	m_Shader->CreateRootSignature(m_Direct3D->GetDevice());
-	m_Shader->CreatPipelineState({ { ShaderType::Type::VS, L"Shader Files/ColorVertexShader.hlsl" },{ ShaderType::Type::PS, L"Shader Files/ColorPixelShader.hlsl" } }, 
-		m_Direct3D->GetDevice(), SCREEN_WIDTH, SCREEN_HEIGHT, ShaderPipelineType::COLOR);
-
 	//Initialize the model object
 	for (auto model : m_Models)
 		model->Initialize(m_Direct3D->GetDevice(), m_Direct3D->GetCommandList(), camera->GetViewMatrix(), XMFLOAT4(0.0f, 0.0f, 0.5f, 1.0f));
@@ -48,6 +42,18 @@ void GoodaDriver::Initialize(HWND hwnd, Camera* camera)
 	//Initialize the light object
 	for (auto light : m_Lights)
 		light->Initialize(m_Direct3D->GetDevice(), m_Direct3D->GetCommandList());
+
+	m_Shader->CreateRootDescriptorTableRange(2, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 0);
+
+	for (auto model : m_Models)
+		m_Shader->AppendRootDescriptorToHeap(model->GetConstantBuffer());
+
+	for (auto light : m_Lights)
+		m_Shader->AppendRootDescriptorToHeap(light->GetConstantBuffer());
+
+	m_Shader->CreateRootSignature(m_Direct3D->GetDevice());
+	m_Shader->CreatPipelineState({ { ShaderType::Type::VS, L"Shader Files/ColorVertexShader.hlsl" },{ ShaderType::Type::PS, L"Shader Files/ColorPixelShader.hlsl" } }, 
+		m_Direct3D->GetDevice(), SCREEN_WIDTH, SCREEN_HEIGHT, ShaderPipelineType::COLOR);
 
 	//Close the command list now that all the commands have been recorded
 	m_Direct3D->CloseCommandList();

@@ -18,6 +18,11 @@ void ConstantBuffer::UpdateConstantBufferData(int currentFrame)
 	memcpy(m_constantBufferGPUAddress[currentFrame], m_bufferData, m_size);
 }
 
+int ConstantBuffer::GetConstantBufferSize()
+{
+	return (sizeof(m_size) + 255) & ~255;
+}
+
 D3D12_GPU_VIRTUAL_ADDRESS ConstantBuffer::GetBufferLocation(int currentFrame)
 {
 	return m_constantBufferUploadHeap[currentFrame]->GetGPUVirtualAddress();

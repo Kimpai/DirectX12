@@ -26,6 +26,11 @@ Cube::~Cube()
 	}
 }
 
+ConstantBuffer* Cube::GetConstantBuffer()
+{
+	return m_constantBuffer;
+}
+
 void Cube::InitializeBuffers(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
 {
 	//Create vertex data
@@ -123,9 +128,6 @@ void Cube::Render(ID3D12GraphicsCommandList* commandList, int currentFrame)
 
 	//Set the index buffer
 	m_indexBuffer->SetIndexBuffer();
-
-	//Set constant buffer
-	commandList->SetGraphicsRootConstantBufferView(0, m_constantBuffer->GetBufferLocation(currentFrame));
 
 	//Draw
 	commandList->DrawIndexedInstanced(m_indices, 1, 0, 0, 0);

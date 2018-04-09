@@ -16,6 +16,11 @@ DirectionalLight::~DirectionalLight()
 	}
 }
 
+ConstantBuffer* DirectionalLight::GetConstantBuffer()
+{
+	return m_constantBuffer;
+}
+
 void DirectionalLight::InitializeBuffers(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
 {
 	//Create a constant buffer for the world, view and projection matrices
@@ -24,5 +29,5 @@ void DirectionalLight::InitializeBuffers(ID3D12Device* device, ID3D12GraphicsCom
 
 void DirectionalLight::Render(ID3D12GraphicsCommandList* commandList, int currentFrame)
 {
-	commandList->SetGraphicsRootConstantBufferView(1, m_constantBuffer->GetBufferLocation(currentFrame));
+	//commandList->SetGraphicsRootConstantBufferView(1, m_constantBuffer->GetBufferLocation(currentFrame));
 }

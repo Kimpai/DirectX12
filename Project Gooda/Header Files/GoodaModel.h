@@ -35,6 +35,7 @@ public:
 
 	void Initialize(ID3D12Device*, ID3D12GraphicsCommandList*, XMMATRIX, XMFLOAT4);
 	virtual void Render(ID3D12GraphicsCommandList*, int) = 0;
+	virtual ConstantBuffer* GetConstantBuffer() = 0;
 	virtual void Frame(int, XMMATRIX);
 
 private:
@@ -42,8 +43,6 @@ private:
 	XMFLOAT4X4 m_viewMatrix;
 	XMFLOAT4X4 m_projectionMatrix;
 	XMFLOAT4X4 m_rotationMatrix;
-
-	const int ConstantBufferPerObjectAlignedSize = (sizeof(m_constantBufferData) + 255) & ~255;
 
 	void UpdateMatrices(XMMATRIX viewMatrix);
 	virtual void BuildWorlViewProjectionMatrix(XMMATRIX, XMFLOAT4);

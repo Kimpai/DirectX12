@@ -7,6 +7,7 @@ class DirectionalLight : public Light
 public:
 	DirectionalLight(XMFLOAT4, XMFLOAT4, XMFLOAT3);
 	~DirectionalLight();
+	ConstantBuffer* GetConstantBuffer();
 	void Render(ID3D12GraphicsCommandList*, int);
 
 private:

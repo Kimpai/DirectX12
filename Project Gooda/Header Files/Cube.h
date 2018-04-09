@@ -18,6 +18,8 @@ public:
 	Cube(XMFLOAT3 origin);
 	~Cube();
 
+	ConstantBuffer* GetConstantBuffer();
+
 private:
 	void InitializeBuffers(ID3D12Device*, ID3D12GraphicsCommandList*);
 	void Render(ID3D12GraphicsCommandList*, int);
