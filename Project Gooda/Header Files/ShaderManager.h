@@ -24,7 +24,7 @@ struct ShaderType
 
 enum class ShaderPipelineType { COLOR, TEXTURE, INVALID };
 
-class Shader
+class ShaderManager
 {
 public:
 	struct ShaderPipeline
@@ -35,8 +35,8 @@ public:
 		ShaderPipeline(ShaderPipelineType type, ID3D12PipelineState* pipelinestate) : m_type(type), m_pipelineState(pipelinestate) {};
 	};
 
-	Shader();
-	~Shader();
+	ShaderManager();
+	~ShaderManager();
 
 	void Frame(int);
 

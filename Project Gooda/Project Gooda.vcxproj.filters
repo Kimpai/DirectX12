@@ -111,7 +111,7 @@
     <ClCompile Include="Source Files\DirectionalLight.cpp">
       <Filter>Source Files\Lights</Filter>
     </ClCompile>
-    <ClCompile Include="Source Files\Shader.cpp">
+    <ClCompile Include="Source Files\ShaderManager.cpp">
       <Filter>Source Files\Shaders</Filter>
     </ClCompile>
   </ItemGroup>
@@ -167,7 +167,7 @@
     <ClInclude Include="Header Files\DirectionalLight.h">
       <Filter>Header Files\Lights</Filter>
     </ClInclude>
-    <ClInclude Include="Header Files\Shader.h">
+    <ClInclude Include="Header Files\ShaderManager.h">
       <Filter>Header Files\Shaders</Filter>
     </ClInclude>
   </ItemGroup>

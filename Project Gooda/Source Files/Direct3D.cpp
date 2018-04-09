@@ -81,7 +81,7 @@ Direct3D::~Direct3D()
 		m_device = nullptr;
 }
 
-void Direct3D::BeginScene(Shader* shader)
+void Direct3D::BeginScene(ShaderManager* shader)
 {
 	//Swap the current render target view buffer index so drawing is don on the correct buffer
 	m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();

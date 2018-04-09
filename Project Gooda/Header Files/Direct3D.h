@@ -12,7 +12,7 @@
 #include <frame.h>
 #include <config.h>
 
-#include "Shader.h"
+#include "ShaderManager.h"
 
 using namespace Microsoft::WRL;
 
@@ -23,7 +23,7 @@ public:
 	Direct3D(const Direct3D&);
 	~Direct3D();
 
-	void BeginScene(Shader*);
+	void BeginScene(ShaderManager*);
 	void EndScene();
 	void CloseCommandList();
 	void ResetCommandList(ID3D12PipelineState*);

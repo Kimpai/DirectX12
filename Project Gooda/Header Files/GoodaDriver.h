@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "Direct3D.h"
-#include "Shader.h"
+#include "ShaderManager.h"
 #include "Cube.h"
 #include "Terrain.h"
 #include "Camera.h"
@@ -31,7 +31,7 @@ private:
 	void Render();
 
 	Direct3D* m_Direct3D;
-	Shader* m_Shader;
+	ShaderManager* m_Shader;
 	std::vector<Model*> m_Models;
 	std::vector<Light*> m_Lights;
 };

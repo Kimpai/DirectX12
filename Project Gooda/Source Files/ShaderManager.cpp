@@ -1,21 +1,21 @@
-#include "Shader.h"
+#include "ShaderManager.h"
 
-Shader::Shader()
+ShaderManager::ShaderManager()
 {
 	
 }
 
-Shader::~Shader()
+ShaderManager::~ShaderManager()
 {
 
 }
 
-void Shader::Frame(int frameIndex)
+void ShaderManager::Frame(int frameIndex)
 {
 
 }
 
-void Shader::CreateRootDescriptorTableRange(UINT numberOfDescriptors, D3D12_DESCRIPTOR_RANGE_TYPE rangeType, UINT shaderRegister)
+void ShaderManager::CreateRootDescriptorTableRange(UINT numberOfDescriptors, D3D12_DESCRIPTOR_RANGE_TYPE rangeType, UINT shaderRegister)
 {
 	D3D12_DESCRIPTOR_RANGE ranges[1];
 	ranges[0].BaseShaderRegister = shaderRegister;
@@ -27,7 +27,7 @@ void Shader::CreateRootDescriptorTableRange(UINT numberOfDescriptors, D3D12_DESC
 	m_rootDescriptorTableRangesCBV.push_back(ranges[0]);
 }
 
-void Shader::CreateRootDescriptor(UINT shaderRegister, D3D12_ROOT_PARAMETER_TYPE type, D3D12_SHADER_VISIBILITY shader)
+void ShaderManager::CreateRootDescriptor(UINT shaderRegister, D3D12_ROOT_PARAMETER_TYPE type, D3D12_SHADER_VISIBILITY shader)
 {
 	//Fill out a root desc
 	D3D12_ROOT_DESCRIPTOR rootDesc;
@@ -43,26 +43,26 @@ void Shader::CreateRootDescriptor(UINT shaderRegister, D3D12_ROOT_PARAMETER_TYPE
 	AppendRootParameter(rootParameter[0]);
 }
 
-void Shader::CreateRootConstant(UINT, D3D12_ROOT_PARAMETER_TYPE, D3D12_SHADER_VISIBILITY)
+void ShaderManager::CreateRootConstant(UINT, D3D12_ROOT_PARAMETER_TYPE, D3D12_SHADER_VISIBILITY)
 {
 }
 
-ID3D12DescriptorHeap* Shader::GetDescriptorHeap(int currentFrame)
+ID3D12DescriptorHeap* ShaderManager::GetDescriptorHeap(int currentFrame)
 {
 	return m_mainDescriptorHeap[currentFrame].Get();
 }
 
-std::vector<D3D12_ROOT_PARAMETER> Shader::GetRootParameters()
+std::vector<D3D12_ROOT_PARAMETER> ShaderManager::GetRootParameters()
 {
 	return m_rootParameters;
 }
 
-ID3D12RootSignature* Shader::GetRootSignature()
+ID3D12RootSignature* ShaderManager::GetRootSignature()
 {
 	return m_rootSignature.Get();
 }
 
-void Shader::CreateRootSignature(ID3D12Device* device)
+void ShaderManager::CreateRootSignature(ID3D12Device* device)
 {
 	CreateRootDescriptorTableCBV();
 	CreateRootDescriptorHeap(device);
@@ -80,7 +80,7 @@ void Shader::CreateRootSignature(ID3D12Device* device)
 	m_rootSignature->SetName(L"Root Signature");
 }
 
-ID3D12PipelineState* Shader::GetPipelineState(ShaderPipelineType type)
+ID3D12PipelineState* ShaderManager::GetPipelineState(ShaderPipelineType type)
 {
 	for (auto pipeline : m_pipelines)
 		if (pipeline.m_type == type)
@@ -89,17 +89,17 @@ ID3D12PipelineState* Shader::GetPipelineState(ShaderPipelineType type)
 	return nullptr;
 }
 
-CD3DX12_CPU_DESCRIPTOR_HANDLE Shader::GetDepthStencilViewHandle()
+CD3DX12_CPU_DESCRIPTOR_HANDLE ShaderManager::GetDepthStencilViewHandle()
 {
 	return CD3DX12_CPU_DESCRIPTOR_HANDLE(m_depthStencilDescHeap->GetCPUDescriptorHandleForHeapStart());
 }
 
-void Shader::AppendRootDescriptorToHeap(ConstantBuffer* constantBuffer)
+void ShaderManager::AppendRootDescriptorToHeap(ConstantBuffer* constantBuffer)
 {
 	m_constantBuffers.push_back(constantBuffer);
 }
 
-void Shader::CompileShader(ShaderType shader)
+void ShaderManager::CompileShader(ShaderType shader)
 {
 	switch (shader.m_type)
 	{
@@ -116,7 +116,7 @@ void Shader::CompileShader(ShaderType shader)
 
 }
 
-void Shader::CreatPipelineState(std::vector<ShaderType> shaderTypes, ID3D12Device* device, int screenWidth, int screenHeight, ShaderPipelineType type)
+void ShaderManager::CreatPipelineState(std::vector<ShaderType> shaderTypes, ID3D12Device* device, int screenWidth, int screenHeight, ShaderPipelineType type)
 {
 	//Compile the necessary shaders
 	for (auto shaderType : shaderTypes)
@@ -179,7 +179,7 @@ void Shader::CreatPipelineState(std::vector<ShaderType> shaderTypes, ID3D12Devic
 	m_pipelines.push_back(pipeline);
 }
 
-void Shader::CreateDepthStencil(ID3D12Device* device, int screenWidth, int screenHeight, D3D12_DEPTH_STENCIL_DESC& depthStencilDesc)
+void ShaderManager::CreateDepthStencil(ID3D12Device* device, int screenWidth, int screenHeight, D3D12_DEPTH_STENCIL_DESC& depthStencilDesc)
 {
 	//Fill out a depth stencil desc structure
 	depthStencilDesc.DepthEnable = TRUE;
@@ -231,12 +231,12 @@ void Shader::CreateDepthStencil(ID3D12Device* device, int screenWidth, int scree
 	device->CreateDepthStencilView(m_depthStencilBuffer.Get(), &depthStencilViewDesc, m_depthStencilDescHeap->GetCPUDescriptorHandleForHeapStart());
 }
 
-void Shader::AppendRootParameter(D3D12_ROOT_PARAMETER rootParameter)
+void ShaderManager::AppendRootParameter(D3D12_ROOT_PARAMETER rootParameter)
 {
 	m_rootParameters.push_back(rootParameter);
 }
 
-void Shader::CreateRootDescriptorTableCBV()
+void ShaderManager::CreateRootDescriptorTableCBV()
 {
 	// create a descriptor table
 	D3D12_ROOT_DESCRIPTOR_TABLE descriptorTable;
@@ -251,7 +251,7 @@ void Shader::CreateRootDescriptorTableCBV()
 	AppendRootParameter(rootParameters[0]);
 }
 
-void Shader::CreateRootDescriptorHeap(ID3D12Device* device)
+void ShaderManager::CreateRootDescriptorHeap(ID3D12Device* device)
 {
 	for (int i = 0; i < frameBufferCount; ++i)
 	{

@@ -23,7 +23,7 @@ void GoodaDriver::Initialize(HWND hwnd, Camera* camera)
 	assert(m_Direct3D);
 
 	//Create the Color Shader object
-	m_Shader = new Shader();
+	m_Shader = new ShaderManager();
 	assert(&m_Shader);
 
 	//Create the Model object
