@@ -52,7 +52,7 @@ void GoodaDriver::Initialize(HWND hwnd, Camera* camera)
 		m_Shader->AppendRootDescriptorToHeap(light->GetConstantBuffer());
 
 	m_Shader->CreateRootSignature(m_Direct3D->GetDevice());
-	m_Shader->CreatPipelineState({ { ShaderType::Type::VS, L"Shader Files/ColorVertexShader.hlsl" },{ ShaderType::Type::PS, L"Shader Files/ColorPixelShader.hlsl" } }, 
+	m_Shader->CreatPipelineState({ { ShaderType::VS, L"Shader Files/ColorVertexShader.hlsl" },{ ShaderType::PS, L"Shader Files/ColorPixelShader.hlsl" } }, 
 		m_Direct3D->GetDevice(), SCREEN_WIDTH, SCREEN_HEIGHT, ShaderPipelineType::COLOR);
 
 	//Close the command list now that all the commands have been recorded

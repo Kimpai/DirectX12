@@ -99,28 +99,28 @@ void ShaderManager::AppendRootDescriptorToHeap(ConstantBuffer* constantBuffer)
 	m_constantBuffers.push_back(constantBuffer);
 }
 
-void ShaderManager::CompileShader(ShaderType shader)
+void ShaderManager::CompileShader(ShaderPipeline::Shader shader)
 {
 	switch (shader.m_type)
 	{
-	case ShaderType::Type::VS:
+	case ShaderType::VS:
 		assert(!D3DCompileFromFile(shader.m_shader, NULL, NULL, "main", "vs_5_0", D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, 0, &m_vertexShader, NULL));
 		break;
-	case ShaderType::Type::PS:
+	case ShaderType::PS:
 		assert(!D3DCompileFromFile(shader.m_shader, NULL, NULL, "main", "ps_5_0", D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, 0, &m_pixelShader, NULL));
 		break;
 	default:
-		assert(("Invalid shader type", shader.m_type != ShaderType::Type::INVALID));
+		assert("Invalid shader type");
 		break;
 	}
 
 }
 
-void ShaderManager::CreatPipelineState(std::vector<ShaderType> shaderTypes, ID3D12Device* device, int screenWidth, int screenHeight, ShaderPipelineType type)
+void ShaderManager::CreatPipelineState(std::vector<ShaderPipeline::Shader> shaders, ID3D12Device* device, int screenWidth, int screenHeight, ShaderPipelineType shaderPipelineType)
 {
 	//Compile the necessary shaders
-	for (auto shaderType : shaderTypes)
-		CompileShader(shaderType);
+	for (auto shader : shaders)
+		CompileShader(shader);
 
 	//Fill out a shader bytecode structure, which is basically just a pointer
 	//to the shader bytecode and the size of the shader bytecode
@@ -175,7 +175,7 @@ void ShaderManager::CreatPipelineState(std::vector<ShaderType> shaderTypes, ID3D
 	assert(!device->CreateGraphicsPipelineState(&pipelineStateDesc, __uuidof(ID3D12PipelineState), (void**)&pipelineState));
 	pipelineState->SetName(L"Color PipelineState");
 
-	ShaderPipeline pipeline(type, pipelineState);
+	ShaderPipeline pipeline(shaderPipelineType, pipelineState, shaders);
 	m_pipelines.push_back(pipeline);
 }
 
