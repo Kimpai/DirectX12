@@ -19,10 +19,12 @@ public:
 	void UpdateConstantBufferData(int);
 	int GetConstantBufferSize();
 	D3D12_GPU_VIRTUAL_ADDRESS GetBufferLocation(int);
+	D3D12_CONSTANT_BUFFER_VIEW_DESC GetConstantBufferViewDesc(int);
+
 private:
 	void CreateUploadHeap();
+	void CreateConstantBufferViewDesc();
 
-	ComPtr<ID3D12DescriptorHeap> m_constantBufferDescHeap[frameBufferCount];
 	ComPtr<ID3D12Resource> m_constantBufferUploadHeap[frameBufferCount];
 	UINT8* m_constantBufferGPUAddress[frameBufferCount];
 
@@ -30,4 +32,5 @@ private:
 	ID3D12GraphicsCommandList* m_commandList;
 	const void* m_bufferData;
 	int m_size;
+	D3D12_CONSTANT_BUFFER_VIEW_DESC m_cbvDesc[frameBufferCount];
 };

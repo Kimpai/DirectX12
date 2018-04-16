@@ -18,3 +18,8 @@ void Light::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandL
 {
 	InitializeBuffers(device, commandList);
 }
+
+int Light::GetNumOfConstantBuffers()
+{
+	return m_numOfConstantBuffers;
+}

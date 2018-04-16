@@ -15,48 +15,6 @@ void ShaderManager::Frame(int frameIndex)
 
 }
 
-void ShaderManager::CreateRootDescriptorTableRange(UINT numberOfDescriptors, D3D12_DESCRIPTOR_RANGE_TYPE rangeType, UINT shaderRegister)
-{
-	D3D12_DESCRIPTOR_RANGE ranges[1];
-	ranges[0].BaseShaderRegister = shaderRegister;
-	ranges[0].NumDescriptors = numberOfDescriptors;
-	ranges[0].RangeType = rangeType;
-	ranges[0].RegisterSpace = 0;
-	ranges[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-
-	m_rootDescriptorTableRangesCBV.push_back(ranges[0]);
-}
-
-void ShaderManager::CreateRootDescriptor(UINT shaderRegister, D3D12_ROOT_PARAMETER_TYPE type, D3D12_SHADER_VISIBILITY shader)
-{
-	//Fill out a root desc
-	D3D12_ROOT_DESCRIPTOR rootDesc;
-	rootDesc.RegisterSpace = 0;
-	rootDesc.ShaderRegister = shaderRegister;
-
-	//Fill out a root parameter
-	D3D12_ROOT_PARAMETER rootParameter[1];
-	rootParameter[0].ParameterType = type;
-	rootParameter[0].Descriptor = rootDesc;
-	rootParameter[0].ShaderVisibility = shader;
-
-	AppendRootParameter(rootParameter[0]);
-}
-
-void ShaderManager::CreateRootConstant(UINT, D3D12_ROOT_PARAMETER_TYPE, D3D12_SHADER_VISIBILITY)
-{
-}
-
-ID3D12DescriptorHeap* ShaderManager::GetDescriptorHeap(int currentFrame)
-{
-	return m_mainDescriptorHeap[currentFrame].Get();
-}
-
-std::vector<D3D12_ROOT_PARAMETER> ShaderManager::GetRootParameters()
-{
-	return m_rootParameters;
-}
-
 ID3D12RootSignature* ShaderManager::GetRootSignature()
 {
 	return m_rootSignature.Get();
@@ -64,20 +22,27 @@ ID3D12RootSignature* ShaderManager::GetRootSignature()
 
 void ShaderManager::CreateRootSignature(ID3D12Device* device)
 {
-	CreateRootDescriptorTableCBV();
-	CreateRootDescriptorHeap(device);
+	CreateRootDescriptorTable();
 
-	ComPtr<ID3DBlob> rootsignature;
-
-	//Create root signature
+	ID3DBlob* rootsignature;
 	CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc;
 	rootSignatureDesc.Init((UINT)m_rootParameters.size(), &m_rootParameters[0], 0, NULL, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
 	assert(!D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &rootsignature, NULL));
 
-	assert(!device->CreateRootSignature(0, rootsignature->GetBufferPointer(), rootsignature->GetBufferSize(), IID_PPV_ARGS(m_rootSignature.GetAddressOf())));
+	assert(!device->CreateRootSignature(0, rootsignature->GetBufferPointer(), rootsignature->GetBufferSize(), IID_PPV_ARGS(&m_rootSignature)));
 
 	m_rootSignature->SetName(L"Root Signature");
+
+	if (rootsignature)
+		rootsignature->Release();
+
+	CreateRootDescriptorHeap(device);
+}
+
+ID3D12DescriptorHeap * ShaderManager::GetDescriptorHeap(int frameIndex)
+{
+	return m_mainDescriptorHeap[frameIndex].Get();
 }
 
 ID3D12PipelineState* ShaderManager::GetPipelineState(ShaderPipelineType type)
@@ -231,24 +196,39 @@ void ShaderManager::CreateDepthStencil(ID3D12Device* device, int screenWidth, in
 	device->CreateDepthStencilView(m_depthStencilBuffer.Get(), &depthStencilViewDesc, m_depthStencilDescHeap->GetCPUDescriptorHandleForHeapStart());
 }
 
+void ShaderManager::CreateRootDescriptorTable()
+{
+	CreateRootDescriptorTableRange(1, 0);
+	CreateRootDescriptorTableRange(1, 1);
+
+	// create a descriptor table
+	D3D12_ROOT_DESCRIPTOR_TABLE descriptorTable;
+	descriptorTable.NumDescriptorRanges = (UINT)m_descriptorRanges.size();
+	descriptorTable.pDescriptorRanges = &m_descriptorRanges[0];
+
+	D3D12_ROOT_PARAMETER  rootParameter[1];
+	rootParameter[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameter[0].DescriptorTable = descriptorTable;
+	rootParameter[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+
+	AppendRootParameter(rootParameter[0]);
+}
+
+void ShaderManager::CreateRootDescriptorTableRange(UINT numOfConstantBuffers, UINT shaderRegister)
+{
+	D3D12_DESCRIPTOR_RANGE range[1];
+	range[0].BaseShaderRegister = shaderRegister;
+	range[0].NumDescriptors = numOfConstantBuffers;
+	range[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
+	range[0].RegisterSpace = 0;
+	range[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+	m_descriptorRanges.push_back(range[0]);
+}
+
 void ShaderManager::AppendRootParameter(D3D12_ROOT_PARAMETER rootParameter)
 {
 	m_rootParameters.push_back(rootParameter);
-}
-
-void ShaderManager::CreateRootDescriptorTableCBV()
-{
-	// create a descriptor table
-	D3D12_ROOT_DESCRIPTOR_TABLE descriptorTable;
-	descriptorTable.NumDescriptorRanges = (UINT)m_rootDescriptorTableRangesCBV.size();
-	descriptorTable.pDescriptorRanges = &m_rootDescriptorTableRangesCBV[0];
-
-	D3D12_ROOT_PARAMETER  rootParameters[1];
-	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-	rootParameters[0].DescriptorTable = descriptorTable;
-	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-
-	AppendRootParameter(rootParameters[0]);
 }
 
 void ShaderManager::CreateRootDescriptorHeap(ID3D12Device* device)
@@ -264,11 +244,8 @@ void ShaderManager::CreateRootDescriptorHeap(ID3D12Device* device)
 		m_mainDescriptorHeap[i]->SetName(L"Descriptor Heap");
 		for (int j = 0; j < m_constantBuffers.size(); ++j)
 		{
-			D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
-			cbvDesc.BufferLocation = m_constantBuffers[j]->GetBufferLocation(i);
-			cbvDesc.SizeInBytes = m_constantBuffers[j]->GetConstantBufferSize();
 			CD3DX12_CPU_DESCRIPTOR_HANDLE handle(m_mainDescriptorHeap[i]->GetCPUDescriptorHandleForHeapStart(), j, device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
-			device->CreateConstantBufferView(&cbvDesc, handle);
+			device->CreateConstantBufferView(&m_constantBuffers[j]->GetConstantBufferViewDesc(i), handle);
 		}
 	}
 }

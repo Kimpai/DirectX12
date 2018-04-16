@@ -28,9 +28,10 @@ public:
 	virtual void Frame(int);
 	virtual void Render(ID3D12GraphicsCommandList*, int) = 0;
 	virtual ConstantBuffer* GetConstantBuffer() = 0;
+	static int GetNumOfConstantBuffers();
 
 private:
-	const int ConstantBufferPerObjectAlignedSize = (sizeof(m_constantBufferData) + 255) & ~255;
+	const static int m_numOfConstantBuffers = 1;
 
 	virtual void InitializeBuffers(ID3D12Device*, ID3D12GraphicsCommandList*) = 0;
 };

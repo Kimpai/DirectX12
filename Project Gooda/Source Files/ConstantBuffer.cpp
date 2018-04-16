@@ -6,6 +6,7 @@ ConstantBuffer::ConstantBuffer(const void* bufferData, int size, ID3D12Device* d
 	m_size = size;
 
 	CreateUploadHeap();
+	CreateConstantBufferViewDesc();
 }
 
 ConstantBuffer::~ConstantBuffer()
@@ -28,6 +29,11 @@ D3D12_GPU_VIRTUAL_ADDRESS ConstantBuffer::GetBufferLocation(int currentFrame)
 	return m_constantBufferUploadHeap[currentFrame]->GetGPUVirtualAddress();
 }
 
+D3D12_CONSTANT_BUFFER_VIEW_DESC ConstantBuffer::GetConstantBufferViewDesc(int frameIndex)
+{
+	return m_cbvDesc[frameIndex];
+}
+
 void ConstantBuffer::CreateUploadHeap()
 {
 	//Create an upload heap for each frame buffer
@@ -42,5 +48,15 @@ void ConstantBuffer::CreateUploadHeap()
 		CD3DX12_RANGE readRange(0, 0);
 		assert(!m_constantBufferUploadHeap[i]->Map(0, &readRange, reinterpret_cast<void**>(&m_constantBufferGPUAddress[i])));
 		memcpy(m_constantBufferGPUAddress[i], &m_bufferData, m_size);
+	}
+}
+
+void ConstantBuffer::CreateConstantBufferViewDesc()
+{
+	//Create a constant buffer view description
+	for (int i = 0; i < frameBufferCount; ++i)
+	{
+		m_cbvDesc[i].BufferLocation = GetBufferLocation(i);
+		m_cbvDesc[i].SizeInBytes = GetConstantBufferSize();
 	}
 }

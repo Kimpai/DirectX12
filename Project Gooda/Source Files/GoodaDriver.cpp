@@ -37,19 +37,17 @@ void GoodaDriver::Initialize(HWND hwnd, Camera* camera)
 
 	//Initialize the model object
 	for (auto model : m_Models)
+	{
 		model->Initialize(m_Direct3D->GetDevice(), m_Direct3D->GetCommandList(), camera->GetViewMatrix(), XMFLOAT4(0.0f, 0.0f, 0.5f, 1.0f));
+		m_Shader->AppendRootDescriptorToHeap(model->GetConstantBuffer());
+	}
 
 	//Initialize the light object
 	for (auto light : m_Lights)
+	{
 		light->Initialize(m_Direct3D->GetDevice(), m_Direct3D->GetCommandList());
-
-	m_Shader->CreateRootDescriptorTableRange(2, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 0);
-
-	for (auto model : m_Models)
-		m_Shader->AppendRootDescriptorToHeap(model->GetConstantBuffer());
-
-	for (auto light : m_Lights)
 		m_Shader->AppendRootDescriptorToHeap(light->GetConstantBuffer());
+	}
 
 	m_Shader->CreateRootSignature(m_Direct3D->GetDevice());
 	m_Shader->CreatPipelineState({ { ShaderType::VS, L"Shader Files/ColorVertexShader.hlsl" },{ ShaderType::PS, L"Shader Files/ColorPixelShader.hlsl" } }, 
