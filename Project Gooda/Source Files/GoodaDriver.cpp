@@ -28,7 +28,7 @@ void GoodaDriver::Initialize(HWND hwnd, Camera* camera)
 
 	//Create the Model object
 	m_Models.push_back(new Cube(XMFLOAT3(3.0f, 3.0f, 5.0f)));
-	//m_Models.push_back(new Terrain("Resource Files/heightmap.bmp", 257, 257, 12.0f));
+	m_Models.push_back(new Terrain("Resource Files/heightmap.bmp", 257, 257, 12.0f));
 	assert(&m_Models);
 
 	//Create the light object

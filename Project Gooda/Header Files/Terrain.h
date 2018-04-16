@@ -17,13 +17,15 @@ public:
 	Terrain(char*, int, int, float);
 	~Terrain();
 
+	ConstantBuffer* GetConstantBuffer();
+
 private:
 	void InitializeBuffers(ID3D12Device*, ID3D12GraphicsCommandList*);
 	void Render(ID3D12GraphicsCommandList*, int);
 
 	void LoadBitmapHeightMap();
 	void SetCoordinates();
-	void Build(VertexPositionColor*);
+	void Build(VertexPositionNormalColor*);
 
 	int m_height, m_width;
 	float m_scale;

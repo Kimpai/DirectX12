@@ -37,5 +37,5 @@ float4 main(PixelShaderInput input) : SV_TARGET
     color *= input.color;
 
     //Return the interpolated color
-    return color;
+    return input.color;
 }

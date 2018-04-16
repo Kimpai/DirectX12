@@ -42,6 +42,11 @@ Terrain::~Terrain()
 	}
 }
 
+ConstantBuffer* Terrain::GetConstantBuffer()
+{
+	return m_constantBuffer;
+}
+
 void Terrain::InitializeBuffers(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
 {
 	//Load the bitmap file
@@ -54,7 +59,7 @@ void Terrain::InitializeBuffers(ID3D12Device* device, ID3D12GraphicsCommandList*
 	//also used to set size of the vertex and index buffer
 	const int size = (m_width - 1) * (m_height - 1) * 6;
 
-	VertexPositionColor* vertices = new VertexPositionColor[size];
+	VertexPositionNormalColor* vertices = new VertexPositionNormalColor[size];
 	unsigned int* indices = new unsigned int[size];
 
 	//Build the 3D terrain
@@ -68,11 +73,11 @@ void Terrain::InitializeBuffers(ID3D12Device* device, ID3D12GraphicsCommandList*
 	m_indices = size;
 
 	//Determine the size of the vertex and index buffers
-	int vertexBufferSize = size * sizeof(VertexPositionColor);
+	int vertexBufferSize = size * sizeof(VertexPositionNormalColor);
 	int indexBufferSize = size * sizeof(DWORD);
 
 	//Create a vertex buffer
-	m_vertexBuffer = new VertexBuffer(vertices, vertexBufferSize, sizeof(VertexPositionColor), device, commandList);
+	m_vertexBuffer = new VertexBuffer(vertices, vertexBufferSize, sizeof(VertexPositionNormalColor), device, commandList);
 	
 	//Create an index buffer
 	m_indexBuffer = new IndexBuffer(indices, indexBufferSize, sizeof(DWORD), device, commandList);
@@ -104,9 +109,6 @@ void Terrain::Render(ID3D12GraphicsCommandList* commandList, int currentFrame)
 
 	//Set the index buffer
 	m_indexBuffer->SetIndexBuffer();
-
-	//Set constant buffer
-	commandList->SetGraphicsRootConstantBufferView(0, m_constantBuffer->GetBufferLocation(currentFrame));
 
 	//Draw
 	commandList->DrawIndexedInstanced(m_indices, 1, 0, 0, 0);
@@ -207,7 +209,7 @@ void Terrain::SetCoordinates()
 	}
 }
 
-void Terrain::Build(VertexPositionColor* vertices)
+void Terrain::Build(VertexPositionNormalColor* vertices)
 {
 	//Initialize the index
 	int index = 0;
@@ -230,42 +232,48 @@ void Terrain::Build(VertexPositionColor* vertices)
 			vertices[index].position.x = m_heightMap[index1].x;
 			vertices[index].position.y = m_heightMap[index1].y;
 			vertices[index].position.z = m_heightMap[index1].z;
-			vertices[index].color =	XMFLOAT4( 0.0f, 1.0f, 0.0f, 1.0f );
+			vertices[index].normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
+			vertices[index].color =	XMFLOAT4(0.0f, 0.5f, 0.0f, 1.0f);
 			index++;
 
 			//Triangle 1 - Upper right
 			vertices[index].position.x = m_heightMap[index2].x;
 			vertices[index].position.y = m_heightMap[index2].y;
 			vertices[index].position.z = m_heightMap[index2].z;
-			vertices[index].color = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+			vertices[index].normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
+			vertices[index].color = XMFLOAT4(0.0f, 0.5f, 0.0f, 1.0f);
 			index++;
 
 			//Triangle 1 - Bottom left
 			vertices[index].position.x = m_heightMap[index3].x;
 			vertices[index].position.y = m_heightMap[index3].y;
 			vertices[index].position.z = m_heightMap[index3].z;
-			vertices[index].color = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+			vertices[index].normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
+			vertices[index].color = XMFLOAT4(0.0f, 0.5f, 0.0f, 1.0f);
 			index++;
 
 			//Triangle 2 - Bottom left
 			vertices[index].position.x = m_heightMap[index3].x;
 			vertices[index].position.y = m_heightMap[index3].y;
 			vertices[index].position.z = m_heightMap[index3].z;
-			vertices[index].color = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+			vertices[index].normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
+			vertices[index].color = XMFLOAT4(0.0f, 0.5f, 0.0f, 1.0f);
 			index++;
 
 			//Triangle 2 - Upper right
 			vertices[index].position.x = m_heightMap[index2].x;
 			vertices[index].position.y = m_heightMap[index2].y;
 			vertices[index].position.z = m_heightMap[index2].z;
-			vertices[index].color = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+			vertices[index].normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
+			vertices[index].color = XMFLOAT4(0.0f, 0.5f, 0.0f, 1.0f);
 			index++;
 
 			//Triangle 2 - Bottom right
 			vertices[index].position.x = m_heightMap[index4].x;
 			vertices[index].position.y = m_heightMap[index4].y;
 			vertices[index].position.z = m_heightMap[index4].z;
-			vertices[index].color = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+			vertices[index].normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
+			vertices[index].color = XMFLOAT4(0.0f, 0.5f, 0.0f, 1.0f);
 			index++;
 		}
 	}
