@@ -27,7 +27,9 @@ void GoodaDriver::Initialize(HWND hwnd, Camera* camera)
 	assert(&m_Shader);
 
 	//Create the Model object
-	m_Models.push_back(new Cube(XMFLOAT3(3.0f, 3.0f, 5.0f)));
+	m_Models.push_back(new Cube(XMFLOAT3(3.0f, 1.0f, 5.0f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)));
+	m_Models.push_back(new Cube(XMFLOAT3(3.0f, 1.0f, 15.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f)));
+	m_Models.push_back(new Cube(XMFLOAT3(10.0f, 1.0f, 15.0f), XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f)));
 	m_Models.push_back(new Terrain("Resource Files/heightmap.bmp", 257, 257, 12.0f));
 	assert(&m_Models);
 

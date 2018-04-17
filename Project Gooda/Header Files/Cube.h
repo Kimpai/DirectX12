@@ -15,7 +15,7 @@ using namespace Microsoft::WRL;
 class Cube : public Model
 {
 public:
-	Cube(XMFLOAT3 origin);
+	Cube(XMFLOAT3 origin, XMFLOAT4 color);
 	~Cube();
 
 	ConstantBuffer* GetConstantBuffer();
@@ -26,4 +26,5 @@ private:
 	
 	int m_indices;
 	XMFLOAT3 m_origin;
+	XMFLOAT4 m_color;
 };
