@@ -1,8 +1,6 @@
 #pragma once
 
 #include <Windows.h>
-#include <lua.hpp>
-#include <lauxlib.h>
 #include <config.h>
 #include <iostream>
 #include <vector>
@@ -13,8 +11,7 @@
 #include "Terrain.h"
 #include "Camera.h"
 #include "DirectionalLight.h"
-
-static bool renderQuad = true;
+#include "SoundManager.h"
 
 class GoodaDriver
 {
@@ -32,6 +29,8 @@ private:
 
 	Direct3D* m_Direct3D;
 	ShaderManager* m_Shader;
+	SoundManager* m_Sound;
+	std::vector<int> m_Channels;
 	std::vector<Model*> m_Models;
 	std::vector<Light*> m_Lights;
 };

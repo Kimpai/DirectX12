@@ -31,6 +31,11 @@ ConstantBuffer* Cube::GetConstantBuffer()
 	return m_constantBuffer;
 }
 
+XMFLOAT3 Cube::GetPosition()
+{
+	return m_origin;
+}
+
 void Cube::InitializeBuffers(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
 {
 	//Create vertex data

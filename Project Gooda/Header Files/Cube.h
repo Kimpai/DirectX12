@@ -19,6 +19,7 @@ public:
 	~Cube();
 
 	ConstantBuffer* GetConstantBuffer();
+	XMFLOAT3 GetPosition();
 
 private:
 	void InitializeBuffers(ID3D12Device*, ID3D12GraphicsCommandList*);

@@ -10,7 +10,6 @@
 #include "Input.h"
 #include "GoodaDriver.h"
 #include "Console.h"
-#include "LuaScript.h"
 #include "Camera.h"
 
 class GoodaDevice
@@ -38,7 +37,6 @@ private:
 	Input* m_Input;
 	GoodaDriver* m_Driver;
 	Console* m_Console;
-	Lua* m_Lua;
 	Camera* m_Camera;
 };
 

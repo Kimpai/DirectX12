@@ -37,6 +37,7 @@ public:
 	virtual void Render(ID3D12GraphicsCommandList*, int) = 0;
 	virtual ConstantBuffer* GetConstantBuffer() = 0;
 	virtual void Frame(int, XMMATRIX);
+	virtual XMFLOAT3 GetPosition() { return XMFLOAT3(0.0f, 0.0f, 0.0f); };
 
 private:
 	XMFLOAT4X4 m_worldMatrix;

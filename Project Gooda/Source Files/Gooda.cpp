@@ -5,7 +5,6 @@ GoodaDevice::GoodaDevice()
 	m_Input = nullptr;
 	m_Driver = nullptr;
 	m_Console = nullptr;
-	m_Lua = nullptr;
 	m_Camera = nullptr;
 }
 
@@ -54,17 +53,6 @@ void GoodaDevice::Initialize()
 
 	//Initialize console object
 	m_Console->Initialize();
-
-
-	//Create lua object
-	m_Lua = new Lua();
-	assert(m_Lua);
-
-	//Initialize lua object
-	m_Lua->Initialize();
-
-	m_Lua->PushCFunction(m_Lua->Print);
-	m_Lua->SetGlobal("Print");
 }
 
 void GoodaDevice::Shutdown()
@@ -95,13 +83,6 @@ void GoodaDevice::Shutdown()
 	{
 		delete m_Console;
 		m_Console = nullptr;
-	}
-
-	//Release lua object
-	if (m_Lua)
-	{
-		delete m_Lua;
-		m_Lua = nullptr;
 	}
 
 	//Shutdown the window
@@ -190,11 +171,7 @@ bool GoodaDevice::Frame()
 	std::string input;
 
 	//Do the console frame processing
-	if (m_Console->Frame(input))
-	{
-		if (!m_Lua->DoString(input.c_str()))
-			std::cout << "Lua Error" << std::endl;
-	}
+	m_Console->Frame(input);
 
 	//Do the frame processing for input and camera
 	if (m_hwnd == GetFocus())
