@@ -9,7 +9,7 @@
 #include <vector>
 
 #include "ConstantBuffer.h"
-#include "GoodaModel.h"
+#include "Model.h"
 #include "Light.h"
 
 using namespace DirectX;

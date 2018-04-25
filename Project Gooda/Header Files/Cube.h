@@ -7,7 +7,7 @@
 #include <VertexTypes.h>
 #include <frame.h>
 
-#include "GoodaModel.h"
+#include "Model.h"
 
 using namespace DirectX;
 using namespace Microsoft::WRL;

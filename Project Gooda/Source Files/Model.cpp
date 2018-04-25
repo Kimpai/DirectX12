@@ -1,4 +1,4 @@
-#include "GoodaModel.h"
+#include "Model.h"
 
 Model::Model()
 {

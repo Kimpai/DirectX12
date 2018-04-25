@@ -175,7 +175,7 @@
     <ClCompile Include="Source Files\Input.cpp" />
     <ClCompile Include="Source Files\Light.cpp" />
     <ClCompile Include="Source Files\main.cpp" />
-    <ClCompile Include="Source Files\GoodaModel.cpp" />
+    <ClCompile Include="Source Files\Model.cpp" />
     <ClCompile Include="Source Files\Gooda.cpp" />
     <ClCompile Include="Source Files\RootDescriptor.cpp" />
     <ClCompile Include="Source Files\RootParameter.cpp" />
@@ -199,7 +199,7 @@
     <ClInclude Include="Header Files\IndexBuffer.h" />
     <ClInclude Include="Header Files\Input.h" />
     <ClInclude Include="Header Files\Light.h" />
-    <ClInclude Include="Header Files\GoodaModel.h" />
+    <ClInclude Include="Header Files\Model.h" />
     <ClInclude Include="Header Files\Gooda.h" />
     <ClInclude Include="Header Files\RootDescriptor.h" />
     <ClInclude Include="Header Files\RootParameter.h" />

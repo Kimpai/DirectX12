@@ -6,7 +6,7 @@
 #include <wrl.h>
 #include <fstream>
 
-#include "GoodaModel.h"
+#include "Model.h"
 
 using namespace DirectX;
 using namespace Microsoft::WRL;
