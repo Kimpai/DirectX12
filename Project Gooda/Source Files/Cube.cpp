@@ -123,7 +123,7 @@ void Cube::InitializeBuffers(ID3D12Device* device, ID3D12GraphicsCommandList* co
 	m_constantBuffer = new ConstantBuffer(&m_constantBufferData, sizeof(ConstantBufferData), device, commandList);
 }
 
-void Cube::Render(ID3D12GraphicsCommandList* commandList, int currentFrame)
+void Cube::Render(ID3D12GraphicsCommandList* commandList, int currentFrame, CD3DX12_GPU_DESCRIPTOR_HANDLE handle)
 {
 	//Set the primitive topology
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -133,6 +133,8 @@ void Cube::Render(ID3D12GraphicsCommandList* commandList, int currentFrame)
 
 	//Set the index buffer
 	m_indexBuffer->SetIndexBuffer();
+
+	commandList->SetGraphicsRootDescriptorTable(0, handle);
 
 	//Draw
 	commandList->DrawIndexedInstanced(m_indices, 1, 0, 0, 0);

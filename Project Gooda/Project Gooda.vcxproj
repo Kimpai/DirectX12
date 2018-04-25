@@ -167,6 +167,7 @@
     <ClCompile Include="Source Files\Console.cpp" />
     <ClCompile Include="Source Files\ConstantBuffer.cpp" />
     <ClCompile Include="Source Files\Cube.cpp" />
+    <ClCompile Include="Source Files\DescriptorHeap.cpp" />
     <ClCompile Include="Source Files\Direct3D.cpp" />
     <ClCompile Include="Source Files\DirectionalLight.cpp" />
     <ClCompile Include="Source Files\GoodaDriver.cpp" />
@@ -176,6 +177,9 @@
     <ClCompile Include="Source Files\main.cpp" />
     <ClCompile Include="Source Files\GoodaModel.cpp" />
     <ClCompile Include="Source Files\Gooda.cpp" />
+    <ClCompile Include="Source Files\RootDescriptor.cpp" />
+    <ClCompile Include="Source Files\RootParameter.cpp" />
+    <ClCompile Include="Source Files\RootSignature.cpp" />
     <ClCompile Include="Source Files\ShaderManager.cpp" />
     <ClCompile Include="Source Files\SoundManager.cpp" />
     <ClCompile Include="Source Files\Terrain.cpp" />
@@ -187,6 +191,7 @@
     <ClInclude Include="Header Files\Console.h" />
     <ClInclude Include="Header Files\ConstantBuffer.h" />
     <ClInclude Include="Header Files\Cube.h" />
+    <ClInclude Include="Header Files\DescriptorHeap.h" />
     <ClInclude Include="Header Files\Direct3D.h" />
     <ClInclude Include="Header Files\DirectionalLight.h" />
     <ClInclude Include="Header Files\frame.h" />
@@ -196,6 +201,9 @@
     <ClInclude Include="Header Files\Light.h" />
     <ClInclude Include="Header Files\GoodaModel.h" />
     <ClInclude Include="Header Files\Gooda.h" />
+    <ClInclude Include="Header Files\RootDescriptor.h" />
+    <ClInclude Include="Header Files\RootParameter.h" />
+    <ClInclude Include="Header Files\RootSignature.h" />
     <ClInclude Include="Header Files\ShaderManager.h" />
     <ClInclude Include="Header Files\SoundManager.h" />
     <ClInclude Include="Header Files\Terrain.h" />

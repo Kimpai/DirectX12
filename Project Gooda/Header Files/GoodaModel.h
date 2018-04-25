@@ -34,7 +34,7 @@ public:
 	virtual ~Model() = 0;
 
 	void Initialize(ID3D12Device*, ID3D12GraphicsCommandList*, XMMATRIX, XMFLOAT4);
-	virtual void Render(ID3D12GraphicsCommandList*, int) = 0;
+	virtual void Render(ID3D12GraphicsCommandList*, int, CD3DX12_GPU_DESCRIPTOR_HANDLE) = 0;
 	virtual ConstantBuffer* GetConstantBuffer() = 0;
 	virtual void Frame(int, XMMATRIX);
 	virtual XMFLOAT3 GetPosition() { return XMFLOAT3(0.0f, 0.0f, 0.0f); };

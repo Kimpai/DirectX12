@@ -51,11 +51,14 @@ void GoodaDriver::Initialize(HWND hwnd, Camera* camera)
 	assert(&m_Lights);
 
 	//Initialize the model object
-	for (auto model : m_Models)
-	{
-		model->Initialize(m_Direct3D->GetDevice(), m_Direct3D->GetCommandList(), camera->GetViewMatrix(), XMFLOAT4(0.0f, 0.0f, 0.5f, 1.0f));
-		m_Shader->AppendRootDescriptorToHeap(model->GetConstantBuffer());
-	}
+	m_Models[0]->Initialize(m_Direct3D->GetDevice(), m_Direct3D->GetCommandList(), camera->GetViewMatrix(), XMFLOAT4(0.0f, 0.0f, 10.0f, 1.0f));
+	m_Shader->AppendRootDescriptorToHeap(m_Models[0]->GetConstantBuffer());
+	m_Models[1]->Initialize(m_Direct3D->GetDevice(), m_Direct3D->GetCommandList(), camera->GetViewMatrix(), XMFLOAT4(0.0f, 0.0f, 10.0f, 1.0f));
+	m_Shader->AppendRootDescriptorToHeap(m_Models[1]->GetConstantBuffer());
+	m_Models[2]->Initialize(m_Direct3D->GetDevice(), m_Direct3D->GetCommandList(), camera->GetViewMatrix(), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
+	m_Shader->AppendRootDescriptorToHeap(m_Models[2]->GetConstantBuffer());
+	m_Models[3]->Initialize(m_Direct3D->GetDevice(), m_Direct3D->GetCommandList(), camera->GetViewMatrix(), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
+	m_Shader->AppendRootDescriptorToHeap(m_Models[3]->GetConstantBuffer());
 
 	//Initialize the light object
 	for (auto light : m_Lights)
@@ -133,8 +136,13 @@ void GoodaDriver::Render()
 	for (auto light : m_Lights)
 		light->Render(m_Direct3D->GetCommandList(), m_Direct3D->GetCurrentFrame());
 
-	for (auto model : m_Models)
-		model->Render(m_Direct3D->GetCommandList(), m_Direct3D->GetCurrentFrame());
+	CD3DX12_GPU_DESCRIPTOR_HANDLE handle(m_Shader->GetDescriptorHeap(m_Direct3D->GetCurrentFrame())->GetGPUDescriptorHandleForHeapStart());
+
+	for (int i = 0; i < m_Models.size(); ++i)
+	{
+		m_Models[i]->Render(m_Direct3D->GetCommandList(), m_Direct3D->GetCurrentFrame(), handle);
+		handle.Offset(i, m_Direct3D->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
+	}
 
 	//Close the command list and execute the commands
 	m_Direct3D->EndScene();

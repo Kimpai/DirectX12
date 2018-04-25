@@ -1,10 +1,8 @@
 #include "ConstantBuffer.h"
 
 ConstantBuffer::ConstantBuffer(const void* bufferData, int size, ID3D12Device* device, ID3D12GraphicsCommandList* commandList) : 
-	m_device(device), m_commandList(commandList), m_bufferData(bufferData)
+	m_device(device), m_commandList(commandList), m_bufferData(bufferData), m_size(size)
 {
-	m_size = size;
-
 	CreateUploadHeap();
 	CreateConstantBufferViewDesc();
 }

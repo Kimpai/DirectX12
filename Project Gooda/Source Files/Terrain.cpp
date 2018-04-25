@@ -99,7 +99,7 @@ void Terrain::InitializeBuffers(ID3D12Device* device, ID3D12GraphicsCommandList*
 	}
 }
 
-void Terrain::Render(ID3D12GraphicsCommandList* commandList, int currentFrame)
+void Terrain::Render(ID3D12GraphicsCommandList* commandList, int currentFrame, CD3DX12_GPU_DESCRIPTOR_HANDLE handle)
 {
 	//Set the primitive topology
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -109,6 +109,8 @@ void Terrain::Render(ID3D12GraphicsCommandList* commandList, int currentFrame)
 
 	//Set the index buffer
 	m_indexBuffer->SetIndexBuffer();
+
+	commandList->SetGraphicsRootDescriptorTable(0, handle);
 
 	//Draw
 	commandList->DrawIndexedInstanced(m_indices, 1, 0, 0, 0);

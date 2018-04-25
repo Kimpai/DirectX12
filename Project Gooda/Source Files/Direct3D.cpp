@@ -138,9 +138,6 @@ void Direct3D::BeginScene(ShaderManager* shader)
 	ID3D12DescriptorHeap* descriptorHeaps[] = { shader->GetDescriptorHeap(m_frameIndex) };
 	m_commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
-	// set the root descriptor table 0 to the constant buffer descriptor heap
-	m_commandList->SetGraphicsRootDescriptorTable(0, shader->GetDescriptorHeap(m_frameIndex)->GetGPUDescriptorHandleForHeapStart());
-
 	m_commandList->RSSetViewports(1, &m_viewport);
 	m_commandList->RSSetScissorRects(1, &m_rect);
 }
