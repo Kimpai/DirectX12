@@ -11,6 +11,11 @@ ConstantBuffer::~ConstantBuffer()
 {
 }
 
+void ConstantBuffer::SetConstantBuffer(int rootIndex, CD3DX12_GPU_DESCRIPTOR_HANDLE handle)
+{
+	m_commandList->SetGraphicsRootDescriptorTable(0, handle);
+}
+
 void ConstantBuffer::UpdateConstantBufferData(int currentFrame)
 {
 	//Copy the ConstantBuffer instance to the mapped constant buffer resource

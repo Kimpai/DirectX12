@@ -1,8 +1,9 @@
 #include "Cube.h"
 
-Cube::Cube(XMFLOAT3 origin, XMFLOAT4 color) : m_origin(origin), m_color(color)
+Cube::Cube(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, XMFLOAT3 origin, XMFLOAT4 color) : Model(device, commandList, origin),
+			m_origin(origin), m_color(color), m_indices(0)
 {
-	m_indices = 0;
+	InitializeBuffers(device, commandList);
 }
 
 Cube::~Cube()
@@ -123,7 +124,7 @@ void Cube::InitializeBuffers(ID3D12Device* device, ID3D12GraphicsCommandList* co
 	m_constantBuffer = new ConstantBuffer(&m_constantBufferData, sizeof(ConstantBufferData), device, commandList);
 }
 
-void Cube::Render(ID3D12GraphicsCommandList* commandList, int currentFrame, CD3DX12_GPU_DESCRIPTOR_HANDLE handle)
+void Cube::Render(ID3D12GraphicsCommandList* commandList, int currentFrame, int rootIndex, CD3DX12_GPU_DESCRIPTOR_HANDLE handle)
 {
 	//Set the primitive topology
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -134,7 +135,8 @@ void Cube::Render(ID3D12GraphicsCommandList* commandList, int currentFrame, CD3D
 	//Set the index buffer
 	m_indexBuffer->SetIndexBuffer();
 
-	commandList->SetGraphicsRootDescriptorTable(0, handle);
+	//Set the constant buffer
+	m_constantBuffer->SetConstantBuffer(rootIndex, handle);
 
 	//Draw
 	commandList->DrawIndexedInstanced(m_indices, 1, 0, 0, 0);

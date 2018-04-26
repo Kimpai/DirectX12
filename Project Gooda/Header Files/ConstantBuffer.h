@@ -16,6 +16,7 @@ public:
 	ConstantBuffer(const void*, int, ID3D12Device*, ID3D12GraphicsCommandList*);
 	~ConstantBuffer();
 
+	void SetConstantBuffer(int, CD3DX12_GPU_DESCRIPTOR_HANDLE);
 	void UpdateConstantBufferData(int);
 	int GetConstantBufferSize();
 	D3D12_GPU_VIRTUAL_ADDRESS GetBufferLocation(int);

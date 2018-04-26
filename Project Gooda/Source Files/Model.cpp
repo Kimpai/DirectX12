@@ -1,20 +1,13 @@
 #include "Model.h"
 
-Model::Model()
+Model::Model(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, XMFLOAT3 origin)
 {
-
+	BuildWorlViewProjectionMatrix(origin);
 }
 
 Model::~Model()
 {
 
-}
-
-void Model::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, XMMATRIX viewMatrix, XMFLOAT4 origin)
-{
-	InitializeBuffers(device, commandList);
-
-	BuildWorlViewProjectionMatrix(viewMatrix, origin);
 }
 
 void Model::UpdateMatrices(XMMATRIX viewMatrix)
@@ -42,7 +35,7 @@ void Model::UpdateMatrices(XMMATRIX viewMatrix)
 	m_constantBufferData.rotationMatrix = m_rotationMatrix;
 }
 
-void Model::BuildWorlViewProjectionMatrix(XMMATRIX viewMatrix, XMFLOAT4 origin)
+void Model::BuildWorlViewProjectionMatrix(XMFLOAT3 origin)
 {
 	//Build projection matrix
 	XMMATRIX matrix = XMMatrixPerspectiveFovLH(45.0f*(3.14f/180.0f), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT,
@@ -50,13 +43,13 @@ void Model::BuildWorlViewProjectionMatrix(XMMATRIX viewMatrix, XMFLOAT4 origin)
 	XMStoreFloat4x4(&m_projectionMatrix, matrix);
 
 	//Build view matrix
-	XMStoreFloat4x4(&m_viewMatrix, viewMatrix);
+	XMStoreFloat4x4(&m_viewMatrix, XMMatrixIdentity());
 
 	//Build rotation matrix
 	XMStoreFloat4x4(&m_rotationMatrix, XMMatrixIdentity());
 
 	//Build world matrix
-	matrix = XMMatrixTranslationFromVector(XMLoadFloat4(&origin));
+	matrix = XMMatrixTranslationFromVector(XMLoadFloat3(&origin));
 	XMStoreFloat4x4(&m_worldMatrix, matrix);
 }
 

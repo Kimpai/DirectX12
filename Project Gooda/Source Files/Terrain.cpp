@@ -1,12 +1,9 @@
 #include "Terrain.h"
 
-Terrain::Terrain(char* file, int width, int height, float scale)
+Terrain::Terrain(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, char* file, int width, int height, float scale, XMFLOAT3 origin) : Model(device, commandList, origin),
+					m_height(height), m_width(width), m_scale(scale), m_file(file), m_heightMap(nullptr)
 {
-	m_height = height;
-	m_width = width;
-	m_scale = scale;
-	m_file = file;
-	m_heightMap = nullptr;
+	InitializeBuffers(device, commandList);
 }
 
 Terrain::~Terrain()
@@ -99,7 +96,7 @@ void Terrain::InitializeBuffers(ID3D12Device* device, ID3D12GraphicsCommandList*
 	}
 }
 
-void Terrain::Render(ID3D12GraphicsCommandList* commandList, int currentFrame, CD3DX12_GPU_DESCRIPTOR_HANDLE handle)
+void Terrain::Render(ID3D12GraphicsCommandList* commandList, int currentFrame, int rootIndex, CD3DX12_GPU_DESCRIPTOR_HANDLE handle)
 {
 	//Set the primitive topology
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -110,7 +107,8 @@ void Terrain::Render(ID3D12GraphicsCommandList* commandList, int currentFrame, C
 	//Set the index buffer
 	m_indexBuffer->SetIndexBuffer();
 
-	commandList->SetGraphicsRootDescriptorTable(0, handle);
+	//Set constant buffer
+	m_constantBuffer->SetConstantBuffer(rootIndex, handle);
 
 	//Draw
 	commandList->DrawIndexedInstanced(m_indices, 1, 0, 0, 0);

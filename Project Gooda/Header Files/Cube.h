@@ -15,7 +15,7 @@ using namespace Microsoft::WRL;
 class Cube : public Model
 {
 public:
-	Cube(XMFLOAT3 origin, XMFLOAT4 color);
+	Cube(ID3D12Device*, ID3D12GraphicsCommandList*, XMFLOAT3, XMFLOAT4);
 	~Cube();
 
 	ConstantBuffer* GetConstantBuffer();
@@ -23,7 +23,7 @@ public:
 
 private:
 	void InitializeBuffers(ID3D12Device*, ID3D12GraphicsCommandList*);
-	void Render(ID3D12GraphicsCommandList*, int, CD3DX12_GPU_DESCRIPTOR_HANDLE);
+	void Render(ID3D12GraphicsCommandList*, int, int, CD3DX12_GPU_DESCRIPTOR_HANDLE);
 	
 	int m_indices;
 	XMFLOAT3 m_origin;

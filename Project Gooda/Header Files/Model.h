@@ -30,11 +30,10 @@ public:
 
 	} m_constantBufferData;
 
-	Model();
+	Model(ID3D12Device*, ID3D12GraphicsCommandList*, XMFLOAT3);
 	virtual ~Model() = 0;
 
-	void Initialize(ID3D12Device*, ID3D12GraphicsCommandList*, XMMATRIX, XMFLOAT4);
-	virtual void Render(ID3D12GraphicsCommandList*, int, CD3DX12_GPU_DESCRIPTOR_HANDLE) = 0;
+	virtual void Render(ID3D12GraphicsCommandList*, int, int, CD3DX12_GPU_DESCRIPTOR_HANDLE) = 0;
 	virtual ConstantBuffer* GetConstantBuffer() = 0;
 	virtual void Frame(int, XMMATRIX);
 	virtual XMFLOAT3 GetPosition() { return XMFLOAT3(0.0f, 0.0f, 0.0f); };
@@ -46,6 +45,6 @@ private:
 	XMFLOAT4X4 m_rotationMatrix;
 
 	void UpdateMatrices(XMMATRIX viewMatrix);
-	virtual void BuildWorlViewProjectionMatrix(XMMATRIX, XMFLOAT4);
+	virtual void BuildWorlViewProjectionMatrix(XMFLOAT3);
 	virtual void InitializeBuffers(ID3D12Device*, ID3D12GraphicsCommandList*) = 0;
 };

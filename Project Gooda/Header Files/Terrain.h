@@ -14,14 +14,14 @@ using namespace Microsoft::WRL;
 class Terrain : public Model
 {
 public:
-	Terrain(char*, int, int, float);
+	Terrain(ID3D12Device*, ID3D12GraphicsCommandList*, char*, int, int, float, XMFLOAT3);
 	~Terrain();
 
 	ConstantBuffer* GetConstantBuffer();
 
 private:
 	void InitializeBuffers(ID3D12Device*, ID3D12GraphicsCommandList*);
-	void Render(ID3D12GraphicsCommandList*, int, CD3DX12_GPU_DESCRIPTOR_HANDLE);
+	void Render(ID3D12GraphicsCommandList*, int, int, CD3DX12_GPU_DESCRIPTOR_HANDLE);
 
 	void LoadBitmapHeightMap();
 	void SetCoordinates();
