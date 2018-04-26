@@ -52,15 +52,10 @@ void GoodaDriver::Initialize(HWND hwnd, Camera* camera)
 	m_Channels.push_back(m_Sound->Play("Resource Files/church-chime.wav", m_Models[2]->GetPosition(), 5.0f));
 
 	//Create the light object
-	m_Lights.push_back(new DirectionalLight(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT4(0.15f, 0.15f, 0.15f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f)));
+	m_Lights.push_back(new DirectionalLight(m_Direct3D->GetDevice(), m_Direct3D->GetCommandList(), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT4(0.15f, 0.15f, 0.15f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f)));
+	m_Shader->AppendRootDescriptorToHeap(m_Lights.back()->GetConstantBuffer());
 	assert(&m_Lights);
 
-	//Initialize the light object
-	for (auto light : m_Lights)
-	{
-		light->Initialize(m_Direct3D->GetDevice(), m_Direct3D->GetCommandList());
-		m_Shader->AppendRootDescriptorToHeap(light->GetConstantBuffer());
-	}
 
 	m_Shader->CreateRootSignature(m_Direct3D->GetDevice());
 	m_Shader->CreatPipelineState({ { ShaderType::VS, L"Shader Files/ColorVertexShader.hlsl" },{ ShaderType::PS, L"Shader Files/ColorPixelShader.hlsl" } }, 
@@ -128,8 +123,11 @@ void GoodaDriver::Render()
 	//Reset the command list and put it in a recording state
 	m_Direct3D->BeginScene(m_Shader);
 
-	for (auto light : m_Lights)
-		light->Render(m_Direct3D->GetCommandList(), m_Direct3D->GetCurrentFrame());
+	for (int i = 0; i < m_Lights.size(); ++i)
+	{
+		CD3DX12_GPU_DESCRIPTOR_HANDLE handle(m_Shader->GetDescriptorHeap(m_Direct3D->GetCurrentFrame())->GetGPUDescriptorHandleForHeapStart(), (int)m_Models.size() + i, m_Direct3D->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
+		m_Lights[i]->Render(m_Direct3D->GetCommandList(), m_Direct3D->GetCurrentFrame(), 0, handle);
+	}
 
 	for (int i = 0; i < m_Models.size(); ++i)
 	{

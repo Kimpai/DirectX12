@@ -1,10 +1,12 @@
 #include "DirectionalLight.h"
 
-DirectionalLight::DirectionalLight(XMFLOAT4 diffuseColor, XMFLOAT4 ambientColor, XMFLOAT3 lightDirection)
+DirectionalLight::DirectionalLight(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, XMFLOAT4 diffuseColor, XMFLOAT4 ambientColor, XMFLOAT3 lightDirection) : Light(device, commandList)
 {
 	m_constantBufferData.ambientColor = ambientColor,
 	m_constantBufferData.diffuseColor = diffuseColor;
 	m_constantBufferData.lightDirection = lightDirection;
+
+	InitializeBuffers(device, commandList);
 }
 
 DirectionalLight::~DirectionalLight()
@@ -23,11 +25,12 @@ ConstantBuffer* DirectionalLight::GetConstantBuffer()
 
 void DirectionalLight::InitializeBuffers(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
 {
-	//Create a constant buffer for the world, view and projection matrices
+	//Create a constant buffer for this directional light
 	m_constantBuffer = new ConstantBuffer(&m_constantBufferData, sizeof(ConstantBufferData), device, commandList);
 }
 
-void DirectionalLight::Render(ID3D12GraphicsCommandList* commandList, int currentFrame)
+void DirectionalLight::Render(ID3D12GraphicsCommandList* commandList, int currentFrame, int rootIndex, CD3DX12_GPU_DESCRIPTOR_HANDLE handle)
 {
-	//commandList->SetGraphicsRootConstantBufferView(1, m_constantBuffer->GetBufferLocation(currentFrame));
+	//Set the constant buffer
+	m_constantBuffer->SetConstantBuffer(rootIndex, handle);
 }

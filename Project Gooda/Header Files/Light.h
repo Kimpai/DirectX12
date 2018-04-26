@@ -21,12 +21,11 @@ public:
 
 	} m_constantBufferData;
 
-	Light();
+	Light(ID3D12Device*, ID3D12GraphicsCommandList*);
 	virtual ~Light() = 0;
 
-	void Initialize(ID3D12Device*, ID3D12GraphicsCommandList*);
 	virtual void Frame(int);
-	virtual void Render(ID3D12GraphicsCommandList*, int) = 0;
+	virtual void Render(ID3D12GraphicsCommandList*, int, int, CD3DX12_GPU_DESCRIPTOR_HANDLE) = 0;
 	virtual ConstantBuffer* GetConstantBuffer() = 0;
 	static int GetNumOfConstantBuffers();
 
