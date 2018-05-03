@@ -30,11 +30,11 @@ float4 main(PixelShaderInput input) : SV_TARGET
         color += (diffuseColor * lightIntensity);
     }
 
-     //Saturate the final light color.
-    color = saturate(color);
-
     //Multiply the final color with the material color
-    color *= input.color;
+    color = color * input.color;
+
+    //Saturate the final light color.
+    color = saturate(color);
 
     //Return the interpolated color
     return input.color;
