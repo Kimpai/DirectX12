@@ -4,7 +4,6 @@ GoodaDriver::GoodaDriver()
 {
 	m_Direct3D = nullptr;
 	m_Shader = nullptr;
-	m_Sound = nullptr;
 }
 
 GoodaDriver::GoodaDriver(const GoodaDriver& other)
@@ -27,26 +26,17 @@ void GoodaDriver::Initialize(HWND hwnd, Camera* camera)
 	m_Shader = new ShaderManager();
 	assert(&m_Shader);
 
-	//Create the Sound manager object
-	m_Sound = new SoundManager();
-	assert(&m_Sound);
-
 	//Create the Model object
-	m_Models.push_back(new Cube(m_Direct3D->GetDevice(), m_Direct3D->GetCommandList(), XMFLOAT3(5.0f, 1.0f, 20.0f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)));
+	m_Models.push_back(new Cube(m_Direct3D->GetDevice(), m_Direct3D->GetCommandList(), XMFLOAT3(0.0f, 1.0f, 5.0f), XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f)));
 	m_Shader->AppendRootDescriptorToHeap(m_Models.back()->GetConstantBuffer());
-	m_Models.push_back(new Cube(m_Direct3D->GetDevice(), m_Direct3D->GetCommandList(), XMFLOAT3(50.0f, 1.0f, 20.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f)));
-	m_Shader->AppendRootDescriptorToHeap(m_Models.back()->GetConstantBuffer());
-	m_Models.push_back(new Cube(m_Direct3D->GetDevice(), m_Direct3D->GetCommandList(), XMFLOAT3(100.0f, 1.0f, 20.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f)));
-	m_Shader->AppendRootDescriptorToHeap(m_Models.back()->GetConstantBuffer());
-	m_Models.push_back(new Terrain(m_Direct3D->GetDevice(), m_Direct3D->GetCommandList(), "Resource Files/heightmap.bmp", 257, 257, 12.0f, XMFLOAT3(0.0f, 0.0f, 0.0f)));
-	m_Shader->AppendRootDescriptorToHeap(m_Models.back()->GetConstantBuffer());
-
+	/*m_Models.push_back(new Cube(m_Direct3D->GetDevice(), m_Direct3D->GetCommandList(), XMFLOAT3(1.0f, 1.0f, 5.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f)));
+	m_Shader->AppendRootDescriptorToHeap(m_Models.back()->GetConstantBuffer());*/
 	assert(&m_Models);
 
 	//Create the light object
-	m_Lights.push_back(new DirectionalLight(m_Direct3D->GetDevice(), m_Direct3D->GetCommandList(), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT4(0.15f, 0.15f, 0.15f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f)));
+	/*m_Lights.push_back(new DirectionalLight(m_Direct3D->GetDevice(), m_Direct3D->GetCommandList(), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT4(0.15f, 0.15f, 0.15f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f)));
 	m_Shader->AppendRootDescriptorToHeap(m_Lights.back()->GetConstantBuffer());
-	assert(&m_Lights);
+	assert(&m_Lights);*/
 
 
 	m_Shader->CreateRootSignature(m_Direct3D->GetDevice());
@@ -69,12 +59,6 @@ void GoodaDriver::Shutdown()
 			delete model;
 			model = nullptr;
 		}
-
-	if (m_Sound)
-	{
-		delete m_Sound;
-		m_Sound = nullptr;
-	}
 
 	//Release the Color Shader object
 	if (m_Shader)

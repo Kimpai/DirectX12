@@ -26,7 +26,6 @@ public:
 		XMFLOAT4X4 worldMatrix;
 		XMFLOAT4X4 viewMatrix;
 		XMFLOAT4X4 projectionMatrix;
-		XMFLOAT4X4 rotationMatrix;
 
 	} m_constantBufferData;
 
@@ -42,7 +41,6 @@ private:
 	XMFLOAT4X4 m_worldMatrix;
 	XMFLOAT4X4 m_viewMatrix;
 	XMFLOAT4X4 m_projectionMatrix;
-	XMFLOAT4X4 m_rotationMatrix;
 
 	void UpdateMatrices(XMMATRIX viewMatrix);
 	virtual void BuildWorlViewProjectionMatrix(XMFLOAT3);
