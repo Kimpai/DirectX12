@@ -43,14 +43,6 @@ void GoodaDriver::Initialize(HWND hwnd, Camera* camera)
 
 	assert(&m_Models);
 
-	m_Sound->Load("Resource Files/baby-music-box.wav", true, true, true);
-	m_Sound->Load("Resource Files/Siren.wav", true, true, true);
-	m_Sound->Load("Resource Files/church-chime.wav", true, true, true);
-
-	m_Channels.push_back(m_Sound->Play("Resource Files/baby-music-box.wav", m_Models[0]->GetPosition(), 5.0f));
-	m_Channels.push_back(m_Sound->Play("Resource Files/Siren.wav", m_Models[1]->GetPosition(), 5.0f));
-	m_Channels.push_back(m_Sound->Play("Resource Files/church-chime.wav", m_Models[2]->GetPosition(), 5.0f));
-
 	//Create the light object
 	m_Lights.push_back(new DirectionalLight(m_Direct3D->GetDevice(), m_Direct3D->GetCommandList(), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT4(0.15f, 0.15f, 0.15f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f)));
 	m_Shader->AppendRootDescriptorToHeap(m_Lights.back()->GetConstantBuffer());
@@ -77,6 +69,12 @@ void GoodaDriver::Shutdown()
 			delete model;
 			model = nullptr;
 		}
+
+	if (m_Sound)
+	{
+		delete m_Sound;
+		m_Sound = nullptr;
+	}
 
 	//Release the Color Shader object
 	if (m_Shader)
@@ -111,8 +109,6 @@ void GoodaDriver::Frame(Camera* camera)
 	for (auto light : m_Lights)
 		light->Frame(m_Direct3D->GetCurrentFrame());
 
-	m_Sound->Set3dListenerAndOrientation(camera->GetPosition(), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f));
-	m_Sound->Frame();
 
 	//Render the graphics scene
 	Render();
