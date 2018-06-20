@@ -22,9 +22,6 @@ void Model::UpdateMatrices(XMMATRIX viewMatrix)
 	transposed = XMMatrixTranspose(XMLoadFloat4x4(&m_viewMatrix));
 	XMStoreFloat4x4(&m_viewMatrix, transposed);
 
-	transposed = XMMatrixTranspose(XMLoadFloat4x4(&m_rotationMatrix));
-	XMStoreFloat4x4(&m_rotationMatrix, transposed);
-
 	transposed = XMMatrixTranspose(XMLoadFloat4x4(&m_worldMatrix));
 	XMStoreFloat4x4(&m_worldMatrix, transposed);
 
@@ -32,7 +29,6 @@ void Model::UpdateMatrices(XMMATRIX viewMatrix)
 	m_constantBufferData.worldMatrix = m_worldMatrix;
 	m_constantBufferData.viewMatrix = m_viewMatrix;
 	m_constantBufferData.projectionMatrix = m_projectionMatrix;
-	m_constantBufferData.rotationMatrix = m_rotationMatrix;
 }
 
 void Model::BuildWorlViewProjectionMatrix(XMFLOAT3 origin)
@@ -44,9 +40,6 @@ void Model::BuildWorlViewProjectionMatrix(XMFLOAT3 origin)
 
 	//Build view matrix
 	XMStoreFloat4x4(&m_viewMatrix, XMMatrixIdentity());
-
-	//Build rotation matrix
-	XMStoreFloat4x4(&m_rotationMatrix, XMMatrixIdentity());
 
 	//Build world matrix
 	matrix = XMMatrixTranslationFromVector(XMLoadFloat3(&origin));
