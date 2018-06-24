@@ -198,15 +198,14 @@ void ShaderManager::CreateDepthStencil(ID3D12Device* device, int screenWidth, in
 
 void ShaderManager::CreateRootDescriptorTable()
 {
-	CreateRootDescriptorTableRange(1, 0);
-	CreateRootDescriptorTableRange(1, 1);
+	CreateRootDescriptorTableRange(2, 0);
 
 	// create a descriptor table
 	D3D12_ROOT_DESCRIPTOR_TABLE descriptorTable;
 	descriptorTable.NumDescriptorRanges = (UINT)m_descriptorRanges.size();
 	descriptorTable.pDescriptorRanges = &m_descriptorRanges[0];
 
-	D3D12_ROOT_PARAMETER  rootParameter[1];
+	D3D12_ROOT_PARAMETER rootParameter[1];
 	rootParameter[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 	rootParameter[0].DescriptorTable = descriptorTable;
 	rootParameter[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;

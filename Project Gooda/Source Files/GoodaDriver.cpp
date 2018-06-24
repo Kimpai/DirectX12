@@ -27,16 +27,15 @@ void GoodaDriver::Initialize(HWND hwnd, Camera* camera)
 	assert(&m_Shader);
 
 	//Create the Model object
-	m_Models.push_back(new Cube(m_Direct3D->GetDevice(), m_Direct3D->GetCommandList(), XMFLOAT3(0.0f, 1.0f, 5.0f), XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f)));
+	m_Models.push_back(new Cube(m_Direct3D->GetDevice(), m_Direct3D->GetCommandList(), XMFLOAT3(0.0f, 1.0f, 5.0f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)));
 	m_Shader->AppendRootDescriptorToHeap(m_Models.back()->GetConstantBuffer());
-	/*m_Models.push_back(new Cube(m_Direct3D->GetDevice(), m_Direct3D->GetCommandList(), XMFLOAT3(1.0f, 1.0f, 5.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f)));
-	m_Shader->AppendRootDescriptorToHeap(m_Models.back()->GetConstantBuffer());*/
+	m_Models.push_back(new Cube(m_Direct3D->GetDevice(), m_Direct3D->GetCommandList(), XMFLOAT3(5.0f, 1.0f, 5.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f)));
 	assert(&m_Models);
 
 	//Create the light object
-	/*m_Lights.push_back(new DirectionalLight(m_Direct3D->GetDevice(), m_Direct3D->GetCommandList(), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT4(0.15f, 0.15f, 0.15f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f)));
+	m_Lights.push_back(new DirectionalLight(m_Direct3D->GetDevice(), m_Direct3D->GetCommandList(), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT4(0.15f, 0.15f, 0.15f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f)));
 	m_Shader->AppendRootDescriptorToHeap(m_Lights.back()->GetConstantBuffer());
-	assert(&m_Lights);*/
+	assert(&m_Lights);
 
 
 	m_Shader->CreateRootSignature(m_Direct3D->GetDevice());
@@ -103,17 +102,16 @@ void GoodaDriver::Render()
 	//Reset the command list and put it in a recording state
 	m_Direct3D->BeginScene(m_Shader);
 
-	for (int i = 0; i < m_Lights.size(); ++i)
-	{
-		CD3DX12_GPU_DESCRIPTOR_HANDLE handle(m_Shader->GetDescriptorHeap(m_Direct3D->GetCurrentFrame())->GetGPUDescriptorHandleForHeapStart(), (int)m_Models.size() + i, m_Direct3D->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
-		m_Lights[i]->Render(m_Direct3D->GetCommandList(), m_Direct3D->GetCurrentFrame(), 0, handle);
-	}
+	UINT descriptorSize = m_Direct3D->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	CD3DX12_GPU_DESCRIPTOR_HANDLE handle(m_Shader->GetDescriptorHeap(m_Direct3D->GetCurrentFrame())->GetGPUDescriptorHandleForHeapStart());
 
-	for (int i = 0; i < m_Models.size(); ++i)
-	{
-		CD3DX12_GPU_DESCRIPTOR_HANDLE handle(m_Shader->GetDescriptorHeap(m_Direct3D->GetCurrentFrame())->GetGPUDescriptorHandleForHeapStart(), i, m_Direct3D->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
-		m_Models[i]->Render(m_Direct3D->GetCommandList(), m_Direct3D->GetCurrentFrame(), 0, handle);
-	}
+	for (auto model : m_Models)
+		model->Render(m_Direct3D->GetCommandList(), m_Direct3D->GetCurrentFrame(), 0, handle);
+
+	handle.Offset(descriptorSize);
+
+	for (auto light : m_Lights)
+		light->Render(m_Direct3D->GetCommandList(), m_Direct3D->GetCurrentFrame(), 0, handle);	
 
 	//Close the command list and execute the commands
 	m_Direct3D->EndScene();

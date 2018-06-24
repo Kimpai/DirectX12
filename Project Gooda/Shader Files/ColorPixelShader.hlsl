@@ -37,5 +37,5 @@ float4 main(PixelShaderInput input) : SV_TARGET
     color = saturate(color);
 
     //Return the interpolated color
-    return input.color;
+    return color;
 }
