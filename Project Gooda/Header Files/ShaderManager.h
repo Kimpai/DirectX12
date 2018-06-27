@@ -11,6 +11,9 @@
 #include "ConstantBuffer.h"
 #include "Model.h"
 #include "Light.h"
+#include "DescriptorHeap.h"
+#include "RootSignature.h"
+#include "RootParameter.h"
 
 using namespace DirectX;
 using namespace Microsoft::WRL;
@@ -49,30 +52,25 @@ public:
 	void CreatPipelineState(std::vector<ShaderPipeline::Shader>, ID3D12Device*, int, int, ShaderPipelineType);
 
 	CD3DX12_CPU_DESCRIPTOR_HANDLE GetDepthStencilViewHandle();
-	void AppendRootDescriptorToHeap(ConstantBuffer*);
-
 	ID3D12RootSignature* GetRootSignature();
-	void CreateRootSignature(ID3D12Device*);
-
 	ID3D12DescriptorHeap* GetDescriptorHeap(int);
+
+	void CreateDescriptor(ConstantBuffer* constantBuffer);
+	void CreateRootSignature(ID3D12Device * device);
+	void CreateRootDescriptorTable();
+	void CreateRootDescriptorHeap(ID3D12Device* device);
 
 private:
 	void CompileShader(ShaderPipeline::Shader);
 	void CreateDepthStencil(ID3D12Device*, int, int, D3D12_DEPTH_STENCIL_DESC&);
-	void CreateRootDescriptorHeap(ID3D12Device* device);
-	void CreateRootDescriptorTable();
-	void CreateRootDescriptorTableRange(UINT, UINT);
-
-	void AppendRootParameter(D3D12_ROOT_PARAMETER);
 
 	ComPtr<ID3DBlob> m_vertexShader;
 	ComPtr<ID3DBlob> m_pixelShader;
 
-	ComPtr<ID3D12DescriptorHeap> m_mainDescriptorHeap[frameBufferCount];
-	ComPtr<ID3D12RootSignature> m_rootSignature;
-	std::vector<D3D12_ROOT_PARAMETER> m_rootParameters;
-	std::vector<D3D12_DESCRIPTOR_RANGE> m_descriptorRanges;
+	DescriptorHeap* m_mainDescriptorHeap;
+	RootSignature* m_rootSignature;
 
+	std::vector<RootParameter*> m_rootParameters;
 	std::vector<ConstantBuffer*> m_constantBuffers;
 	
 	std::vector<ShaderPipeline> m_pipelines;

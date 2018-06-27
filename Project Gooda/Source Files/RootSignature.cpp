@@ -1,41 +1,28 @@
 #include "RootSignature.h"
 
-
-RootSignature::RootSignature(ID3D12Device * device, ID3D12GraphicsCommandList* commandList, ID3D12GraphicsCommandList* computeCommandList) : 
-	m_device(device), m_commandList(commandList), m_computeCommandList(computeCommandList)
+RootSignature::RootSignature(ID3D12Device* device, UINT size, UINT staticSamplers, RootParameter* rootParameter, 
+							D3D12_STATIC_SAMPLER_DESC* samplers, D3D12_ROOT_SIGNATURE_FLAGS flags)
 {
-}
+	ID3DBlob* rootsignature;
+	CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc;
+	rootSignatureDesc.Init(size, &rootParameter[0].GetRootParameter(), 0, NULL, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
-void RootSignature::CreateRootSignature(const UINT & size, const UINT & staticSamplers, const D3D12_ROOT_PARAMETER1 * params, 
-											const D3D12_STATIC_SAMPLER_DESC * samplers, D3D12_ROOT_SIGNATURE_FLAGS flags)
-{
-	CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootDesc = {};
-	rootDesc.Init_1_1(size, params, staticSamplers, samplers, flags);
+	assert(!D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &rootsignature, NULL));
 
-	//Create signature from the description
-	ID3DBlob* errorBuff; ID3DBlob* signature;
-	assert(!D3DX12SerializeVersionedRootSignature(&rootDesc, D3D_ROOT_SIGNATURE_VERSION_1_1, &signature, &errorBuff));
-	assert(!m_device->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(m_rootSignature.GetAddressOf())));
+	assert(!device->CreateRootSignature(0, rootsignature->GetBufferPointer(), rootsignature->GetBufferSize(), IID_PPV_ARGS(&m_rootSignature)));
 
-	//Release the blobs since we no longer need them
-	if (errorBuff)
-		errorBuff->Release();
+	m_rootSignature->SetName(L"Root Signature");
 
-	if (signature)
-		signature->Release();
+	if (rootsignature)
+		rootsignature->Release();
 }
 
 void RootSignature::SetRootSignature()
 {
-	m_commandList->SetGraphicsRootSignature(m_rootSignature.Get());
+	
 }
 
-void RootSignature::SetComputeRootSignature()
-{
-	m_computeCommandList->SetComputeRootSignature(m_rootSignature.Get());
-}
-
-ID3D12RootSignature * RootSignature::GetRootSignature() const
+ID3D12RootSignature* RootSignature::GetRootSignature()
 {
 	return m_rootSignature.Get();
 }

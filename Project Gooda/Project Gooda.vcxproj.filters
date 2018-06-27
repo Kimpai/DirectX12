@@ -69,9 +69,6 @@
     <ClCompile Include="Source Files\RootSignature.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source Files\RootDescriptor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source Files\RootParameter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -129,9 +126,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Header Files\DescriptorHeap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Header Files\RootDescriptor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Header Files\RootSignature.h">

@@ -32,9 +32,14 @@ D3D12_GPU_VIRTUAL_ADDRESS ConstantBuffer::GetBufferLocation(int currentFrame)
 	return m_constantBufferUploadHeap[currentFrame]->GetGPUVirtualAddress();
 }
 
-D3D12_CONSTANT_BUFFER_VIEW_DESC ConstantBuffer::GetConstantBufferViewDesc(int frameIndex)
+D3D12_CONSTANT_BUFFER_VIEW_DESC* ConstantBuffer::GetConstantBufferViewDesc(int frameIndex)
 {
-	return m_cbvDesc[frameIndex];
+	return &m_cbvDesc[frameIndex];
+}
+
+D3D12_CONSTANT_BUFFER_VIEW_DESC* ConstantBuffer::GetConstantBufferViewDesc()
+{
+	return m_cbvDesc;
 }
 
 void ConstantBuffer::CreateUploadHeap()

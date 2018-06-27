@@ -28,13 +28,17 @@ void GoodaDriver::Initialize(HWND hwnd, Camera* camera)
 
 	//Create the Model object
 	m_Models.push_back(new Cube(m_Direct3D->GetDevice(), m_Direct3D->GetCommandList(), XMFLOAT3(0.0f, 1.0f, 5.0f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)));
-	m_Shader->AppendRootDescriptorToHeap(m_Models.back()->GetConstantBuffer());
 	m_Models.push_back(new Cube(m_Direct3D->GetDevice(), m_Direct3D->GetCommandList(), XMFLOAT3(5.0f, 1.0f, 5.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f)));
+
+	//Pointer to the begining of the vector of models
+	m_Shader->CreateDescriptor(m_Models[0]->GetConstantBuffer());
 	assert(&m_Models);
 
 	//Create the light object
 	m_Lights.push_back(new DirectionalLight(m_Direct3D->GetDevice(), m_Direct3D->GetCommandList(), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT4(0.15f, 0.15f, 0.15f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f)));
-	m_Shader->AppendRootDescriptorToHeap(m_Lights.back()->GetConstantBuffer());
+	
+	//Pointer to the begining of the vector of lights
+	m_Shader->CreateDescriptor(m_Lights[0]->GetConstantBuffer());
 	assert(&m_Lights);
 
 
