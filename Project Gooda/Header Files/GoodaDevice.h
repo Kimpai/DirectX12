@@ -5,14 +5,14 @@
 #include <Windows.h>
 #include <stdio.h>
 #include <iostream>
-#include <config.h>
+#include <Gooda.h>
 #include <fstream>
 #include "Input.h"
 #include "GoodaDriver.h"
 #include "Console.h"
 #include "Camera.h"
 
-class GoodaDevice
+class GoodaDevice : public Gooda
 {
 public:
 	GoodaDevice();
@@ -20,11 +20,15 @@ public:
 
 	void Run();
 
-	LRESULT CALLBACK MessageHandler(HWND, UINT, WPARAM, LPARAM);
+	void SetRenderWindow(unsigned int screenHeight, unsigned int screenWidth, float screenDepth, float screenNear);
+	void EnableVSYNC(bool vsyncEnabled);
+	void SetFullScreen(bool fullScreen);
+
+	LRESULT CALLBACK MessageHandler(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam);
 
 private:
 	bool Frame();
-	void SetupWindows(int&, int&);
+	void SetupWindows();
 
 	LPCWSTR m_applicationName;
 	HINSTANCE m_hinstance;
@@ -36,5 +40,5 @@ private:
 	Camera* m_camera;
 };
 
-static LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+static LRESULT CALLBACK WndProc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam);
 static GoodaDevice* ApplicationHandle = nullptr;

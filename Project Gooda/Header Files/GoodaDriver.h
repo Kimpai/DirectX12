@@ -15,19 +15,16 @@
 class GoodaDriver
 {
 public:
-	GoodaDriver();
-	GoodaDriver(const GoodaDriver&);
+	GoodaDriver(HWND hwnd);
 	~GoodaDriver();
 
-	void Initialize(HWND, Camera*);
-	void Shutdown();
 	void Frame(Camera*);
 
 private:
 	void Render();
 
-	Direct3D* m_Direct3D;
-	ShaderManager* m_Shader;
-	std::vector<Model*> m_Models;
-	std::vector<Light*> m_Lights;
+	Direct3D* m_direct3D;
+	ShaderManager* m_shaderManager;
+	std::vector<Model*> m_models;
+	std::vector<Light*> m_lights;
 };

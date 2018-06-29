@@ -4,15 +4,14 @@
 #include <stdio.h>
 #include <iostream>
 #include <string>
+#include <assert.h>
 
 class Console
 {
 public:
 	Console();
-	Console(const Console&);
 	~Console();
 	
-	bool Initialize();
 	bool Frame(std::string&);
 
 private:

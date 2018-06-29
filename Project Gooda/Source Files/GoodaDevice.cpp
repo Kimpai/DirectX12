@@ -1,29 +1,23 @@
-#include "Gooda.h"
+#include "GoodaDevice.h"
 
 GoodaDevice::GoodaDevice()
 {
-	int screenHeight, screenWidth;
+	//Set up the windows api
+	SetupWindows();
 
-	//Set the width and height of the screen to zero
-	screenHeight = 0;
-	screenWidth = 0;
-
-	//Setup the windows api
-	SetupWindows(screenHeight, screenWidth);
-
-	//Create the graphics object
-	m_driver = new GoodaDriver(m_hwnd);
+	//Create the driver object
+	m_driver = new GoodaDriver(Renderer::DX12, m_hwnd);
 	assert(m_driver);
 
 	//Create the input object
-	m_inputDevice = new Input(m_hwnd);
+	m_inputDevice = new Input();
 	assert(m_inputDevice);
-
+	
 	//Create the camera object
 	m_camera = new Camera(m_inputDevice);
 	assert(m_camera);
 
-	//Create console object
+	//Create the console object
 	m_console = new Console();
 	assert(m_console);
 }
@@ -34,7 +28,7 @@ GoodaDevice::~GoodaDevice()
 	ShowCursor(true);
 
 	//Fix the display settings if leaving full screen
-	if (FULL_SCREEN)
+	if (m_fullScreen)
 	{
 		ChangeDisplaySettings(NULL, 0);
 	}
@@ -49,6 +43,24 @@ GoodaDevice::~GoodaDevice()
 
 	//Release the pointer to this class
 	ApplicationHandle = NULL;
+}
+
+void GoodaDevice::SetRenderWindow(unsigned int screenHeight, unsigned int screenWidth, float screenDepth, float screenNear)
+{
+	m_screenHeight = screenHeight;
+	m_screenWidth = screenWidth;
+	m_screenDepth = screenDepth;
+	m_screenNear = screenNear;
+}
+
+void GoodaDevice::EnableVSYNC(bool vsyncEnabled)
+{
+	m_vsync = vsyncEnabled;
+}
+
+void GoodaDevice::SetFullScreen(bool fullScreen)
+{
+	m_fullScreen = fullScreen;
 }
 
 void GoodaDevice::Run()
@@ -89,15 +101,15 @@ void GoodaDevice::Run()
 	return;
 }
 
-LRESULT GoodaDevice::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam)
+LRESULT GoodaDevice::MessageHandler(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam)
 {
-	switch (umsg)
+	switch (umessage)
 	{
 		//Check if a key has been pressed on the keyboard
 		case WM_KEYDOWN:
 		{
 			//If a key is pressed send it to input object so it can record that state
-			m_inputDevice->ProcessKeyboardMessage(umsg, wparam, lparam);
+			m_inputDevice->ProcessKeyboardMessage(umessage, wparam, lparam);
 			break;
 		}
 
@@ -105,21 +117,21 @@ LRESULT GoodaDevice::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM 
 		case WM_KEYUP:
 		{
 			//If a key has been released then send it to the input object so it can unset the state for that key
-			m_inputDevice->ProcessKeyboardMessage(umsg, wparam, lparam);
+			m_inputDevice->ProcessKeyboardMessage(umessage, wparam, lparam);
 			break;
 		}
 
 		case WM_MOUSEMOVE:
 		{
 			//If mouse was moved send to input object to update the camera
-			m_inputDevice->ProcessMouseMessage(umsg, wparam, lparam);
+			m_inputDevice->ProcessMouseMessage(umessage, wparam, lparam);
 			break;
 		}
 	
 		//Any other message send to the default message handler as out application won't use them
 		default:
 		{
-			return DefWindowProc(hwnd, umsg, wparam, lparam);
+			return DefWindowProc(hwnd, umessage, wparam, lparam);
 		}
 	}
 
@@ -146,14 +158,21 @@ bool GoodaDevice::Frame()
 		m_camera->Frame();
 	}
 	
-	//Do the frame processing for the graphics object
+	//Do the frame processing for the driver
 	m_driver->Frame(m_camera);
 
 	return true;
 }
 
-void GoodaDevice::SetupWindows(int& screenHeight, int& screenWidth)
+void GoodaDevice::SetupWindows()
 {
+	int screenHeight, screenWidth;
+
+	//Initialize the width and height of the screen to zero
+	screenHeight = 0;
+	screenWidth = 0;
+
+	//Initialize the windows api
 	WNDCLASSEX wc;
 	DEVMODE dmScreenSettings;
 	int posX, posY;
@@ -189,7 +208,7 @@ void GoodaDevice::SetupWindows(int& screenHeight, int& screenWidth)
 	screenWidth = GetSystemMetrics(SM_CXSCREEN);
 
 	//Setup the screen settings depending on whether it is running in full screen or in window mode
-	if (FULL_SCREEN)
+	if (m_fullScreen)
 	{
 		//If full screen set the screen maximum size of the users desktop and 32bit
 		memset(&dmScreenSettings, 0, sizeof(dmScreenSettings));
@@ -207,9 +226,9 @@ void GoodaDevice::SetupWindows(int& screenHeight, int& screenWidth)
 	}
 	else
 	{
-		//If windowed then set it 800x600 resolution
-		screenWidth = SCREEN_WIDTH;
-		screenHeight = SCREEN_HEIGHT;
+		//If windowed then set to specified resolution
+		screenWidth = m_screenWidth;
+		screenHeight = m_screenHeight;
 
 		//Place the window in the middle of the screen
 		posX = (GetSystemMetrics(SM_CXSCREEN) - screenWidth) / 2;
@@ -228,8 +247,6 @@ void GoodaDevice::SetupWindows(int& screenHeight, int& screenWidth)
 
 	//Hide the mouse cursor
 	ShowCursor(false);
-
-	return;
 }
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam)

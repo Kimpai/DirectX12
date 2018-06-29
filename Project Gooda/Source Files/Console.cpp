@@ -2,18 +2,6 @@
 
 Console::Console()
 {
-}
-
-Console::Console(const Console &)
-{
-}
-
-Console::~Console()
-{
-}
-
-bool Console::Initialize()
-{
 	FILE* fp = nullptr;
 
 	//Allocate a console
@@ -22,10 +10,7 @@ bool Console::Initialize()
 
 	//Redirect unbuffered STDOUT to the console
 	m_stdOutputHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-	if (m_stdOutputHandle == INVALID_HANDLE_VALUE)
-	{
-		return false;
-	}
+	assert(m_stdOutputHandle);
 
 	freopen_s(&fp, "CONOUT$", "w", stdout);
 	setvbuf(stdout, NULL, _IONBF, 0);
@@ -53,8 +38,10 @@ bool Console::Initialize()
 	//Make cout, wcout, cin, wcin, wcerr, cerr, wclog and clog 
 	//point to console as well
 	std::ios::sync_with_stdio();
+}
 
-	return true;
+Console::~Console()
+{
 }
 
 bool Console::Frame(std::string& input)

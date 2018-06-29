@@ -17,11 +17,9 @@ using namespace DirectX;
 class Input
 {
 public:
-	Input();
-	Input(const Input&);
+	Input(HWND hwnd);
 	~Input();
 
-	void Initialize(HWND);
 	void ProcessKeyboardMessage(UINT, WPARAM, LPARAM);
 	void ProcessMouseMessage(UINT, WPARAM, LPARAM);
 	bool IsKeyPressed(unsigned int);

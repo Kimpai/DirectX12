@@ -1,30 +1,10 @@
 #include "Input.h"
 
-Input::Input()
+Input::Input(HWND hwnd)
 {
-	m_mouse = nullptr;
-	m_keyboard = nullptr;
-	m_keyboardTracker = nullptr;
-	m_mouseTracker = nullptr;
 	m_mouseX = 0.0f;
 	m_mouseY = 0.0f;
-}
 
-Input::Input(const Input& other)
-{
-
-}
-
-Input::~Input()
-{
-	m_mouse = nullptr;
-	m_keyboard = nullptr;
-	m_keyboardTracker = nullptr;
-	m_mouseTracker = nullptr;
-}
-
-void Input::Initialize(HWND hwnd)
-{
 	//Create keyboard object
 	m_keyboard = std::make_unique<Keyboard>();
 
@@ -38,8 +18,14 @@ void Input::Initialize(HWND hwnd)
 
 	//Create a mouse state tracker
 	m_mouseTracker = std::make_unique<Mouse::ButtonStateTracker>();
+}
 
-	return;
+Input::~Input()
+{
+	m_mouse = nullptr;
+	m_keyboard = nullptr;
+	m_keyboardTracker = nullptr;
+	m_mouseTracker = nullptr;
 }
 
 void Input::ProcessKeyboardMessage(UINT message, WPARAM wParam, LPARAM lParam)
