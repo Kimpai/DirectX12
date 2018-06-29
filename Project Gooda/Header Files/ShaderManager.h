@@ -7,6 +7,7 @@
 #include <wrl.h>
 #include <frame.h>
 #include <vector>
+#include <Gooda.h>
 
 #include "ConstantBuffer.h"
 #include "Model.h"
@@ -21,7 +22,7 @@ using namespace Microsoft::WRL;
 enum class ShaderType { VS, PS, CS, HS, DS, GS };
 enum class ShaderPipelineType { COLOR, TEXTURE };
 
-class ShaderManager
+class ShaderManager : public Gooda
 {
 private:
 	struct ShaderPipeline

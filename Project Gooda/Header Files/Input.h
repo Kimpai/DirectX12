@@ -9,12 +9,12 @@
 #include <Mouse.h>
 #include <DirectXMath.h>
 #include <Keyboard.h>
-#include <config.h>
 #include <iostream>
+#include <Gooda.h>
 
 using namespace DirectX;
 
-class Input
+class Input : public Gooda
 {
 public:
 	Input(HWND hwnd);

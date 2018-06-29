@@ -2,12 +2,13 @@
 
 #include <d3d12.h>
 #include <DirectXMath.h>
+#include <Gooda.h>
 
 #include "ConstantBuffer.h"
 
 using namespace DirectX;
 
-class Light
+class Light : public Gooda
 {
 public:
 	ConstantBuffer* m_constantBuffer;

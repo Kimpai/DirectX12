@@ -2,12 +2,13 @@
 
 #include <DirectXMath.h>
 #include <iostream>
+#include <Gooda.h>
 
 #include "Input.h"
 
 using namespace DirectX;
 
-class Camera
+class Camera : public Gooda
 {
 public:
 	Camera(Input*);

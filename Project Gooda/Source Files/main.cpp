@@ -1,16 +1,19 @@
 #include <crtdbg.h>
-#include "Gooda.h"
+#include "GD.h"
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)
 {
-	std::unique_ptr<GoodaDevice> device;
+	GoodaDevice* device;
 
 	//Create the device object
-	device = std::make_unique<GoodaDevice>();
+	device = new GoodaDevice();
 	assert(device);
 
 	//Initialize and run the device object
 	device->Run();
+
+	//Release the Gooda object
+	device->Release();
 
 	return 0;
 }

@@ -51,9 +51,6 @@
     <ClCompile Include="Source Files\Light.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source Files\Gooda.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source Files\ShaderManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -75,12 +72,12 @@
     <ClCompile Include="Source Files\Model.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source Files\GD.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Header Files\Camera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Header Files\config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Header Files\Console.h">
@@ -113,9 +110,6 @@
     <ClInclude Include="Header Files\Light.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Header Files\Gooda.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Header Files\ShaderManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -135,6 +129,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Header Files\Model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Header Files\GD.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

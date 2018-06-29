@@ -16,13 +16,6 @@ Direct3D::Direct3D(int screenHeight, int screenWidth, HWND hwnd, bool fullscreen
 	CreateViewPortAndScissorRect(screenWidth, screenHeight);
 }
 
-
-Direct3D::Direct3D(const Direct3D& other)
-{
-
-}
-
-
 Direct3D::~Direct3D()
 {
 	//Wait of GPU to finish before releasing com objects
@@ -157,13 +150,14 @@ void Direct3D::EndScene()
 	ppCommandLists[0] = m_commandList.Get();
 
 	//Execute the list of commands.
+	m_fenceValue[m_frameIndex]++;
 	m_commandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
 
 	//Signal and increment the fence value.
 	assert(!m_commandQueue->Signal(m_fence[m_frameIndex].Get(), m_fenceValue[m_frameIndex]));
 
 	//Finally present the back buffer to the screen since rendering is complete.
-	if (VSYNC_ENABLED)
+	if (m_vsync)
 	{
 		//Lock to screen refresh rate.
 		assert(!m_swapChain->Present(1, 0));
@@ -217,9 +211,6 @@ int Direct3D::GetCurrentFrame()
 
 void Direct3D::DeviceSynchronize()
 {
-	//Swap the current render target view buffer index so drawing is don on the correct buffer
-	m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
-
 	//If the current fence value is still less than the "m_fenceValue", then GPU has not finished
 	//the command queue since it has not reached the "m_commandQueue->Signal" command
 	if (m_fence[m_frameIndex]->GetCompletedValue() < m_fenceValue[m_frameIndex])
@@ -439,7 +430,7 @@ void Direct3D::CreateCommandInterfaceAndSwapChain(HWND hwnd, int screenWidth, in
 	}
 
 	//Set the refresh rate of the back buffer
-	if (VSYNC_ENABLED)
+	if (m_vsync)
 	{
 		swapChainDesc.BufferDesc.RefreshRate.Numerator = numerator;
 		swapChainDesc.BufferDesc.RefreshRate.Denominator = denominator;

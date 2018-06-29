@@ -5,14 +5,14 @@
 #include <Windows.h>
 #include <stdio.h>
 #include <iostream>
-#include <config.h>
+#include <Gooda.h>
 #include <fstream>
 #include "Input.h"
 #include "GoodaDriver.h"
 #include "Console.h"
 #include "Camera.h"
 
-class GoodaDevice
+class GoodaDevice : public Gooda
 {
 public:
 	GoodaDevice();

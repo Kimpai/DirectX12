@@ -1,9 +1,9 @@
 #pragma once
 
 #include <Windows.h>
-#include <config.h>
 #include <iostream>
 #include <vector>
+#include <Gooda.h>
 
 #include "Direct3D.h"
 #include "ShaderManager.h"
@@ -12,7 +12,7 @@
 #include "Camera.h"
 #include "DirectionalLight.h"
 
-class GoodaDriver
+class GoodaDriver : public Gooda
 {
 public:
 	GoodaDriver(HWND hwnd);

@@ -5,7 +5,7 @@
 #include <DirectXMath.h>
 #include <wrl.h>
 #include <frame.h>
-#include <config.h>
+#include <Gooda.h>
 
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
@@ -14,7 +14,7 @@
 using namespace DirectX;
 using namespace Microsoft::WRL;
 
-class Model
+class Model : public Gooda
 {
 public:
 	ConstantBuffer* m_constantBuffer;

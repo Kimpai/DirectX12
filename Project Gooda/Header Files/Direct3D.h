@@ -10,13 +10,13 @@
 #include <wrl.h>
 #include <assert.h>
 #include <frame.h>
-#include <config.h>
+#include <Gooda.h>
 
 #include "ShaderManager.h"
 
 using namespace Microsoft::WRL;
 
-class Direct3D
+class Direct3D : public Gooda
 {
 public:
 	Direct3D(int, int , HWND, bool, float, float);

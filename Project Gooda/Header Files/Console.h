@@ -5,8 +5,9 @@
 #include <iostream>
 #include <string>
 #include <assert.h>
+#include <Gooda.h>
 
-class Console
+class Console : public Gooda
 {
 public:
 	Console();

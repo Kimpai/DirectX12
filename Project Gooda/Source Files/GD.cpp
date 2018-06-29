@@ -1,4 +1,4 @@
-#include "Gooda.h"
+#include "GD.h"
 
 GoodaDevice::GoodaDevice()
 {
@@ -34,7 +34,7 @@ GoodaDevice::~GoodaDevice()
 	ShowCursor(true);
 
 	//Fix the display settings if leaving full screen
-	if (FULL_SCREEN)
+	if (m_fullScreen)
 	{
 		ChangeDisplaySettings(NULL, 0);
 	}
@@ -49,6 +49,12 @@ GoodaDevice::~GoodaDevice()
 
 	//Release the pointer to this class
 	ApplicationHandle = NULL;
+
+	//Release Gooda objects
+	m_console->Release();
+	m_inputDevice->Release();
+	m_camera->Release();
+	m_driver->Release();
 }
 
 void GoodaDevice::Run()
@@ -189,7 +195,7 @@ void GoodaDevice::SetupWindows(int& screenHeight, int& screenWidth)
 	screenWidth = GetSystemMetrics(SM_CXSCREEN);
 
 	//Setup the screen settings depending on whether it is running in full screen or in window mode
-	if (FULL_SCREEN)
+	if (m_fullScreen)
 	{
 		//If full screen set the screen maximum size of the users desktop and 32bit
 		memset(&dmScreenSettings, 0, sizeof(dmScreenSettings));
@@ -208,8 +214,8 @@ void GoodaDevice::SetupWindows(int& screenHeight, int& screenWidth)
 	else
 	{
 		//If windowed then set it 800x600 resolution
-		screenWidth = SCREEN_WIDTH;
-		screenHeight = SCREEN_HEIGHT;
+		screenWidth = m_screenWidth;
+		screenHeight = m_screenHeight;
 
 		//Place the window in the middle of the screen
 		posX = (GetSystemMetrics(SM_CXSCREEN) - screenWidth) / 2;

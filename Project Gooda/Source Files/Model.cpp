@@ -34,8 +34,8 @@ void Model::UpdateMatrices(XMMATRIX viewMatrix)
 void Model::BuildWorlViewProjectionMatrix(XMFLOAT3 origin)
 {
 	//Build projection matrix
-	XMMATRIX matrix = XMMatrixPerspectiveFovLH(45.0f*(3.14f/180.0f), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT,
-		SCREEN_NEAR, SCREEN_DEPTH);
+	XMMATRIX matrix = XMMatrixPerspectiveFovLH(45.0f*(3.14f/180.0f), (float)m_screenWidth / (float)m_screenHeight,
+		m_screenNear, m_screenDepth);
 	XMStoreFloat4x4(&m_projectionMatrix, matrix);
 
 	//Build view matrix

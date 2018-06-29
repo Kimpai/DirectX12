@@ -3,7 +3,7 @@
 GoodaDriver::GoodaDriver(HWND hwnd)
 {
 	//Create the Direct3D object
-	m_direct3D = new Direct3D(SCREEN_HEIGHT, SCREEN_WIDTH, hwnd, FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR);
+	m_direct3D = new Direct3D(m_screenHeight, m_screenWidth, hwnd, m_fullScreen, m_screenDepth, m_screenNear);
 	assert(m_direct3D);
 
 	//Create the Shader manager object
@@ -28,7 +28,7 @@ GoodaDriver::GoodaDriver(HWND hwnd)
 
 	m_shaderManager->CreateRootSignature(m_direct3D->GetDevice());
 	m_shaderManager->CreatPipelineState({ { ShaderType::VS, L"Shader Files/ColorVertexShader.hlsl" },{ ShaderType::PS, L"Shader Files/ColorPixelShader.hlsl" } },
-		m_direct3D->GetDevice(), SCREEN_WIDTH, SCREEN_HEIGHT, ShaderPipelineType::COLOR);
+		m_direct3D->GetDevice(), m_screenWidth, m_screenHeight, ShaderPipelineType::COLOR);
 
 	//Close the command list now that all the commands have been recorded
 	m_direct3D->CloseCommandList();
@@ -39,6 +39,14 @@ GoodaDriver::GoodaDriver(HWND hwnd)
 
 GoodaDriver::~GoodaDriver()
 {
+	m_direct3D->Release();
+
+	//Release Gooda objects
+	for (auto model : m_models)
+		model->Release();
+
+	for (auto light : m_lights)
+		light->Release();
 }
 
 void GoodaDriver::Frame(Camera* camera)

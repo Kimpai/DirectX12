@@ -6,6 +6,8 @@ public:
     Gooda();
     virtual ~Gooda() = 0;
 
+	void Release();
+
 protected:
 	bool m_fullScreen = false;
 	bool m_vsync = true;
