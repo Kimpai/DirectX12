@@ -70,23 +70,23 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(ProjectDir)/Include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)/Lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)/include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)/lib/Win32;$(ProjectDir)/lib/Win32/Debug;$(LibraryPath)</LibraryPath>
     <ReferencePath>$(ReferencePath)</ReferencePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(ProjectDir)/Include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)/Lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)/include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)/lib/Win32;$(ProjectDir)/lib/Win32/Release;$(LibraryPath)</LibraryPath>
     <ReferencePath>$(ReferencePath)</ReferencePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(ProjectDir)/Include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)/Lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)/include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)/lib/x64;$(ProjectDir)/lib/x64/Debug;$(LibraryPath)</LibraryPath>
     <ReferencePath>$(ReferencePath)</ReferencePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(ProjectDir)/Include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)/Lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)/include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)/lib/x64;$(ProjectDir)/lib/x64/Release;$(LibraryPath)</LibraryPath>
     <ReferencePath>$(ReferencePath)</ReferencePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -94,32 +94,38 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)/Header Files;$(ProjectDir)/fmod/lowlevel/inc;$(ProjectDir)/fmod/studio/inc%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)/src/graphics/DX12;$(ProjectDir)/src/graphics;$(ProjectDir)/src/buffers;$(ProjectDir)/src/Gooda</AdditionalIncludeDirectories>
     </ClCompile>
     <PostBuildEvent>
       <Command>
       </Command>
     </PostBuildEvent>
     <Link>
-      <AdditionalDependencies>lua5.3.lib;lua5.3-static.lib;luac.lib;d3d12.lib;dxgi.lib;d3dcompiler.lib;dxguid.lib;fmodL_vc.lib;fmodstudioL_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <FxCompile>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)/Header Files;$(ProjectDir)/fmod/lowlevel/inc;$(ProjectDir)/fmod/studio/inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)/src/graphics/DX12;$(ProjectDir)/src/graphics;$(ProjectDir)/src/buffers;$(ProjectDir)/src/Gooda</AdditionalIncludeDirectories>
     </ClCompile>
     <PostBuildEvent>
       <Command>
       </Command>
     </PostBuildEvent>
     <Link>
-      <AdditionalDependencies>lua5.3.lib;lua5.3-static.lib;luac.lib;d3d12.lib;dxgi.lib;d3dcompiler.lib;dxguid.lib;Gooda.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>DirectXTK12.lib;Gooda.lib;lua5.3.lib;lua5.3-static.lib;luac.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <FxCompile>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -134,7 +140,7 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>lua5.3.lib;lua5.3-static.lib;luac.lib;d3d12.lib;dxgi.lib;d3dcompiler.lib;dxguid.lib;fmodL_vc.lib;fmodstudioL_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
@@ -154,118 +160,88 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>lua5.3.lib;lua5.3-static.lib;luac.lib;d3d12.lib;dxgi.lib;d3dcompiler.lib;dxguid.lib;fmodL64_vc.lib;fmodstudioL64_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>DirectXTK12.lib;Gooda.lib;lua5.3.lib;lua5.3-static.lib;luac.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>
       </Command>
     </PostBuildEvent>
+    <FxCompile>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Source Files\Camera.cpp" />
-    <ClCompile Include="Source Files\Console.cpp" />
-    <ClCompile Include="Source Files\ConstantBuffer.cpp" />
-    <ClCompile Include="Source Files\Cube.cpp" />
-    <ClCompile Include="Source Files\DescriptorHeap.cpp" />
-    <ClCompile Include="Source Files\Direct3D.cpp" />
-    <ClCompile Include="Source Files\DirectionalLight.cpp" />
-    <ClCompile Include="Source Files\GoodaDriver.cpp" />
-    <ClCompile Include="Source Files\IndexBuffer.cpp" />
-    <ClCompile Include="Source Files\Input.cpp" />
-    <ClCompile Include="Source Files\Light.cpp" />
-    <ClCompile Include="Source Files\main.cpp" />
-    <ClCompile Include="Source Files\Model.cpp" />
-    <ClCompile Include="Source Files\GD.cpp" />
-    <ClCompile Include="Source Files\RootParameter.cpp" />
-    <ClCompile Include="Source Files\RootSignature.cpp" />
-    <ClCompile Include="Source Files\ShaderManager.cpp" />
-    <ClCompile Include="Source Files\Terrain.cpp" />
-    <ClCompile Include="Source Files\VertexBuffer.cpp" />
+    <ClCompile Include="src\buffers\ConstantBuffer.cpp" />
+    <ClCompile Include="src\buffers\IndexBuffer.cpp" />
+    <ClCompile Include="src\buffers\VertexBuffer.cpp" />
+    <ClCompile Include="src\Gooda\Console.cpp" />
+    <ClCompile Include="src\Gooda\GD.cpp" />
+    <ClCompile Include="src\Gooda\GoodaDriver.cpp" />
+    <ClCompile Include="src\Gooda\Input.cpp" />
+    <ClCompile Include="src\Gooda\LuaScript.cpp" />
+    <ClCompile Include="src\graphics\Camera.cpp" />
+    <ClCompile Include="src\graphics\Cube.cpp" />
+    <ClCompile Include="src\graphics\DirectionalLight.cpp" />
+    <ClCompile Include="src\graphics\DX12\Direct3D12.cpp" />
+    <ClCompile Include="src\graphics\DX12\DescriptorHeap.cpp" />
+    <ClCompile Include="src\graphics\DX12\RootParameter.cpp" />
+    <ClCompile Include="src\graphics\DX12\RootSignature.cpp" />
+    <ClCompile Include="src\graphics\Light.cpp" />
+    <ClCompile Include="src\graphics\Model.cpp" />
+    <ClCompile Include="src\graphics\ShaderManager.cpp" />
+    <ClCompile Include="src\graphics\Terrain.cpp" />
+    <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Header Files\Camera.h" />
-    <ClInclude Include="Header Files\Console.h" />
-    <ClInclude Include="Header Files\ConstantBuffer.h" />
-    <ClInclude Include="Header Files\Cube.h" />
-    <ClInclude Include="Header Files\DescriptorHeap.h" />
-    <ClInclude Include="Header Files\Direct3D.h" />
-    <ClInclude Include="Header Files\DirectionalLight.h" />
-    <ClInclude Include="Header Files\frame.h" />
-    <ClInclude Include="Header Files\GoodaDriver.h" />
-    <ClInclude Include="Header Files\IndexBuffer.h" />
-    <ClInclude Include="Header Files\Input.h" />
-    <ClInclude Include="Header Files\Light.h" />
-    <ClInclude Include="Header Files\Model.h" />
-    <ClInclude Include="Header Files\GD.h" />
-    <ClInclude Include="Header Files\RootParameter.h" />
-    <ClInclude Include="Header Files\RootSignature.h" />
-    <ClInclude Include="Header Files\ShaderManager.h" />
-    <ClInclude Include="Header Files\Terrain.h" />
-    <ClInclude Include="Header Files\VertexBuffer.h" />
+    <ClInclude Include="src\buffers\ConstantBuffer.h" />
+    <ClInclude Include="src\buffers\IndexBuffer.h" />
+    <ClInclude Include="src\buffers\VertexBuffer.h" />
+    <ClInclude Include="src\Gooda\Console.h" />
+    <ClInclude Include="src\Gooda\GD.h" />
+    <ClInclude Include="src\Gooda\GoodaDriver.h" />
+    <ClInclude Include="src\Gooda\Input.h" />
+    <ClInclude Include="src\Gooda\LuaScript.h" />
+    <ClInclude Include="src\Gooda\ShaderManager.h" />
+    <ClInclude Include="src\graphics\Camera.h" />
+    <ClInclude Include="src\graphics\Cube.h" />
+    <ClInclude Include="src\graphics\DirectionalLight.h" />
+    <ClInclude Include="src\graphics\DX12\Direct3D12.h" />
+    <ClInclude Include="src\graphics\DX12\DescriptorHeap.h" />
+    <ClInclude Include="src\graphics\DX12\RootParameter.h" />
+    <ClInclude Include="src\graphics\DX12\RootSignature.h" />
+    <ClInclude Include="src\graphics\Light.h" />
+    <ClInclude Include="src\graphics\Model.h" />
+    <ClInclude Include="src\graphics\ShaderManager.h" />
+    <ClInclude Include="src\graphics\Terrain.h" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Shader Files\ColorPixelShader.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    <Text Include="resources\setup.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="shaders\ColorPixelShader.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.1</ShaderModel>
     </FxCompile>
-    <FxCompile Include="Shader Files\ColorVertexShader.hlsl">
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.1</ShaderModel>
+    <FxCompile Include="shaders\ColorVertexShader.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
-    <FxCompile Include="Shader Files\TexturePixelShader.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    <FxCompile Include="shaders\TexturePixelShader.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.1</ShaderModel>
     </FxCompile>
-    <FxCompile Include="Shader Files\TextureVertexShader.hlsl">
+    <FxCompile Include="shaders\TextureVertexShader.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.1</ShaderModel>
     </FxCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="Resource Files\setup.txt">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </Text>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\packages\directxtk12_desktop_2015.2018.6.1.2\build\native\directxtk12_desktop_2015.targets" Condition="Exists('..\packages\directxtk12_desktop_2015.2018.6.1.2\build\native\directxtk12_desktop_2015.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\directxtk12_desktop_2015.2018.6.1.2\build\native\directxtk12_desktop_2015.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxtk12_desktop_2015.2018.6.1.2\build\native\directxtk12_desktop_2015.targets'))" />
   </Target>
 </Project>

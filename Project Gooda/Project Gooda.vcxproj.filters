@@ -1,160 +1,158 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    <Filter Include="shaders">
+      <UniqueIdentifier>{4a324379-7126-4b80-bb59-287b8d9bfc18}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
-    <Filter Include="Resource Files">
+    <Filter Include="resources">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Shader Files">
+    <Filter Include="src">
       <UniqueIdentifier>{e98864d3-d581-4897-9301-a2f433da8b4b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source Files\main.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\main.cpp">
+      <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="Source Files\Camera.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\graphics\Cube.cpp">
+      <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="Source Files\Console.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\graphics\DirectionalLight.cpp">
+      <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="Source Files\ConstantBuffer.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\graphics\Light.cpp">
+      <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="Source Files\Cube.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\graphics\Model.cpp">
+      <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="Source Files\Direct3D.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\graphics\Terrain.cpp">
+      <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="Source Files\DirectionalLight.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\Gooda\Console.cpp">
+      <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="Source Files\GoodaDriver.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\Gooda\GD.cpp">
+      <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="Source Files\IndexBuffer.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\Gooda\GoodaDriver.cpp">
+      <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="Source Files\Input.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\Gooda\Input.cpp">
+      <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="Source Files\Light.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\Gooda\LuaScript.cpp">
+      <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="Source Files\ShaderManager.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\buffers\ConstantBuffer.cpp">
+      <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="Source Files\Terrain.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\buffers\IndexBuffer.cpp">
+      <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="Source Files\VertexBuffer.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\buffers\VertexBuffer.cpp">
+      <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="Source Files\DescriptorHeap.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\graphics\DX12\DescriptorHeap.cpp">
+      <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="Source Files\RootSignature.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\graphics\DX12\RootParameter.cpp">
+      <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="Source Files\RootParameter.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\graphics\DX12\RootSignature.cpp">
+      <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="Source Files\Model.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\graphics\DX12\Direct3D12.cpp">
+      <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="Source Files\GD.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\graphics\Camera.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\ShaderManager.cpp">
+      <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Header Files\Camera.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\graphics\Cube.h">
+      <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="Header Files\Console.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\graphics\DirectionalLight.h">
+      <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="Header Files\ConstantBuffer.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\graphics\Light.h">
+      <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="Header Files\Cube.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\graphics\Model.h">
+      <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="Header Files\Direct3D.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\graphics\Terrain.h">
+      <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="Header Files\DirectionalLight.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\Gooda\Console.h">
+      <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="Header Files\frame.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\Gooda\GD.h">
+      <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="Header Files\GoodaDriver.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\Gooda\GoodaDriver.h">
+      <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="Header Files\IndexBuffer.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\Gooda\Input.h">
+      <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="Header Files\Input.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\Gooda\LuaScript.h">
+      <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="Header Files\Light.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\Gooda\ShaderManager.h">
+      <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="Header Files\ShaderManager.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\buffers\ConstantBuffer.h">
+      <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="Header Files\Terrain.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\buffers\IndexBuffer.h">
+      <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="Header Files\VertexBuffer.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\buffers\VertexBuffer.h">
+      <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="Header Files\DescriptorHeap.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\graphics\DX12\DescriptorHeap.h">
+      <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="Header Files\RootSignature.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\graphics\DX12\RootParameter.h">
+      <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="Header Files\RootParameter.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\graphics\DX12\RootSignature.h">
+      <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="Header Files\Model.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\graphics\DX12\Direct3D12.h">
+      <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="Header Files\GD.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\graphics\Camera.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\ShaderManager.h">
+      <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Shader Files\ColorVertexShader.hlsl">
-      <Filter>Shader Files</Filter>
-    </FxCompile>
-    <FxCompile Include="Shader Files\ColorPixelShader.hlsl">
-      <Filter>Shader Files</Filter>
-    </FxCompile>
-    <FxCompile Include="Shader Files\TexturePixelShader.hlsl">
-      <Filter>Shader Files</Filter>
-    </FxCompile>
-    <FxCompile Include="Shader Files\TextureVertexShader.hlsl">
-      <Filter>Shader Files</Filter>
-    </FxCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="Resource Files\setup.txt">
-      <Filter>Resource Files</Filter>
+    <Text Include="resources\setup.txt">
+      <Filter>resources</Filter>
     </Text>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <FxCompile Include="shaders\ColorPixelShader.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\ColorVertexShader.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\TexturePixelShader.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\TextureVertexShader.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
