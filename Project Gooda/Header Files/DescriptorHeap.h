@@ -10,6 +10,7 @@ class DescriptorHeap
 {
 public:
 	DescriptorHeap(ID3D12Device* device, UINT numOfDescriptors, bool shaderVisible, D3D12_DESCRIPTOR_HEAP_TYPE type);
+	~DescriptorHeap();
 	
 	D3D12_CPU_DESCRIPTOR_HANDLE GetCPUIncrementHandle(int frameIndex, int descriptorIndex);
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUIncrementHandle(int frameIndex, int descriptorIndex);

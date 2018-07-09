@@ -17,6 +17,13 @@ DescriptorHeap::DescriptorHeap(ID3D12Device * device, UINT numOfDescriptors, boo
 	m_size = 0;
 }
 
+DescriptorHeap::~DescriptorHeap()
+{
+	for (int i = 0; i < frameBufferCount; ++i)
+		if (m_descriptorHeap[i])
+			m_descriptorHeap[i] = nullptr;
+}
+
 D3D12_CPU_DESCRIPTOR_HANDLE DescriptorHeap::GetCPUIncrementHandle(int frameIndex, int descriptorIndex)
 {
 	return CD3DX12_CPU_DESCRIPTOR_HANDLE(m_descriptorHeap[frameIndex]->GetCPUDescriptorHandleForHeapStart(), descriptorIndex, m_incrementSize);

@@ -18,12 +18,15 @@ Direct3D::Direct3D(int screenHeight, int screenWidth, HWND hwnd, bool fullscreen
 
 Direct3D::~Direct3D()
 {
-	//Wait of GPU to finish before releasing com objects
+	//Wait of GPU to finish with all the frame buffers
 	for (int i = 0; i < frameBufferCount; i++)
 	{
 		m_frameIndex = i;
 		DeviceSynchronize();
 	}
+
+	//Flush the Command queue to make sure that the GPU is not currently using it
+	FlushCommandQueue();
 
 	//Before shutting down set to windowed mode or when you release the swap chain it will throw an exception.
 	if (m_swapChain)
@@ -31,47 +34,6 @@ Direct3D::~Direct3D()
 
 	//Close the object handle to the fence event.
 	CloseHandle(m_fenceEvent);
-
-	for (int i = 0; i < frameBufferCount; i++)
-	{
-		//Release the fence.
-		if (m_fence[i])
-			m_fence[i] = nullptr;
-	}
-
-	//Release the command list.
-	if (m_commandList)
-		m_commandList = nullptr;
-
-	for (int i = 0; i < frameBufferCount; i++)
-	{
-		//Release the command allocator.
-		if (m_commandAllocator[i])
-			m_commandAllocator[i] = nullptr;
-	}
-
-	//Release the back buffer render target views.
-	for (int i = 0; i < frameBufferCount; i++)
-	{
-		if (m_backBufferRenderTarget[i])
-			m_backBufferRenderTarget[0] = nullptr;
-	}
-
-	//Release the render target view heap.
-	if (m_renderTargetViewDescHeap)
-		m_renderTargetViewDescHeap = nullptr;
-
-	//Release the swap chain.
-	if (m_swapChain)
-		m_swapChain = nullptr;
-
-	//Release the command queue.
-	if (m_commandQueue)
-		m_commandQueue = nullptr;
-
-	//Release the device.
-	if (m_device)
-		m_device = nullptr;
 }
 
 void Direct3D::BeginScene(ShaderManager* shader)
@@ -150,10 +112,10 @@ void Direct3D::EndScene()
 	ppCommandLists[0] = m_commandList.Get();
 
 	//Execute the list of commands.
-	m_fenceValue[m_frameIndex]++;
 	m_commandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
 
 	//Signal and increment the fence value.
+	m_fenceValue[m_frameIndex]++;
 	assert(!m_commandQueue->Signal(m_fence[m_frameIndex].Get(), m_fenceValue[m_frameIndex]));
 
 	//Finally present the back buffer to the screen since rendering is complete.
@@ -225,6 +187,21 @@ void Direct3D::DeviceSynchronize()
 	m_fenceValue[m_frameIndex]++;
 }
 
+void Direct3D::FlushCommandQueue()
+{
+	//Signal and increment the fence value one last time to flush the command queue
+	m_fenceValue[m_frameIndex]++;
+	assert(!m_commandQueue->Signal(m_fence[m_frameIndex].Get(), m_fenceValue[m_frameIndex]));
+
+	if (m_fence[m_frameIndex]->GetCompletedValue() < m_fenceValue[m_frameIndex])
+	{
+		assert(!m_fence[m_frameIndex]->SetEventOnCompletion(m_fenceValue[m_frameIndex], m_fenceEvent));
+
+		//Wait until the fence has triggered the event
+		WaitForSingleObject(m_fenceEvent, INFINITE);
+	}
+}
+
 void Direct3D::CreateDirect3DDevice(HWND hwnd)
 {
 
@@ -233,6 +210,8 @@ void Direct3D::CreateDirect3DDevice(HWND hwnd)
 	ComPtr<ID3D12Debug> debugController = nullptr;
 	if (SUCCEEDED(D3D12GetDebugInterface(__uuidof(ID3D12Debug), (void**)&debugController)))
 		debugController->EnableDebugLayer();
+
+
 
 	//Release the debug controller now that the debug layer has been enabled
 	debugController = nullptr;
@@ -265,7 +244,12 @@ void Direct3D::CreateDirect3DDevice(HWND hwnd)
 		assert(!D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_11_0, __uuidof(ID3D12Device), (void**)&m_device));
 	}
 
-	factory = nullptr;
+#if _DEBUG
+	ComPtr<IDXGIDebug> debug = nullptr;
+	if (SUCCEEDED(DXGIGetDebugInterface1(0, __uuidof(IDXGIDebug1), (void**)&debug)))
+		debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_DETAIL);
+
+#endif
 }
 
 void Direct3D::CreateViewPortAndScissorRect(int screenWidth, int screenHeight)

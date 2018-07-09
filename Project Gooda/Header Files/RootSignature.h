@@ -13,6 +13,8 @@ public:
 	RootSignature(ID3D12Device* device, UINT size, UINT staticSamplers, RootParameter* rootParameter, 
 				D3D12_STATIC_SAMPLER_DESC* samplers, D3D12_ROOT_SIGNATURE_FLAGS flags);
 
+	~RootSignature();
+
 	void SetRootSignature();
 	ID3D12RootSignature* GetRootSignature();
 

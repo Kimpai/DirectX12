@@ -12,10 +12,7 @@ DirectionalLight::DirectionalLight(ID3D12Device* device, ID3D12GraphicsCommandLi
 DirectionalLight::~DirectionalLight()
 {
 	if (m_constantBuffer)
-	{
-		delete m_constantBuffer;
-		m_constantBuffer = nullptr;
-	}
+		m_constantBuffer->Release();
 }
 
 ConstantBuffer* DirectionalLight::GetConstantBuffer()

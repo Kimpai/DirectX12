@@ -7,7 +7,6 @@ Model::Model(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, XMFLO
 
 Model::~Model()
 {
-
 }
 
 void Model::UpdateMatrices(XMMATRIX viewMatrix)

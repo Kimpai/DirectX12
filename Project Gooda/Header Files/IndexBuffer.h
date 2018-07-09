@@ -4,10 +4,11 @@
 #include <d3dx12.h>
 #include <wrl.h>
 #include <assert.h>
+#include <Gooda.h>
 
 using namespace Microsoft::WRL;
 
-class IndexBuffer
+class IndexBuffer : public Gooda
 {
 public:
 	IndexBuffer(const void*, int, int, ID3D12Device*, ID3D12GraphicsCommandList*);

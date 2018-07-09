@@ -6,11 +6,12 @@
 #include <frame.h>
 #include <DirectXMath.h>
 #include <assert.h>
+#include <Gooda.h>
 
 using namespace Microsoft::WRL;
 using namespace DirectX;
 
-class ConstantBuffer
+class ConstantBuffer : public Gooda
 {
 public:
 	ConstantBuffer(const void*, int, ID3D12Device*, ID3D12GraphicsCommandList*);

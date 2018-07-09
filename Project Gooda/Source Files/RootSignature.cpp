@@ -17,6 +17,12 @@ RootSignature::RootSignature(ID3D12Device* device, UINT size, UINT staticSampler
 		rootsignature->Release();
 }
 
+RootSignature::~RootSignature()
+{
+	if (m_rootSignature)
+		m_rootSignature = nullptr;
+}
+
 void RootSignature::SetRootSignature()
 {
 	

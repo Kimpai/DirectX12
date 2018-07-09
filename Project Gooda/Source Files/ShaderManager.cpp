@@ -7,24 +7,19 @@ ShaderManager::ShaderManager()
 
 ShaderManager::~ShaderManager()
 {
-	if (m_mainDescriptorHeap)
-	{
-		delete[] m_mainDescriptorHeap;
-		m_mainDescriptorHeap = nullptr;
-	}
+	for (auto pipline : m_pipelines)
+		if (pipline)
+			delete pipline;
 
-	if (m_rootSignature)
-	{
-		delete[] m_rootSignature;
-		m_rootSignature = nullptr;
-	}
+	if (m_mainDescriptorHeap)
+		delete m_mainDescriptorHeap;
 
 	for (int i = 0; i < m_rootParameters.size(); ++i)
 		if (m_rootParameters[i])
-		{
-			delete[] m_rootParameters[i];
-			m_rootParameters[i] = nullptr;
-		}
+			delete m_rootParameters[i];
+
+	if (m_rootSignature)
+		delete m_rootSignature;
 }
 
 void ShaderManager::Frame(int frameIndex)
@@ -59,8 +54,8 @@ ID3D12DescriptorHeap* ShaderManager::GetDescriptorHeap(int frameIndex)
 ID3D12PipelineState* ShaderManager::GetPipelineState(ShaderPipelineType type)
 {
 	for (auto pipeline : m_pipelines)
-		if (pipeline.m_type == type)
-			return pipeline.m_pipelineState.Get();
+		if (pipeline->m_type == type)
+			return pipeline->m_pipelineState.Get();
 
 	return nullptr;
 }
@@ -146,7 +141,7 @@ void ShaderManager::CreatPipelineState(std::vector<ShaderPipeline::Shader> shade
 	assert(!device->CreateGraphicsPipelineState(&pipelineStateDesc, __uuidof(ID3D12PipelineState), (void**)&pipelineState));
 	pipelineState->SetName(L"Color PipelineState");
 
-	ShaderPipeline pipeline(shaderPipelineType, pipelineState, shaders);
+	ShaderPipeline* pipeline = new ShaderPipeline(shaderPipelineType, pipelineState, shaders);
 	m_pipelines.push_back(pipeline);
 }
 

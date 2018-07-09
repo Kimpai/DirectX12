@@ -74,7 +74,7 @@ private:
 	std::vector<RootParameter*> m_rootParameters;
 	std::vector<ConstantBuffer*> m_constantBuffers;
 	
-	std::vector<ShaderPipeline> m_pipelines;
+	std::vector<ShaderPipeline*> m_pipelines;
 	ComPtr<ID3D12Resource> m_depthStencilBuffer;
 	ComPtr<ID3D12DescriptorHeap> m_depthStencilDescHeap;
 };

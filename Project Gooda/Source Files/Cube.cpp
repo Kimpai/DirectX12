@@ -9,22 +9,13 @@ Cube::Cube(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, XMFLOAT
 Cube::~Cube()
 {
 	if (m_vertexBuffer)
-	{
-		delete m_vertexBuffer;
-		m_vertexBuffer = nullptr;
-	}
+		m_vertexBuffer->Release();
 
 	if (m_indexBuffer)
-	{
-		delete m_indexBuffer;
-		m_indexBuffer = nullptr;
-	}
+		m_indexBuffer->Release();
 
 	if (m_constantBuffer)
-	{
-		delete m_constantBuffer;
-		m_constantBuffer = nullptr;
-	}
+		m_constantBuffer->Release();
 }
 
 ConstantBuffer* Cube::GetConstantBuffer()

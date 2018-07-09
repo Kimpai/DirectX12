@@ -1,11 +1,8 @@
 #pragma once
 
-#pragma comment(lib, "d3d12.lib")
-#pragma comment(lib, "dxgi.lib")
-#pragma comment(lib, "d3dcompiler.lib")
-
 #include <d3d12.h>
 #include <dxgi1_5.h>
+#include <dxgidebug.h>
 #include <d3dcompiler.h>
 #include <wrl.h>
 #include <assert.h>
@@ -20,7 +17,6 @@ class Direct3D : public Gooda
 {
 public:
 	Direct3D(int, int , HWND, bool, float, float);
-	Direct3D(const Direct3D&);
 	~Direct3D();
 
 	void BeginScene(ShaderManager*);
@@ -35,6 +31,7 @@ public:
 
 private:
 	void DeviceSynchronize();
+	void FlushCommandQueue();
 	void CreateDirect3DDevice(HWND);
 	void CreateViewPortAndScissorRect(int, int);
 	void CreateFenceAndEventHandle();

@@ -39,9 +39,11 @@ GoodaDriver::GoodaDriver(HWND hwnd)
 
 GoodaDriver::~GoodaDriver()
 {
+	//Release Gooda objects
 	m_direct3D->Release();
 
-	//Release Gooda objects
+	m_shaderManager->Release();
+
 	for (auto model : m_models)
 		model->Release();
 
@@ -54,11 +56,11 @@ void GoodaDriver::Frame(Camera* camera)
 	//Update constant buffer
 	m_shaderManager->Frame(m_direct3D->GetCurrentFrame());
 
-	for (int i = 0; i < m_models.size(); ++i)
-		m_models[i]->Frame(m_direct3D->GetCurrentFrame(), camera->GetViewMatrix());
+	for (auto model : m_models)
+		model->Frame(m_direct3D->GetCurrentFrame(), camera->GetViewMatrix());
 
-	for (int i = 0; i < m_lights.size(); ++i)
-		m_lights[i]->Frame(m_direct3D->GetCurrentFrame());
+	for (auto light : m_lights)
+		light->Frame(m_direct3D->GetCurrentFrame());
 
 
 	//Render the graphics scene
@@ -73,13 +75,13 @@ void GoodaDriver::Render()
 	UINT descriptorSize = m_direct3D->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	CD3DX12_GPU_DESCRIPTOR_HANDLE handle(m_shaderManager->GetDescriptorHeap(m_direct3D->GetCurrentFrame())->GetGPUDescriptorHandleForHeapStart());
 
-	for (int i = 0; i < m_models.size(); ++i)
-		m_models[i]->Render(m_direct3D->GetCommandList(), m_direct3D->GetCurrentFrame(), 0, handle);
+	for (auto model : m_models)
+		model->Render(m_direct3D->GetCommandList(), m_direct3D->GetCurrentFrame(), 0, handle);
 
 	handle.Offset(descriptorSize);
 
-	for (int i = 0; i < m_lights.size(); ++i)
-		m_lights[i]->Render(m_direct3D->GetCommandList(), m_direct3D->GetCurrentFrame(), 0, handle);	
+	for (auto light : m_lights)
+		light->Render(m_direct3D->GetCommandList(), m_direct3D->GetCurrentFrame(), 0, handle);	
 
 	//Close the command list and execute the commands
 	m_direct3D->EndScene();
