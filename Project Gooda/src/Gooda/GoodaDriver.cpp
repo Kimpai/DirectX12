@@ -27,8 +27,8 @@ GoodaDriver::GoodaDriver(HWND hwnd)
 
 
 	m_shaderManager->CreateRootSignature(m_direct3D->GetDevice());
-	m_shaderManager->CreatPipelineState({ { ShaderType::VS, L"shaders/ColorVertexShader.hlsl" },{ ShaderType::PS, L"shaders/ColorPixelShader.hlsl" } },
-		m_direct3D->GetDevice(), m_screenWidth, m_screenHeight, ShaderPipelineType::COLOR);
+	m_shaderManager->CreatePipelineState(m_direct3D->GetDevice(), { { ShaderType::VS, L"shaders/ColorVertexShader.hlsl" }, { ShaderType::PS, L"shaders/ColorPixelShader.hlsl" } },
+		m_screenWidth, m_screenHeight, ShaderPipelineType::COLOR);
 
 	//Close the command list now that all the commands have been recorded
 	m_direct3D->CloseCommandList();

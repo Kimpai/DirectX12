@@ -37,6 +37,14 @@ void ShaderManager::CreateDescriptor(ConstantBuffer* constantBuffer)
 	m_constantBuffers.push_back(constantBuffer);
 }
 
+void ShaderManager::CreatePipelineState(ID3D12Device* device, std::vector<Shader> shaders, int screenWidth, int screenHeight, ShaderPipelineType type)
+{
+	D3D12_DEPTH_STENCIL_DESC depthStencilDesc = {};
+	CreateDepthStencil(device, screenWidth, screenHeight, depthStencilDesc);
+
+	m_pipelines.push_back(new PipelineState(device, shaders, screenWidth, screenHeight, type, &depthStencilDesc, m_rootSignature->GetRootSignature()));
+}
+
 void ShaderManager::CreateRootSignature(ID3D12Device* device)
 {
 	CreateRootDescriptorTable();
@@ -54,8 +62,8 @@ ID3D12DescriptorHeap* ShaderManager::GetDescriptorHeap(int frameIndex)
 ID3D12PipelineState* ShaderManager::GetPipelineState(ShaderPipelineType type)
 {
 	for (auto pipeline : m_pipelines)
-		if (pipeline->m_type == type)
-			return pipeline->m_pipelineState.Get();
+		if (pipeline->GetType() == type)
+			return pipeline->GetPipelineState();
 
 	return nullptr;
 }
@@ -63,86 +71,6 @@ ID3D12PipelineState* ShaderManager::GetPipelineState(ShaderPipelineType type)
 CD3DX12_CPU_DESCRIPTOR_HANDLE ShaderManager::GetDepthStencilViewHandle()
 {
 	return CD3DX12_CPU_DESCRIPTOR_HANDLE(m_depthStencilDescHeap->GetCPUDescriptorHandleForHeapStart());
-}
-
-void ShaderManager::CompileShader(ShaderPipeline::Shader shader)
-{
-	switch (shader.m_type)
-	{
-	case ShaderType::VS:
-		assert(!D3DCompileFromFile(shader.m_shader, NULL, NULL, "main", "vs_5_0", D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, 0, &m_vertexShader, NULL));
-		break;
-	case ShaderType::PS:
-		assert(!D3DCompileFromFile(shader.m_shader, NULL, NULL, "main", "ps_5_0", D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, 0, &m_pixelShader, NULL));
-		break;
-	default:
-		assert("Invalid shader type");
-		break;
-	}
-
-}
-
-void ShaderManager::CreatPipelineState(std::vector<ShaderPipeline::Shader> shaders, ID3D12Device* device, int screenWidth, int screenHeight, ShaderPipelineType shaderPipelineType)
-{
-	//Compile the necessary shaders
-	for (auto shader : shaders)
-		CompileShader(shader);
-
-	//Fill out a shader bytecode structure, which is basically just a pointer
-	//to the shader bytecode and the size of the shader bytecode
-	D3D12_SHADER_BYTECODE vertexShaderByteCode = {};
-	vertexShaderByteCode.BytecodeLength = m_vertexShader->GetBufferSize();
-	vertexShaderByteCode.pShaderBytecode = m_vertexShader->GetBufferPointer();
-
-	//Fill out the shader byteccode structure for the pixel shader
-	D3D12_SHADER_BYTECODE pixelShaderByteCode = {};
-	pixelShaderByteCode.BytecodeLength = m_pixelShader->GetBufferSize();
-	pixelShaderByteCode.pShaderBytecode = m_pixelShader->GetBufferPointer();
-
-	//Create a depth stencil
-	D3D12_DEPTH_STENCIL_DESC depthStencilDesc = {};
-	CreateDepthStencil(device, screenWidth, screenHeight, depthStencilDesc);
-
-	//Create input layout
-	//The input layout is used by the Input Assembler so that it knows
-	//how to read the vertex data bound to it
-	D3D12_INPUT_ELEMENT_DESC inputElementDesc[] =
-	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
-	};
-
-	//Fill out an input layout desc structure
-	//Get the number of elements in an array by "sizeof(array) / sizeof(arrayElementType)"
-	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc = {};
-	inputLayoutDesc.NumElements = sizeof(inputElementDesc) / sizeof(D3D12_INPUT_ELEMENT_DESC);
-	inputLayoutDesc.pInputElementDescs = inputElementDesc;
-
-	//Fill in the pipeline state object desc
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC pipelineStateDesc = {};
-	pipelineStateDesc.InputLayout = inputLayoutDesc;
-	pipelineStateDesc.pRootSignature = GetRootSignature();
-	pipelineStateDesc.VS = vertexShaderByteCode;
-	pipelineStateDesc.PS = pixelShaderByteCode;
-	pipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-	pipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
-	pipelineStateDesc.DepthStencilState = depthStencilDesc;
-	pipelineStateDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
-	pipelineStateDesc.SampleDesc.Count = 1;
-	pipelineStateDesc.SampleDesc.Quality = 0;
-	pipelineStateDesc.SampleMask = 0xffffffff;
-	pipelineStateDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-	pipelineStateDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-	pipelineStateDesc.NumRenderTargets = 1;
-
-	//Create a pipeline state object
-	ID3D12PipelineState* pipelineState = nullptr;
-	assert(!device->CreateGraphicsPipelineState(&pipelineStateDesc, __uuidof(ID3D12PipelineState), (void**)&pipelineState));
-	pipelineState->SetName(L"Color PipelineState");
-
-	ShaderPipeline* pipeline = new ShaderPipeline(shaderPipelineType, pipelineState, shaders);
-	m_pipelines.push_back(pipeline);
 }
 
 void ShaderManager::CreateDepthStencil(ID3D12Device* device, int screenWidth, int screenHeight, D3D12_DEPTH_STENCIL_DESC& depthStencilDesc)

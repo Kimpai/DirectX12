@@ -185,6 +185,7 @@
     <ClCompile Include="src\graphics\DirectionalLight.cpp" />
     <ClCompile Include="src\graphics\DX12\Direct3D12.cpp" />
     <ClCompile Include="src\graphics\DX12\DescriptorHeap.cpp" />
+    <ClCompile Include="src\graphics\DX12\PipelineState.cpp" />
     <ClCompile Include="src\graphics\DX12\RootParameter.cpp" />
     <ClCompile Include="src\graphics\DX12\RootSignature.cpp" />
     <ClCompile Include="src\graphics\Light.cpp" />
@@ -202,12 +203,12 @@
     <ClInclude Include="src\Gooda\GoodaDriver.h" />
     <ClInclude Include="src\Gooda\Input.h" />
     <ClInclude Include="src\Gooda\LuaScript.h" />
-    <ClInclude Include="src\Gooda\ShaderManager.h" />
     <ClInclude Include="src\graphics\Camera.h" />
     <ClInclude Include="src\graphics\Cube.h" />
     <ClInclude Include="src\graphics\DirectionalLight.h" />
     <ClInclude Include="src\graphics\DX12\Direct3D12.h" />
     <ClInclude Include="src\graphics\DX12\DescriptorHeap.h" />
+    <ClInclude Include="src\graphics\DX12\PipelineState.h" />
     <ClInclude Include="src\graphics\DX12\RootParameter.h" />
     <ClInclude Include="src\graphics\DX12\RootSignature.h" />
     <ClInclude Include="src\graphics\Light.h" />
