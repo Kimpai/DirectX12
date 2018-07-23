@@ -14,7 +14,7 @@ ShaderManager::~ShaderManager()
 	if (m_mainDescriptorHeap)
 		delete m_mainDescriptorHeap;
 
-	for (int i = 0; i < m_rootParameters.size(); ++i)
+	for (int i = 0; i < m_rootParameters.size(); i++)
 		if (m_rootParameters[i])
 			delete m_rootParameters[i];
 
@@ -135,7 +135,7 @@ void ShaderManager::CreateRootDescriptorHeap(ID3D12Device* device)
 {
 	m_mainDescriptorHeap = new DescriptorHeap(device, (UINT)m_constantBuffers.size(), true, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-	for (int j = 0; j < 2; ++j)
+	for (int j = 0; j < m_constantBuffers.size(); j++)
 		m_mainDescriptorHeap->AppendDescriptorToHeap(m_constantBuffers[j]->GetConstantBufferViewDesc(0));
 }
 

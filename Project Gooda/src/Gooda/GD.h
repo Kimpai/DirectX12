@@ -7,10 +7,10 @@
 #include <iostream>
 #include <Gooda.h>
 #include <fstream>
+
 #include "Input.h"
 #include "GoodaDriver.h"
 #include "Console.h"
-#include "Camera.h"
 
 class GoodaDevice : public Gooda
 {
@@ -33,7 +33,6 @@ private:
 	Input* m_inputDevice;
 	GoodaDriver* m_driver;
 	Console* m_console;
-	Camera* m_camera;
 };
 
 static LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);

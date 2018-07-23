@@ -17,8 +17,9 @@ public:
 	{
 		XMFLOAT4 ambientColor;
 		XMFLOAT4 diffuseColor;
+		XMFLOAT4 specularColor;
 		XMFLOAT3 lightDirection;
-		float padding = 0.0f;
+		float specFactor = 32.0f;
 
 	} m_constantBufferData;
 

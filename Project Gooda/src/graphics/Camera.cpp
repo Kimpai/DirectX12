@@ -1,6 +1,6 @@
 #include "Camera.h"
 
-Camera::Camera(Input* inputHandler) : m_inputHandler(inputHandler)
+Camera::Camera(Input* inputHandler, ID3D12Device* device, ID3D12GraphicsCommandList* commandList) : m_inputHandler(inputHandler)
 {
 	m_position = XMFLOAT3(0.0f, 3.0f, 0.0f);
 	m_rotation = XMFLOAT3(0.0f, 0.0f, 0.0f);
@@ -12,14 +12,14 @@ Camera::Camera(Input* inputHandler) : m_inputHandler(inputHandler)
 	m_frameTime = 0.01f;
 	m_mouse.x = m_inputHandler->GetMousePosition().x;
 	m_mouse.y = m_inputHandler->GetMousePosition().y;
-}
 
-Camera::Camera(const Camera& other)
-{
+	m_constantBuffer = new ConstantBuffer(&m_constantBufferData, sizeof(ConstantBufferData), device, commandList);
 }
 
 Camera::~Camera()
 {
+	if (m_constantBuffer)
+		m_constantBuffer->Release();
 }
 
 void Camera::SetPosition(float x, float y, float z)
@@ -42,10 +42,17 @@ XMFLOAT3 Camera::GetRotation()
 	return m_rotation;
 }
 
-void Camera::Frame()
+ConstantBuffer* Camera::GetConstanBuffer()
 {
-	Turn();
+	return m_constantBuffer;
+}
 
+void Camera::Frame(int frameIndex)
+{
+	m_constantBufferData.CameraPosition = m_position;
+	m_constantBuffer->UpdateConstantBufferData(frameIndex);
+
+	Turn();
 	
 	MoveForward();
 	
@@ -56,6 +63,12 @@ void Camera::Frame()
 	MoveLeft();
 
 	BuildViewMatrix();
+}
+
+void Camera::Render(int rootIndex, CD3DX12_GPU_DESCRIPTOR_HANDLE handle)
+{
+	//Set the constant buffer
+	m_constantBuffer->SetConstantBuffer(rootIndex, handle);
 }
 
 XMMATRIX Camera::GetViewMatrix()

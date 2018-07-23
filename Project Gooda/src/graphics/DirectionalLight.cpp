@@ -1,9 +1,11 @@
 #include "DirectionalLight.h"
 
-DirectionalLight::DirectionalLight(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, XMFLOAT4 diffuseColor, XMFLOAT4 ambientColor, XMFLOAT3 lightDirection) : Light(device, commandList)
+DirectionalLight::DirectionalLight(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, 
+	XMFLOAT4 diffuseColor, XMFLOAT4 ambientColor, XMFLOAT4 specularColor, XMFLOAT3 lightDirection) : Light(device, commandList)
 {
 	m_constantBufferData.ambientColor = ambientColor,
 	m_constantBufferData.diffuseColor = diffuseColor;
+	m_constantBufferData.specularColor = specularColor;
 	m_constantBufferData.lightDirection = lightDirection;
 
 	InitializeBuffers(device, commandList);

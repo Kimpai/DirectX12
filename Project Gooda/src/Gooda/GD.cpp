@@ -11,17 +11,13 @@ GoodaDevice::GoodaDevice()
 	//Setup the windows api
 	SetupWindows(screenHeight, screenWidth);
 
-	//Create the graphics object
-	m_driver = new GoodaDriver(m_hwnd);
-	assert(m_driver);
-
 	//Create the input object
 	m_inputDevice = new Input(m_hwnd);
 	assert(m_inputDevice);
 
-	//Create the camera object
-	m_camera = new Camera(m_inputDevice);
-	assert(m_camera);
+	//Create the graphics object
+	m_driver = new GoodaDriver(m_hwnd, m_inputDevice);
+	assert(m_driver);
 
 	//Create console object
 	m_console = new Console();
@@ -53,7 +49,6 @@ GoodaDevice::~GoodaDevice()
 	//Release Gooda objects
 	m_console->Release();
 	m_inputDevice->Release();
-	m_camera->Release();
 	m_driver->Release();
 }
 
@@ -148,12 +143,10 @@ bool GoodaDevice::Frame()
 		//Check if user wan't to exit application
 		if (m_inputDevice->IsKeyPressed(VK_ESCAPE))
 			return false;
-
-		m_camera->Frame();
 	}
 	
 	//Do the frame processing for the graphics object
-	m_driver->Frame(m_camera);
+	m_driver->Frame();
 
 	return true;
 }

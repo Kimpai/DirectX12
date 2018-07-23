@@ -1,18 +1,19 @@
 #pragma once
 
+#include <d3d12.h>
 #include <DirectXMath.h>
 #include <iostream>
 #include <Gooda.h>
 
 #include "Input.h"
+#include "ConstantBuffer.h"
 
 using namespace DirectX;
 
 class Camera : public Gooda
 {
 public:
-	Camera(Input*);
-	Camera(const Camera&);
+	Camera(Input*, ID3D12Device*, ID3D12GraphicsCommandList*);
 	~Camera();
 
 	void SetPosition(float, float, float);
@@ -20,12 +21,20 @@ public:
 
 	XMFLOAT3 GetPosition();
 	XMFLOAT3 GetRotation();
+	ConstantBuffer* GetConstanBuffer();
 	
-	void Frame();
+	void Frame(int);
+	void Render(int, CD3DX12_GPU_DESCRIPTOR_HANDLE);
 	XMMATRIX GetViewMatrix();
 	XMMATRIX GetBaseViewMatrix();
 
 private:
+	struct ConstantBufferData
+	{
+		XMFLOAT3 CameraPosition;
+		float padding = 0.0f;
+	} m_constantBufferData;
+
 	void BuildBaseViewMatrix();
 	void BuildViewMatrix();
 
@@ -47,4 +56,5 @@ private:
 	XMFLOAT2 m_mouse;
 
 	Input* m_inputHandler;
+	ConstantBuffer* m_constantBuffer;
 };
