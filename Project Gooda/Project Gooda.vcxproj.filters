@@ -23,6 +23,9 @@
     <Filter Include="src\graphics\DX12">
       <UniqueIdentifier>{28a0fbf6-225c-46b7-9491-9c1b8741fd94}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\graphics\DX11">
+      <UniqueIdentifier>{761a1cb2-fead-4aef-a313-1248483cf907}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -88,6 +91,9 @@
     <ClCompile Include="src\graphics\DX12\PipelineState.cpp">
       <Filter>src\graphics\DX12</Filter>
     </ClCompile>
+    <ClCompile Include="src\graphics\DX11\Direct3D11.cpp">
+      <Filter>src\graphics\DX11</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\graphics\Camera.h">
@@ -149,6 +155,9 @@
     </ClInclude>
     <ClInclude Include="src\graphics\DX12\PipelineState.h">
       <Filter>src\graphics\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\DX11\Direct3D11.h">
+      <Filter>src\graphics\DX11</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

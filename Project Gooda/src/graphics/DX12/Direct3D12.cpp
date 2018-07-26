@@ -1,10 +1,10 @@
 #include "Direct3D12.h"
 
-Direct3D::Direct3D(int screenHeight, int screenWidth, HWND hwnd, bool fullscreen, float screenDepth, float screenNear)
+Direct3D12::Direct3D12(HWND hwnd)
 {
 	CreateDirect3DDevice(hwnd);
 
-	CreateCommandInterfaceAndSwapChain(hwnd, screenWidth, screenHeight, fullscreen);
+	CreateCommandInterfaceAndSwapChain(hwnd);
 
 	//Initialize the frameIndex to the current back buffer index
 	m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
@@ -13,10 +13,10 @@ Direct3D::Direct3D(int screenHeight, int screenWidth, HWND hwnd, bool fullscreen
 
 	CreateRenderTargets();
 
-	CreateViewPortAndScissorRect(screenWidth, screenHeight);
+	CreateViewPortAndScissorRect();
 }
 
-Direct3D::~Direct3D()
+Direct3D12::~Direct3D12()
 {
 	//Wait of GPU to finish with all the frame buffers
 	for (int i = 0; i < frameBufferCount; i++)
@@ -30,13 +30,13 @@ Direct3D::~Direct3D()
 
 	//Before shutting down set to windowed mode or when you release the swap chain it will throw an exception.
 	if (m_swapChain)
-		m_swapChain->SetFullscreenState(false, NULL);
+		m_swapChain->SetFullscreenState(false, nullptr);
 
 	//Close the object handle to the fence event.
 	CloseHandle(m_fenceEvent);
 }
 
-void Direct3D::BeginScene(ShaderManager* shader)
+void Direct3D12::BeginScene(ShaderManager* shader)
 {
 	//Swap the current render target view buffer index so drawing is don on the correct buffer
 	m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
@@ -97,7 +97,7 @@ void Direct3D::BeginScene(ShaderManager* shader)
 	m_commandList->RSSetScissorRects(1, &m_rect);
 }
 
-void Direct3D::EndScene()
+void Direct3D12::EndScene()
 {
 	ID3D12CommandList* ppCommandLists[] = { m_commandList.Get() };
 
@@ -131,17 +131,17 @@ void Direct3D::EndScene()
 	}
 }
 
-void Direct3D::CloseCommandList()
+void Direct3D12::CloseCommandList()
 {
 	assert(!m_commandList->Close());
 }
 
-void Direct3D::ResetCommandList(ID3D12PipelineState* pipelinestate)
+void Direct3D12::ResetCommandList(ID3D12PipelineState* pipelinestate)
 {
 	assert(!m_commandList->Reset(m_commandAllocator[m_frameIndex].Get(), pipelinestate));
 }
 
-void Direct3D::ExecuteCommandList()
+void Direct3D12::ExecuteCommandList()
 {
 	ID3D12CommandList* ppCommandLists[] = { m_commandList.Get() };
 
@@ -156,22 +156,22 @@ void Direct3D::ExecuteCommandList()
 	assert(!m_commandQueue->Signal(m_fence[m_frameIndex].Get(), m_fenceValue[m_frameIndex]));
 }
 
-ID3D12Device* Direct3D::GetDevice()
+ID3D12Device* Direct3D12::GetDevice()
 {
 	return m_device.Get();
 }
 
-ID3D12GraphicsCommandList* Direct3D::GetCommandList()
+ID3D12GraphicsCommandList* Direct3D12::GetCommandList()
 {
 	return m_commandList.Get();
 }
 
-int Direct3D::GetCurrentFrame()
+int Direct3D12::GetCurrentFrame()
 {
 	return m_frameIndex;
 }
 
-void Direct3D::DeviceSynchronize()
+void Direct3D12::DeviceSynchronize()
 {
 	//If the current fence value is still less than the "m_fenceValue", then GPU has not finished
 	//the command queue since it has not reached the "m_commandQueue->Signal" command
@@ -187,7 +187,7 @@ void Direct3D::DeviceSynchronize()
 	m_fenceValue[m_frameIndex]++;
 }
 
-void Direct3D::FlushCommandQueue()
+void Direct3D12::FlushCommandQueue()
 {
 	//Signal and increment the fence value one last time to flush the command queue
 	m_fenceValue[m_frameIndex]++;
@@ -202,7 +202,7 @@ void Direct3D::FlushCommandQueue()
 	}
 }
 
-void Direct3D::CreateDirect3DDevice(HWND hwnd)
+void Direct3D12::CreateDirect3DDevice(HWND hwnd)
 {
 
 #if _DEBUG
@@ -221,14 +221,14 @@ void Direct3D::CreateDirect3DDevice(HWND hwnd)
 	ComPtr<IDXGIAdapter1> adapter = nullptr;
 
 	CreateDXGIFactory(__uuidof(IDXGIFactory5), (void**)&factory);
-	for (UINT adapterIndex = 0;; ++adapterIndex)
+	for (UINT adapterIndex = 0;; adapterIndex++)
 	{
 		adapter = nullptr;
 		if (DXGI_ERROR_NOT_FOUND == factory->EnumAdapters1(adapterIndex, &adapter))
 			break;
 
 		//Check to see if the adapter supports Direct3D 12, but don't create the device yet
-		if (SUCCEEDED(D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_12_1, __uuidof(ID3D12Device), NULL)))
+		if (SUCCEEDED(D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_12_1, __uuidof(ID3D12Device), nullptr)))
 			break;
 	}
 
@@ -252,24 +252,24 @@ void Direct3D::CreateDirect3DDevice(HWND hwnd)
 #endif
 }
 
-void Direct3D::CreateViewPortAndScissorRect(int screenWidth, int screenHeight)
+void Direct3D12::CreateViewPortAndScissorRect()
 {
 	//Fill out the Viewport
 	m_viewport.TopLeftX = 0;
 	m_viewport.TopLeftY = 0;
-	m_viewport.Width = (float)screenWidth;
-	m_viewport.Height = (float)screenHeight;
+	m_viewport.Width = (float)m_screenWidth;
+	m_viewport.Height = (float)m_screenHeight;
 	m_viewport.MinDepth = 0.0f;
 	m_viewport.MaxDepth = 1.0f;
 
 	//Fill out a scissor rect
 	m_rect.left = 0;
 	m_rect.top = 0;
-	m_rect.right = screenWidth;
-	m_rect.bottom = screenHeight;
+	m_rect.right = m_screenWidth;
+	m_rect.bottom = m_screenHeight;
 }
 
-void Direct3D::CreateFenceAndEventHandle()
+void Direct3D12::CreateFenceAndEventHandle()
 {
 	for (int i = 0; i < frameBufferCount; i++)
 	{
@@ -283,7 +283,7 @@ void Direct3D::CreateFenceAndEventHandle()
 	m_fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 }
 
-void Direct3D::CreateCommandInterfaceAndSwapChain(HWND hwnd, int screenWidth, int screenHeight, bool fullscreen)
+void Direct3D12::CreateCommandInterfaceAndSwapChain(HWND hwnd)
 {
 	D3D12_COMMAND_QUEUE_DESC commandQueueDesc = {};
 
@@ -322,7 +322,7 @@ void Direct3D::CreateCommandInterfaceAndSwapChain(HWND hwnd, int screenWidth, in
 
 	//Get the number of modes
 	unsigned int numModes = 0;
-	assert(!adapterOutput->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numModes, NULL));
+	assert(!adapterOutput->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numModes, nullptr));
 
 	//Create and hold all the possible display modes for this monitor/graphcis card combination
 	DXGI_MODE_DESC* displayModeList = new DXGI_MODE_DESC[numModes];
@@ -335,9 +335,9 @@ void Direct3D::CreateCommandInterfaceAndSwapChain(HWND hwnd, int screenWidth, in
 	unsigned int numerator, denominator;
 	for (unsigned int i = 0; i < numModes; i++)
 	{
-		if (displayModeList[i].Height == (unsigned int)screenHeight)
+		if (displayModeList[i].Height == m_screenHeight)
 		{
-			if (displayModeList[i].Width == (unsigned int)screenWidth)
+			if (displayModeList[i].Width == m_screenWidth)
 			{
 				numerator = displayModeList[i].RefreshRate.Numerator;
 				denominator = displayModeList[i].RefreshRate.Denominator;
@@ -373,8 +373,8 @@ void Direct3D::CreateCommandInterfaceAndSwapChain(HWND hwnd, int screenWidth, in
 	swapChainDesc.BufferCount = frameBufferCount;
 
 	//Set the height and width of the back buffers in the swap chain.
-	swapChainDesc.BufferDesc.Height = screenHeight;
-	swapChainDesc.BufferDesc.Width = screenWidth;
+	swapChainDesc.BufferDesc.Height = m_screenHeight;
+	swapChainDesc.BufferDesc.Width = m_screenWidth;
 
 	//Set a regular 32-bit surface for the back buffers.
 	swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -384,10 +384,6 @@ void Direct3D::CreateCommandInterfaceAndSwapChain(HWND hwnd, int screenWidth, in
 
 	//Set the swap effect to discard the previous buffer contents after swapping.
 	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-
-	//Set the refreshrate of the swapChain
-	swapChainDesc.BufferDesc.RefreshRate.Numerator = 0;
-	swapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
 
 	//Set the handle for the window to render to.
 	swapChainDesc.OutputWindow = hwnd;
@@ -404,14 +400,10 @@ void Direct3D::CreateCommandInterfaceAndSwapChain(HWND hwnd, int screenWidth, in
 	swapChainDesc.Flags = 0;
 
 	//Set to full screen or windowed mode.
-	if (fullscreen)
-	{
+	if (m_fullScreen)
 		swapChainDesc.Windowed = false;
-	}
 	else
-	{
 		swapChainDesc.Windowed = true;
-	}
 
 	//Set the refresh rate of the back buffer
 	if (m_vsync)
@@ -432,15 +424,9 @@ void Direct3D::CreateCommandInterfaceAndSwapChain(HWND hwnd, int screenWidth, in
 	//Next upgrade the IDXGISwapChain to a IDXGISwapChain3 interface and store it in a private member variable named m_swapChain.
 	//This will allow us to use the newer functionality such as getting the current back buffer index.
 	assert(!swapChain->QueryInterface(__uuidof(IDXGISwapChain3), (void**)&m_swapChain));
-
-	//Clear pointer to original swap chain interface since we are using version 3 instead (m_swapChain).
-	swapChain = nullptr;
-
-	//Release the factory now that the swap chain has been created.
-	factory = nullptr;
 }
 
-void Direct3D::CreateRenderTargets()
+void Direct3D12::CreateRenderTargets()
 {
 	unsigned int renderTargetViewDescriptorSize;
 	D3D12_DESCRIPTOR_HEAP_DESC renderTargetViewHeapDesc = {};

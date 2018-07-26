@@ -18,11 +18,11 @@
 
 using namespace Microsoft::WRL;
 
-class Direct3D : public Gooda
+class Direct3D12 : public Gooda
 {
 public:
-	Direct3D(int, int , HWND, bool, float, float);
-	~Direct3D();
+	Direct3D12(HWND);
+	~Direct3D12();
 
 	void BeginScene(ShaderManager*);
 	void EndScene();
@@ -38,9 +38,9 @@ private:
 	void DeviceSynchronize();
 	void FlushCommandQueue();
 	void CreateDirect3DDevice(HWND);
-	void CreateViewPortAndScissorRect(int, int);
+	void CreateViewPortAndScissorRect();
 	void CreateFenceAndEventHandle();
-	void CreateCommandInterfaceAndSwapChain(HWND, int, int, bool);
+	void CreateCommandInterfaceAndSwapChain(HWND);
 	void CreateRenderTargets();
 
 private:

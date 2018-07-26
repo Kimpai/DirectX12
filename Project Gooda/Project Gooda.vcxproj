@@ -94,7 +94,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)/src/graphics/DX12;$(ProjectDir)/src/graphics;$(ProjectDir)/src/buffers;$(ProjectDir)/src/Gooda</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)/src/graphics/DX12;$(ProjectDir)/src/graphics;$(ProjectDir)/src/buffers;$(ProjectDir)/src/Gooda;$(ProjectDir)/src/graphics/DX11</AdditionalIncludeDirectories>
     </ClCompile>
     <PostBuildEvent>
       <Command>
@@ -113,7 +113,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)/src/graphics/DX12;$(ProjectDir)/src/graphics;$(ProjectDir)/src/buffers;$(ProjectDir)/src/Gooda</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)/src/graphics/DX12;$(ProjectDir)/src/graphics;$(ProjectDir)/src/buffers;$(ProjectDir)/src/Gooda;$(ProjectDir)/src/graphics/DX11</AdditionalIncludeDirectories>
     </ClCompile>
     <PostBuildEvent>
       <Command>
@@ -135,7 +135,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <LanguageStandard>stdcpp14</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)/Header Files;$(ProjectDir)/fmod/lowlevel/inc;$(ProjectDir)/fmod/studio/inc%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)/src/graphics/DX12;$(ProjectDir)/src/graphics;$(ProjectDir)/src/buffers;$(ProjectDir)/src/Gooda;$(ProjectDir)/src/graphics/DX11</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -155,7 +155,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)/Header Files;$(ProjectDir)/fmod/lowlevel/inc;$(ProjectDir)/fmod/studio/inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)/src/graphics/DX12;$(ProjectDir)/src/graphics;$(ProjectDir)/src/buffers;$(ProjectDir)/src/Gooda;$(ProjectDir)/src/graphics/DX11</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -183,6 +183,7 @@
     <ClCompile Include="src\graphics\Camera.cpp" />
     <ClCompile Include="src\graphics\Cube.cpp" />
     <ClCompile Include="src\graphics\DirectionalLight.cpp" />
+    <ClCompile Include="src\graphics\DX11\Direct3D11.cpp" />
     <ClCompile Include="src\graphics\DX12\Direct3D12.cpp" />
     <ClCompile Include="src\graphics\DX12\DescriptorHeap.cpp" />
     <ClCompile Include="src\graphics\DX12\PipelineState.cpp" />
@@ -206,6 +207,7 @@
     <ClInclude Include="src\graphics\Camera.h" />
     <ClInclude Include="src\graphics\Cube.h" />
     <ClInclude Include="src\graphics\DirectionalLight.h" />
+    <ClInclude Include="src\graphics\DX11\Direct3D11.h" />
     <ClInclude Include="src\graphics\DX12\Direct3D12.h" />
     <ClInclude Include="src\graphics\DX12\DescriptorHeap.h" />
     <ClInclude Include="src\graphics\DX12\PipelineState.h" />
