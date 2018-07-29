@@ -1,6 +1,6 @@
 #include "PipelineState.h"
 
-PipelineState::PipelineState(ID3D12Device* device, std::vector<Shader> shaders, int screenWidth, int screenHeight, 
+PipelineState::PipelineState(ID3D12Device* device, std::vector<Shader> shaders, 
 	ShaderPipelineType shaderPipelineType, D3D12_DEPTH_STENCIL_DESC* depthStencilState, ID3D12RootSignature* rootSignature)
 {
 	//Compile the necessary shaders

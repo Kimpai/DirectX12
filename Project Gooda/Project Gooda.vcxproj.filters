@@ -17,9 +17,6 @@
     <Filter Include="src\Gooda">
       <UniqueIdentifier>{8f9d7165-53ce-48e1-a318-cc2a995f4b99}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\buffers">
-      <UniqueIdentifier>{b76f8c5e-a9ff-435d-9f4d-9c03d23d85b1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src\graphics\DX12">
       <UniqueIdentifier>{28a0fbf6-225c-46b7-9491-9c1b8741fd94}</UniqueIdentifier>
     </Filter>
@@ -67,15 +64,6 @@
     <ClCompile Include="src\Gooda\LuaScript.cpp">
       <Filter>src\Gooda</Filter>
     </ClCompile>
-    <ClCompile Include="src\buffers\VertexBuffer.cpp">
-      <Filter>src\buffers</Filter>
-    </ClCompile>
-    <ClCompile Include="src\buffers\IndexBuffer.cpp">
-      <Filter>src\buffers</Filter>
-    </ClCompile>
-    <ClCompile Include="src\buffers\ConstantBuffer.cpp">
-      <Filter>src\buffers</Filter>
-    </ClCompile>
     <ClCompile Include="src\graphics\DX12\DescriptorHeap.cpp">
       <Filter>src\graphics\DX12</Filter>
     </ClCompile>
@@ -94,6 +82,16 @@
     <ClCompile Include="src\graphics\DX11\Direct3D11.cpp">
       <Filter>src\graphics\DX11</Filter>
     </ClCompile>
+    <ClCompile Include="src\graphics\ConstantBuffer.cpp">
+      <Filter>src\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\IndexBuffer.cpp">
+      <Filter>src\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\VertexBuffer.cpp">
+      <Filter>src\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\RenderManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\graphics\Camera.h">
@@ -132,15 +130,6 @@
     <ClInclude Include="src\Gooda\LuaScript.h">
       <Filter>src\Gooda</Filter>
     </ClInclude>
-    <ClInclude Include="src\buffers\VertexBuffer.h">
-      <Filter>src\buffers</Filter>
-    </ClInclude>
-    <ClInclude Include="src\buffers\IndexBuffer.h">
-      <Filter>src\buffers</Filter>
-    </ClInclude>
-    <ClInclude Include="src\buffers\ConstantBuffer.h">
-      <Filter>src\buffers</Filter>
-    </ClInclude>
     <ClInclude Include="src\graphics\DX12\DescriptorHeap.h">
       <Filter>src\graphics\DX12</Filter>
     </ClInclude>
@@ -159,6 +148,16 @@
     <ClInclude Include="src\graphics\DX11\Direct3D11.h">
       <Filter>src\graphics\DX11</Filter>
     </ClInclude>
+    <ClInclude Include="src\graphics\ConstantBuffer.h">
+      <Filter>src\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\IndexBuffer.h">
+      <Filter>src\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\VertexBuffer.h">
+      <Filter>src\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\RenderManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="resources\setup.txt">

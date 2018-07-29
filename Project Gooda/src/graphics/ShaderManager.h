@@ -1,5 +1,7 @@
 #pragma once
 
+#pragma comment(lib, "d3dcompiler.lib")
+
 #include <d3d12.h>
 #include <d3dx12.h>
 #include <DirectXMath.h>
@@ -10,8 +12,6 @@
 
 #include "PipelineState.h"
 #include "ConstantBuffer.h"
-#include "Model.h"
-#include "Light.h"
 #include "DescriptorHeap.h"
 #include "RootSignature.h"
 #include "RootParameter.h"
@@ -22,27 +22,29 @@ using namespace Microsoft::WRL;
 class ShaderManager : public Gooda
 {
 public:
-	ShaderManager();
+	ShaderManager(ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
 	~ShaderManager();
 
 	void Frame(int);
 
 	ID3D12PipelineState* GetPipelineState(ShaderPipelineType);
-	CD3DX12_CPU_DESCRIPTOR_HANDLE GetDepthStencilViewHandle();
 	ID3D12RootSignature* GetRootSignature();
 	ID3D12DescriptorHeap* GetDescriptorHeap(int);
+	D3D12_CPU_DESCRIPTOR_HANDLE GetDepthStencilViewHandle();
 
 	void CreateDescriptor(ConstantBuffer* constantBuffer);
-	void CreatePipelineState(ID3D12Device*, std::vector<Shader>, int, int, ShaderPipelineType);
-	void CreateRootSignature(ID3D12Device* device);
+	void CreatePipelineState(std::vector<Shader>, ShaderPipelineType);
+	void CreateRootSignature();
 	void CreateRootDescriptorTable();
-	void CreateRootDescriptorHeap(ID3D12Device* device);
+	void CreateRootDescriptorHeap();
 
 private:
-	void CreateDepthStencil(ID3D12Device*, int, int, D3D12_DEPTH_STENCIL_DESC&);
+	void CreateDepthStencil(D3D12_DEPTH_STENCIL_DESC&);
 
 	DescriptorHeap* m_mainDescriptorHeap;
 	RootSignature* m_rootSignature;
+	ID3D12Device* m_device;
+	ID3D12GraphicsCommandList* m_commandList;
 
 	std::vector<RootParameter*> m_rootParameters;
 	std::vector<ConstantBuffer*> m_constantBuffers;

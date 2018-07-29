@@ -1,20 +1,15 @@
 #pragma once
 
 #pragma comment(lib, "d3d12.lib")
-#pragma comment(lib, "dxgi.lib")
-#pragma comment(lib, "d3dcompiler.lib")
-#pragma comment(lib, "dxguid.lib")
 
 #include <d3d12.h>
+#include <d3dx12.h>
 #include <dxgi1_5.h>
 #include <dxgidebug.h>
-#include <d3dcompiler.h>
 #include <wrl.h>
 #include <assert.h>
 #include <frame.h>
 #include <Gooda.h>
-
-#include "ShaderManager.h"
 
 using namespace Microsoft::WRL;
 
@@ -24,7 +19,7 @@ public:
 	Direct3D12(HWND);
 	~Direct3D12();
 
-	void BeginScene(ShaderManager*);
+	void BeginScene(D3D12_CPU_DESCRIPTOR_HANDLE*, D3D12_GPU_DESCRIPTOR_HANDLE*);
 	void EndScene();
 	void CloseCommandList();
 	void ResetCommandList(ID3D12PipelineState*);
@@ -44,20 +39,20 @@ private:
 	void CreateRenderTargets();
 
 private:
+	int m_bufferIndex;
+	int m_frameIndex;
+
 	ComPtr<ID3D12Device> m_device;
 	ComPtr<ID3D12CommandQueue> m_commandQueue;
-	char m_videoCardDescription[128];
 	ComPtr<IDXGISwapChain3> m_swapChain;
 	ComPtr<ID3D12DescriptorHeap> m_renderTargetViewDescHeap;
 	ComPtr<ID3D12Resource> m_backBufferRenderTarget[frameBufferCount];
-	unsigned int m_bufferIndex;
 	ComPtr<ID3D12CommandAllocator> m_commandAllocator[frameBufferCount];
 	ComPtr<ID3D12GraphicsCommandList> m_commandList;
 	ComPtr<ID3D12Fence> m_fence[frameBufferCount];
+		
 	HANDLE m_fenceEvent;
 	UINT64 m_fenceValue[frameBufferCount];
 	D3D12_VIEWPORT m_viewport;
 	D3D12_RECT m_rect;
-	int m_frameIndex;
-	int m_videoCardMemory;
 };

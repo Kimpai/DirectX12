@@ -4,7 +4,7 @@ Direct3D11::Direct3D11(HWND hwnd)
 {
 	CreateDirect3DDeviceAndSwapChain(hwnd);
 
-	CreateRenderTarget();
+	CreateRenderTargets();
 
 	CreateViewPortAndScissorRect();
 }
@@ -16,7 +16,7 @@ Direct3D11::~Direct3D11()
 		m_swapChain->SetFullscreenState(false, nullptr);
 }
 
-void Direct3D11::BeginScene(ShaderManager* shader)
+void Direct3D11::BeginScene()
 {
 	//Setup the color to clear the buffer to
 	float color[4] = { 0.5f, 0.5f, 0.5f, 1.0f };
@@ -51,16 +51,54 @@ ID3D11DeviceContext* Direct3D11::GetDeviceContext()
 	return m_deviceContext.Get();
 }
 
+int Direct3D11::GetCurrentFrame()
+{
+	return m_swapChain->GetCurrentBackBufferIndex();
+}
+
 void Direct3D11::CreateDirect3DDeviceAndSwapChain(HWND hwnd)
 {
 
 	//Create a DIrect3D graphics interface factory
-	ComPtr<IDXGIFactory5> factory;
+	ComPtr<IDXGIFactory5> factory = nullptr;
+	ComPtr<IDXGIAdapter1> adapter = nullptr;
+
 	CreateDXGIFactory(__uuidof(IDXGIFactory5), (void**)factory.GetAddressOf());
 
-	//Use the factory to create an adapter for the primary graphics card
-	ComPtr<IDXGIAdapter1> adapter = nullptr;
-	assert(!factory->EnumAdapters1(0, adapter.GetAddressOf()));
+	D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_11_1;
+
+	//Set device flags
+	UINT creationFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
+
+#if _DEBUG
+	// If the project is in a debug build, enable the debug layer.
+	creationFlags |= D3D11_CREATE_DEVICE_DEBUG;
+
+#endif // _DEBUG
+
+	for (UINT adapterIndex = 0;; adapterIndex++)
+	{
+		adapter = nullptr;
+		if (DXGI_ERROR_NOT_FOUND == factory->EnumAdapters1(adapterIndex, adapter.GetAddressOf()))
+			break;
+
+		//Check to see if the adapter supports Direct3D 12, but don't create the device yet
+		if (SUCCEEDED(D3D11CreateDevice(adapter.Get(), D3D_DRIVER_TYPE_UNKNOWN, NULL, creationFlags, &featureLevel, 1, D3D11_SDK_VERSION, nullptr, nullptr, nullptr)))
+			break;
+	}
+
+	if (adapter)
+	{
+		//Create the device
+		assert(!D3D11CreateDevice(adapter.Get(), D3D_DRIVER_TYPE_UNKNOWN, NULL, creationFlags, &featureLevel, 1, D3D11_SDK_VERSION, m_device.GetAddressOf(), nullptr, m_deviceContext.GetAddressOf()));
+	}
+	else
+	{
+		//Create warp device if no adapter was found
+		factory->EnumWarpAdapter(__uuidof(IDXGIAdapter1), (void**)&adapter);
+		featureLevel = D3D_FEATURE_LEVEL_10_0;
+		assert(!D3D11CreateDevice(adapter.Get(), D3D_DRIVER_TYPE_UNKNOWN, NULL, creationFlags, &featureLevel, 1, D3D11_SDK_VERSION, m_device.GetAddressOf(), nullptr, m_deviceContext.GetAddressOf()));
+	}
 
 	//Enumerate the primary monitor
 	ComPtr<IDXGIOutput> adapterOutput = nullptr;
@@ -108,10 +146,14 @@ void Direct3D11::CreateDirect3DDeviceAndSwapChain(HWND hwnd)
 
 	//Convert the name of the video card to a character array and store it.
 	size_t stringLength;
-	wcstombs_s(&stringLength, m_videoCardDescription, 128, adapterDesc.Description, 128);
+	char videoCardDescription[128];
+	wcstombs_s(&stringLength, videoCardDescription, 128, adapterDesc.Description, 128);
 
 	DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
-	ComPtr<IDXGISwapChain> swapchain;
+	ComPtr<IDXGISwapChain> swapChain = nullptr;
+
+	//Initialize the swap chain description.
+	ZeroMemory(&swapChainDesc, sizeof(swapChainDesc));
 
 	//Set to a single back buffer
 	swapChainDesc.BufferCount = frameBufferCount;
@@ -138,6 +180,9 @@ void Direct3D11::CreateDirect3DDeviceAndSwapChain(HWND hwnd)
 	//Set the usage of the back buffer
 	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 
+	//Discard the back buffer contents after presenting
+	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+
 	//Set the handle for the window to render to
 	swapChainDesc.OutputWindow = hwnd;
 
@@ -145,38 +190,25 @@ void Direct3D11::CreateDirect3DDeviceAndSwapChain(HWND hwnd)
 	swapChainDesc.SampleDesc.Count = 1;
 	swapChainDesc.SampleDesc.Quality = 0;
 
+	//Set the scan line ordering and scaling to unspecified
+	swapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+	swapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+
+	//Don't set the advanced flags
+	swapChainDesc.Flags = 0;
+
 	//Set the full screen mode
 	if (m_fullScreen)
 		swapChainDesc.Windowed = false;
 	else
 		swapChainDesc.Windowed = true;
 
-	//Set the scan line ordering and scaling to unspecified
-	swapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-	swapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+	//Finally create the swap chain using the swap chain description.	
+	assert(!factory->CreateSwapChain(m_device.Get(), &swapChainDesc, swapChain.GetAddressOf()));
 
-	//Discard the back buffer contents after presenting
-	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-
-	//Don't set the advanced flags
-	swapChainDesc.Flags = 0;
-
-	//Set device flags
-	UINT creationFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
-
-#if _DEBUG
-	// If the project is in a debug build, enable the debug layer.
-	creationFlags |= D3D11_CREATE_DEVICE_DEBUG;
-
-#endif // _DEBUG
-
-	D3D_FEATURE_LEVEL featureLevel[] = { D3D_FEATURE_LEVEL_11_1, D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_1, D3D_FEATURE_LEVEL_10_0 };
-
-	//Create the swap chain, Direct3D device and Direct3D device context
-	assert(!D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, creationFlags, featureLevel, 4,
-		D3D11_SDK_VERSION, &swapChainDesc, swapchain.GetAddressOf(), m_device.GetAddressOf(), nullptr, m_deviceContext.GetAddressOf()));
-
-	swapchain->QueryInterface(__uuidof(IDXGISwapChain3), (void**)m_swapChain.GetAddressOf());
+	//Next upgrade the IDXGISwapChain to a IDXGISwapChain3 interface and store it in a private member variable named m_swapChain.
+	//This will allow us to use the newer functionality
+	assert(!swapChain->QueryInterface(__uuidof(IDXGISwapChain3), (void**)m_swapChain.GetAddressOf()));
 }
 
 void Direct3D11::CreateViewPortAndScissorRect()
@@ -202,7 +234,7 @@ void Direct3D11::CreateViewPortAndScissorRect()
 	m_deviceContext->RSSetScissorRects(1, &m_rect);
 }
 
-void Direct3D11::CreateRenderTarget()
+void Direct3D11::CreateRenderTargets()
 {
 	//Get the pointer to the back buffer
 	ComPtr<ID3D11Texture2D> backBufferPtr;

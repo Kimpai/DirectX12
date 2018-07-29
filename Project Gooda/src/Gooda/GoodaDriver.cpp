@@ -11,7 +11,7 @@ GoodaDriver::GoodaDriver(HWND hwnd, Input* inputDevice)
 	assert(m_direct3D11);
 
 	//Create the Shader manager object
-	m_shaderManager = new ShaderManager();
+	m_shaderManager = new ShaderManager(m_direct3D12->GetDevice(), m_direct3D12->GetCommandList());
 	assert(&m_shaderManager);
 
 	//Create the Model object
@@ -37,9 +37,9 @@ GoodaDriver::GoodaDriver(HWND hwnd, Input* inputDevice)
 	m_shaderManager->CreateDescriptor(m_camera->GetConstanBuffer());
 	assert(m_camera);
 
-	m_shaderManager->CreateRootSignature(m_direct3D12->GetDevice());
-	m_shaderManager->CreatePipelineState(m_direct3D12->GetDevice(), { { ShaderType::VS, L"shaders/ColorVertexShader.hlsl" }, { ShaderType::PS, L"shaders/ColorPixelShader.hlsl" } },
-		m_screenWidth, m_screenHeight, ShaderPipelineType::COLOR);
+	m_shaderManager->CreateRootSignature();
+	m_shaderManager->CreatePipelineState({ { ShaderType::VS, L"shaders/ColorVertexShader.hlsl" }, { ShaderType::PS, L"shaders/ColorPixelShader.hlsl" } }, 
+		ShaderPipelineType::COLOR);
 
 	//Close the command list now that all the commands have been recorded
 	m_direct3D12->CloseCommandList();
@@ -67,43 +67,41 @@ void GoodaDriver::Frame()
 {
 	m_camera->Frame(m_direct3D12->GetCurrentFrame());
 
-	m_shaderManager->Frame(m_direct3D12->GetCurrentFrame());
-
 	for (auto model : m_models)
 		model->Frame(m_direct3D12->GetCurrentFrame(), m_camera->GetViewMatrix());
 
 	for (auto light : m_lights)
 		light->Frame(m_direct3D12->GetCurrentFrame());
 
-
-	//Render the graphics scene
 	Render();
 }
 
 void GoodaDriver::Render()
 {
-	////Reset the command list and put it in a recording state
-	//m_direct3D12->BeginScene(m_shaderManager);
+	//Reset the command list and put it in a recording state
+	m_direct3D12->BeginScene(&m_shaderManager->GetDepthStencilViewHandle(), nullptr);
 
-	//UINT descriptorSize = m_direct3D12->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	//CD3DX12_GPU_DESCRIPTOR_HANDLE handle(m_shaderManager->GetDescriptorHeap(m_direct3D12->GetCurrentFrame())->GetGPUDescriptorHandleForHeapStart());
+	m_shaderManager->Frame(m_direct3D12->GetCurrentFrame());
 
-	//for (auto model : m_models)
-	//	model->Render(m_direct3D12->GetCommandList(), m_direct3D12->GetCurrentFrame(), 0, handle);
+	UINT descriptorSize = m_direct3D12->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	CD3DX12_GPU_DESCRIPTOR_HANDLE handle(m_shaderManager->GetDescriptorHeap(m_direct3D12->GetCurrentFrame())->GetGPUDescriptorHandleForHeapStart());
 
-	//handle.Offset(descriptorSize);
+	for (auto model : m_models)
+		model->Render(m_direct3D12->GetCommandList(), m_direct3D12->GetCurrentFrame(), 0, handle);
 
-	//for (auto light : m_lights)
-	//	light->Render(m_direct3D12->GetCommandList(), m_direct3D12->GetCurrentFrame(), 0, handle);
+	handle.Offset(descriptorSize);
 
-	//handle.Offset(descriptorSize);
+	for (auto light : m_lights)
+		light->Render(m_direct3D12->GetCommandList(), m_direct3D12->GetCurrentFrame(), 0, handle);
 
-	//m_camera->Render(0, handle);
+	handle.Offset(descriptorSize);
 
-	////Close the command list and execute the commands
-	//m_direct3D12->EndScene();
+	m_camera->Render(0, handle);
 
-	m_direct3D11->BeginScene(m_shaderManager);
+	//Close the command list and execute the commands
+	m_direct3D12->EndScene();
 
-	m_direct3D11->EndScene();
+	/*m_direct3D11->BeginScene(m_shaderManager);
+
+	m_direct3D11->EndScene();*/
 }

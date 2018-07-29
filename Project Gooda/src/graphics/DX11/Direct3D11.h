@@ -1,19 +1,14 @@
 #pragma once
 
 #pragma comment(lib, "d3d11.lib")
-#pragma comment(lib, "dxgi.lib")
-#pragma comment(lib, "d3dcompiler.lib")
 
 #include <d3d11.h>
 #include <dxgi1_5.h>
 #include <dxgidebug.h>
-#include <d3dcompiler.h>
 #include <wrl.h>
 #include <assert.h>
 #include <frame.h>
 #include <Gooda.h>
-
-#include "ShaderManager.h"
 
 using namespace Microsoft::WRL;
 
@@ -23,20 +18,20 @@ public:
 	Direct3D11(HWND);
 	~Direct3D11();
 
-	void BeginScene(ShaderManager*);
+	void BeginScene();
 	void EndScene();
 	
 	ID3D11Device* GetDevice();
 	ID3D11DeviceContext* GetDeviceContext();
+	int GetCurrentFrame();
+
 private:
 	void CreateDirect3DDeviceAndSwapChain(HWND);
 	void CreateViewPortAndScissorRect();
-	void CreateRenderTarget();
+	void CreateRenderTargets();
 
-private:
 	ComPtr<ID3D11Device> m_device;
 	ComPtr<ID3D11DeviceContext> m_deviceContext;
-	char m_videoCardDescription[128];
 	ComPtr<IDXGISwapChain3> m_swapChain;
 	ComPtr<ID3D11RenderTargetView> m_renderTargetView;
 	D3D11_VIEWPORT m_viewport;

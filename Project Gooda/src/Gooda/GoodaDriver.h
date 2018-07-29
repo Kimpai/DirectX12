@@ -6,15 +6,12 @@
 #include <Gooda.h>
 
 #include "Camera.h"
-#include "Direct3D11.h"
-#include "Direct3D12.h"
+#include "RenderManager.h"
 #include "ShaderManager.h"
 #include "Cube.h"
 #include "Terrain.h"
 #include "Camera.h"
 #include "DirectionalLight.h"
-
-enum class Renderer { DX11, DX12 };
 
 class GoodaDriver : public Gooda
 {

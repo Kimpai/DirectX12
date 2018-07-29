@@ -172,9 +172,10 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\buffers\ConstantBuffer.cpp" />
-    <ClCompile Include="src\buffers\IndexBuffer.cpp" />
-    <ClCompile Include="src\buffers\VertexBuffer.cpp" />
+    <ClCompile Include="src\graphics\ConstantBuffer.cpp" />
+    <ClCompile Include="src\graphics\IndexBuffer.cpp" />
+    <ClCompile Include="src\graphics\RenderManager.cpp" />
+    <ClCompile Include="src\graphics\VertexBuffer.cpp" />
     <ClCompile Include="src\Gooda\Console.cpp" />
     <ClCompile Include="src\Gooda\GD.cpp" />
     <ClCompile Include="src\Gooda\GoodaDriver.cpp" />
@@ -196,9 +197,10 @@
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\buffers\ConstantBuffer.h" />
-    <ClInclude Include="src\buffers\IndexBuffer.h" />
-    <ClInclude Include="src\buffers\VertexBuffer.h" />
+    <ClInclude Include="src\graphics\ConstantBuffer.h" />
+    <ClInclude Include="src\graphics\IndexBuffer.h" />
+    <ClInclude Include="src\graphics\RenderManager.h" />
+    <ClInclude Include="src\graphics\VertexBuffer.h" />
     <ClInclude Include="src\Gooda\Console.h" />
     <ClInclude Include="src\Gooda\GD.h" />
     <ClInclude Include="src\Gooda\GoodaDriver.h" />

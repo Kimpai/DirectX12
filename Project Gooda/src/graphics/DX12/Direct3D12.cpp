@@ -28,15 +28,15 @@ Direct3D12::~Direct3D12()
 	//Flush the Command queue to make sure that the GPU is not currently using it
 	FlushCommandQueue();
 
-	//Before shutting down set to windowed mode or when you release the swap chain it will throw an exception.
+	//Before shutting down set to windowed mode or when you release the swap chain it will throw an exception
 	if (m_swapChain)
 		m_swapChain->SetFullscreenState(false, nullptr);
 
-	//Close the object handle to the fence event.
+	//Close the object handle to the fence event
 	CloseHandle(m_fenceEvent);
 }
 
-void Direct3D12::BeginScene(ShaderManager* shader)
+void Direct3D12::BeginScene(D3D12_CPU_DESCRIPTOR_HANDLE* cpuHandle, D3D12_GPU_DESCRIPTOR_HANDLE* gpuHandle)
 {
 	//Swap the current render target view buffer index so drawing is don on the correct buffer
 	m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
@@ -60,7 +60,7 @@ void Direct3D12::BeginScene(ShaderManager* shader)
 
 	//Reset the command list so that it can start recording again.
 	//Only one command list can record at a given time.
-	assert(!m_commandList->Reset(m_commandAllocator[m_frameIndex].Get(), shader->GetPipelineState(ShaderPipelineType::COLOR)));
+	assert(!m_commandList->Reset(m_commandAllocator[m_frameIndex].Get(), nullptr));
 
 	//Record commands in the command list now.
 	//Start by setting the resource barrier.
@@ -73,28 +73,21 @@ void Direct3D12::BeginScene(ShaderManager* shader)
 
 	m_commandList->ResourceBarrier(1, &barrier);
 
-	//Get the render target view handle for the current back buffer.
+	//Get the render target view handle for the current back buffer
 	D3D12_CPU_DESCRIPTOR_HANDLE renderTargetViewHandle = m_renderTargetViewDescHeap->GetCPUDescriptorHandleForHeapStart();
 	renderTargetViewHandle.ptr += m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV) * m_frameIndex;
 
-	//Get the depth stencil view handle
-	D3D12_CPU_DESCRIPTOR_HANDLE depthStencilViewHandle(shader->GetDepthStencilViewHandle());
-
 	//Set the back buffer as the render target.
-	m_commandList->OMSetRenderTargets(1, &renderTargetViewHandle, FALSE, &depthStencilViewHandle);
+	m_commandList->OMSetRenderTargets(1, &renderTargetViewHandle, FALSE, cpuHandle);
 
 	//Then set the color to clear the window to.
 	float color[4] = { 0.5f, 0.5f, 0.5f, 1.0f };
 
-	m_commandList->ClearRenderTargetView(renderTargetViewHandle, color, 0, NULL);
-	m_commandList->ClearDepthStencilView(shader->GetDepthStencilViewHandle(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, NULL);
-	m_commandList->SetGraphicsRootSignature(shader->GetRootSignature());
-	
-	ID3D12DescriptorHeap* descriptorHeaps[] = { shader->GetDescriptorHeap(m_frameIndex) };
-	m_commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
-
 	m_commandList->RSSetViewports(1, &m_viewport);
 	m_commandList->RSSetScissorRects(1, &m_rect);
+
+	m_commandList->ClearRenderTargetView(renderTargetViewHandle, color, 1, &m_rect);
+	m_commandList->ClearDepthStencilView(cpuHandle[0], D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 1, &m_rect);
 }
 
 void Direct3D12::EndScene()
@@ -208,7 +201,7 @@ void Direct3D12::CreateDirect3DDevice(HWND hwnd)
 #if _DEBUG
 	//Get the interface to DirectX 12 debugger
 	ComPtr<ID3D12Debug> debugController = nullptr;
-	if (SUCCEEDED(D3D12GetDebugInterface(__uuidof(ID3D12Debug), (void**)&debugController)))
+	if (SUCCEEDED(D3D12GetDebugInterface(__uuidof(ID3D12Debug), (void**)debugController.GetAddressOf())))
 		debugController->EnableDebugLayer();
 
 
@@ -220,11 +213,11 @@ void Direct3D12::CreateDirect3DDevice(HWND hwnd)
 	ComPtr<IDXGIFactory5> factory = nullptr;
 	ComPtr<IDXGIAdapter1> adapter = nullptr;
 
-	CreateDXGIFactory(__uuidof(IDXGIFactory5), (void**)&factory);
+	CreateDXGIFactory(__uuidof(IDXGIFactory5), (void**)factory.GetAddressOf());
 	for (UINT adapterIndex = 0;; adapterIndex++)
 	{
 		adapter = nullptr;
-		if (DXGI_ERROR_NOT_FOUND == factory->EnumAdapters1(adapterIndex, &adapter))
+		if (DXGI_ERROR_NOT_FOUND == factory->EnumAdapters1(adapterIndex, adapter.GetAddressOf()))
 			break;
 
 		//Check to see if the adapter supports Direct3D 12, but don't create the device yet
@@ -235,7 +228,7 @@ void Direct3D12::CreateDirect3DDevice(HWND hwnd)
 	if (adapter)
 	{
 		//Create the device
-		assert(!D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_12_1, __uuidof(ID3D12Device), (void**)&m_device));
+		assert(!D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_12_1, __uuidof(ID3D12Device), (void**)m_device.GetAddressOf()));
 	}
 	else
 	{
@@ -246,7 +239,7 @@ void Direct3D12::CreateDirect3DDevice(HWND hwnd)
 
 #if _DEBUG
 	ComPtr<IDXGIDebug> debug = nullptr;
-	if (SUCCEEDED(DXGIGetDebugInterface1(0, __uuidof(IDXGIDebug1), (void**)&debug)))
+	if (SUCCEEDED(DXGIGetDebugInterface1(0, __uuidof(IDXGIDebug1), (void**)debug.GetAddressOf())))
 		debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_DETAIL);
 
 #endif
@@ -310,15 +303,15 @@ void Direct3D12::CreateCommandInterfaceAndSwapChain(HWND hwnd)
 
 	//Create temporary factory to use when creating swapchain
 	ComPtr<IDXGIFactory5> factory = nullptr;
-	CreateDXGIFactory(__uuidof(IDXGIFactory5), (void**)&factory);
+	CreateDXGIFactory(__uuidof(IDXGIFactory5), (void**)factory.GetAddressOf());
 
 	//Use the factory to create an adapter for the primary graphics card
 	ComPtr<IDXGIAdapter1> adapter = nullptr;
-	assert(!factory->EnumAdapters1(0, &adapter));
+	assert(!factory->EnumAdapters1(0, adapter.GetAddressOf()));
 
 	//Enumerate the primary monitor
 	ComPtr<IDXGIOutput> adapterOutput = nullptr;
-	assert(!adapter->EnumOutputs(0, &adapterOutput));
+	assert(!adapter->EnumOutputs(0, adapterOutput.GetAddressOf()));
 
 	//Get the number of modes
 	unsigned int numModes = 0;
@@ -361,7 +354,8 @@ void Direct3D12::CreateCommandInterfaceAndSwapChain(HWND hwnd)
 	
 	//Convert the name of the video card to a char array to store it
 	size_t stringLength = 0;
-	wcstombs_s(&stringLength, m_videoCardDescription, 128, adapterDesc.Description, 128);
+	char videoCardDescription[128];
+	wcstombs_s(&stringLength, videoCardDescription, 128, adapterDesc.Description, 128);
 	
 	DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
 	ComPtr<IDXGISwapChain> swapChain = nullptr;
@@ -378,6 +372,18 @@ void Direct3D12::CreateCommandInterfaceAndSwapChain(HWND hwnd)
 
 	//Set a regular 32-bit surface for the back buffers.
 	swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+
+	//Set the refresh rate of the back buffer
+	if (m_vsync)
+	{
+		swapChainDesc.BufferDesc.RefreshRate.Numerator = numerator;
+		swapChainDesc.BufferDesc.RefreshRate.Denominator = denominator;
+	}
+	else
+	{
+		swapChainDesc.BufferDesc.RefreshRate.Numerator = 0;
+		swapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
+	}
 
 	//Set the usage of the back buffers to be render target outputs.
 	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
@@ -405,25 +411,13 @@ void Direct3D12::CreateCommandInterfaceAndSwapChain(HWND hwnd)
 	else
 		swapChainDesc.Windowed = true;
 
-	//Set the refresh rate of the back buffer
-	if (m_vsync)
-	{
-		swapChainDesc.BufferDesc.RefreshRate.Numerator = numerator;
-		swapChainDesc.BufferDesc.RefreshRate.Denominator = denominator;
-	}
-	else
-	{
-		swapChainDesc.BufferDesc.RefreshRate.Numerator = 0;
-		swapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
-	}
 
 	//Finally create the swap chain using the swap chain description.	
-	
-	assert(!factory->CreateSwapChain(m_commandQueue.Get(), &swapChainDesc, &swapChain));
+	assert(!factory->CreateSwapChain(m_commandQueue.Get(), &swapChainDesc, swapChain.GetAddressOf()));
 
 	//Next upgrade the IDXGISwapChain to a IDXGISwapChain3 interface and store it in a private member variable named m_swapChain.
 	//This will allow us to use the newer functionality such as getting the current back buffer index.
-	assert(!swapChain->QueryInterface(__uuidof(IDXGISwapChain3), (void**)&m_swapChain));
+	assert(!swapChain->QueryInterface(__uuidof(IDXGISwapChain3), (void**)m_swapChain.GetAddressOf()));
 }
 
 void Direct3D12::CreateRenderTargets()

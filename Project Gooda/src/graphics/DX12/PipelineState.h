@@ -23,7 +23,7 @@ struct Shader
 class PipelineState
 {
 public:
-	PipelineState(ID3D12Device*, std::vector<Shader>, int, int, ShaderPipelineType, D3D12_DEPTH_STENCIL_DESC*, ID3D12RootSignature*);
+	PipelineState(ID3D12Device*, std::vector<Shader>, ShaderPipelineType, D3D12_DEPTH_STENCIL_DESC*, ID3D12RootSignature*);
 	~PipelineState();
 
 	ID3D12PipelineState* GetPipelineState();
