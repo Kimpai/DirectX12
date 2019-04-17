@@ -1,22 +1,26 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26430.12
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.156
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Project Gooda", "Project Gooda\Project Gooda.vcxproj", "{3AC202A6-F9A3-4DDA-B114-957DB67C373F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Gooda Core", "Gooda Core\Gooda Core.vcxproj", "{3AC202A6-F9A3-4DDA-B114-957DB67C373F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3AC202A6-F9A3-4DDA-B114-957DB67C373F}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{3AC202A6-F9A3-4DDA-B114-957DB67C373F}.Debug|x64.ActiveCfg = Debug|x64
 		{3AC202A6-F9A3-4DDA-B114-957DB67C373F}.Debug|x64.Build.0 = Debug|x64
 		{3AC202A6-F9A3-4DDA-B114-957DB67C373F}.Debug|x86.ActiveCfg = Release|Win32
 		{3AC202A6-F9A3-4DDA-B114-957DB67C373F}.Debug|x86.Build.0 = Release|Win32
+		{3AC202A6-F9A3-4DDA-B114-957DB67C373F}.Release|Any CPU.ActiveCfg = Release|Win32
 		{3AC202A6-F9A3-4DDA-B114-957DB67C373F}.Release|x64.ActiveCfg = Release|x64
 		{3AC202A6-F9A3-4DDA-B114-957DB67C373F}.Release|x64.Build.0 = Release|x64
 		{3AC202A6-F9A3-4DDA-B114-957DB67C373F}.Release|x86.ActiveCfg = Release|Win32
@@ -24,5 +28,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7B1E6C2E-1711-4C34-9F59-0FDCA65E4C64}
 	EndGlobalSection
 EndGlobal

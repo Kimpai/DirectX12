@@ -1,0 +1,194 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="shaders">
+      <UniqueIdentifier>{4a324379-7126-4b80-bb59-287b8d9bfc18}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resources">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{e98864d3-d581-4897-9301-a2f433da8b4b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\graphics">
+      <UniqueIdentifier>{4958bfdf-d4cb-43e2-82d1-74d7578539f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Gooda">
+      <UniqueIdentifier>{8f9d7165-53ce-48e1-a318-cc2a995f4b99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\utils">
+      <UniqueIdentifier>{0cfe0da0-c10f-4437-8fa0-09d3bd33717f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\utils\DX11">
+      <UniqueIdentifier>{761a1cb2-fead-4aef-a313-1248483cf907}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\utils\DX12">
+      <UniqueIdentifier>{28a0fbf6-225c-46b7-9491-9c1b8741fd94}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Gooda\Console.cpp">
+      <Filter>src\Gooda</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Gooda\GD.cpp">
+      <Filter>src\Gooda</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Gooda\GoodaDriver.cpp">
+      <Filter>src\Gooda</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Gooda\Input.cpp">
+      <Filter>src\Gooda</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Gooda\LuaScript.cpp">
+      <Filter>src\Gooda</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\DX11\Direct3D11.cpp">
+      <Filter>src\utils\DX11</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\DX12\DescriptorHeap.cpp">
+      <Filter>src\utils\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\DX12\Direct3D12.cpp">
+      <Filter>src\utils\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\DX12\PipelineState.cpp">
+      <Filter>src\utils\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\DX12\RootParameter.cpp">
+      <Filter>src\utils\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\DX12\RootSignature.cpp">
+      <Filter>src\utils\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\Camera.cpp">
+      <Filter>src\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\Cube.cpp">
+      <Filter>src\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\DirectionalLight.cpp">
+      <Filter>src\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\Light.cpp">
+      <Filter>src\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\Model.cpp">
+      <Filter>src\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\ShaderManager.cpp">
+      <Filter>src\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\Terrain.cpp">
+      <Filter>src\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\Renderer.cpp">
+      <Filter>src\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\RenderManager.cpp">
+      <Filter>src\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\ConstantBuffer.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\IndexBuffer.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\VertexBuffer.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Gooda\Console.h">
+      <Filter>src\Gooda</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Gooda\GD.h">
+      <Filter>src\Gooda</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Gooda\GoodaDriver.h">
+      <Filter>src\Gooda</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Gooda\Input.h">
+      <Filter>src\Gooda</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Gooda\LuaScript.h">
+      <Filter>src\Gooda</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\DX11\Direct3D11.h">
+      <Filter>src\utils\DX11</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\DX12\DescriptorHeap.h">
+      <Filter>src\utils\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\DX12\Direct3D12.h">
+      <Filter>src\utils\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\DX12\PipelineState.h">
+      <Filter>src\utils\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\DX12\RootParameter.h">
+      <Filter>src\utils\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\DX12\RootSignature.h">
+      <Filter>src\utils\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\Camera.h">
+      <Filter>src\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\Cube.h">
+      <Filter>src\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\DirectionalLight.h">
+      <Filter>src\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\Light.h">
+      <Filter>src\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\Model.h">
+      <Filter>src\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\ShaderManager.h">
+      <Filter>src\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\Terrain.h">
+      <Filter>src\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\Renderer.h">
+      <Filter>src\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\RenderManager.h">
+      <Filter>src\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\ConstantBuffer.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\IndexBuffer.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\VertexBuffer.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="resources\setup.txt">
+      <Filter>resources</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="shaders\ColorPixelShader.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\ColorVertexShader.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\TexturePixelShader.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\TextureVertexShader.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+  </ItemGroup>
+</Project>
