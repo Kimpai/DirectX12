@@ -4,11 +4,18 @@ namespace GoodaCore
 {
 	Renderer::Renderer() : m_backend(Backend::NOACTIVE)
 	{
-
+		
 	}
 
-	Renderer::~Renderer()
+	bool Renderer::Init()
 	{
+		m_backend = Backend::DX12;
+		return true;
+	}
+
+	bool Renderer::Destroy()
+	{
+		return true;
 	}
 
 	Renderer* Renderer::Instance()
@@ -17,84 +24,25 @@ namespace GoodaCore
 		return &s_renderer;
 	}
 
-	void* Renderer::GetDevice()
-	{
-		void* device = nullptr;
-
-		switch (m_backend)
-		{
-		case Backend::DX11:
-			device = Direct3D11::Instance()->GetDevice();
-			break;
-		case Backend::DX12:
-			device = Direct3D12::Instance()->GetDevice();
-			break;
-		default:
-			break;
-		}
-
-		return device;
-	}
-
-	void* Renderer::GetDeviceContextOrCommandList()
-	{
-		void* device = nullptr;
-
-		switch (m_backend)
-		{
-		case Backend::DX11:
-			device = Direct3D11::Instance()->GetDeviceContext();
-			break;
-		case Backend::DX12:
-			device = Direct3D12::Instance()->GetCommandList();
-			break;
-		default:
-			break;
-		}
-
-		return device;
-	}
-
 	Backend Renderer::GetBackend()
 	{
 		return m_backend;
 	}
 
-	int Renderer::GetCurrentFrame()
+	bool Renderer::Render(std::vector<Model*>& models)
 	{
-		int frameIndex = -1;
+		for (auto model : models)
+			model->Draw();
 
-		switch (m_backend)
-		{
-		case Backend::DX11:
-			frameIndex = Direct3D11::Instance()->GetCurrentFrame();
-			break;
-		case Backend::DX12:
-			frameIndex = Direct3D12::Instance()->GetCurrentFrame();
-			break;
-		default:
-			break;
-		}
-
-		return frameIndex;
+		return true;
+	}
+	bool Renderer::BeginScene(Window* window)
+	{
+		return false;
 	}
 
-	void Renderer::Render()
+	bool Renderer::EndScene(Window* window)
 	{
-		switch (m_backend)
-		{
-		case Backend::DX11:
-			Direct3D11::Instance()->BeginScene();
-
-			Direct3D11::Instance()->EndScene();
-			break;
-		case Backend::DX12:
-			Direct3D12::Instance()->BeginScene(NULL, NULL);
-
-			Direct3D12::Instance()->EndScene();
-			break;
-		default:
-			break;
-		}
+		return false;
 	}
 }

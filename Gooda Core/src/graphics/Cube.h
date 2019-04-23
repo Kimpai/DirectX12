@@ -1,31 +1,32 @@
 #pragma once
 
-#include <d3d12.h>
-#include <d3dx12.h>
 #include <DirectXMath.h>
-#include <wrl.h>
 #include <VertexTypes.h>
 #include <frame.h>
 
 #include "Model.h"
+#include "../utils/DX12/Direct3D12.h"
 
 using namespace DirectX;
-using namespace Microsoft::WRL;
 
 namespace GoodaCore
 {
 	class Cube : public Model
 	{
 	public:
-		Cube(ID3D12Device*, ID3D12GraphicsCommandList*, XMFLOAT3, XMFLOAT4);
-		~Cube();
+		Cube(XMFLOAT3, XMFLOAT4);
+		virtual ~Cube() = default;
+
+		virtual bool Init();
+		virtual bool Frame(UINT, XMMATRIX, D3D12_GPU_DESCRIPTOR_HANDLE);
+		virtual bool Destroy();
 
 		ConstantBuffer* GetConstantBuffer();
 		XMFLOAT3 GetPosition();
+		virtual void Draw();
 
 	private:
-		void InitializeBuffers(ID3D12Device*, ID3D12GraphicsCommandList*);
-		void Render(ID3D12GraphicsCommandList*, int, int, CD3DX12_GPU_DESCRIPTOR_HANDLE);
+		void InitializeBuffers();
 
 		int m_indices;
 		XMFLOAT3 m_origin;

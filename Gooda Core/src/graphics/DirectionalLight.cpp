@@ -2,21 +2,14 @@
 
 namespace GoodaCore
 {
-	DirectionalLight::DirectionalLight(ID3D12Device* device, ID3D12GraphicsCommandList* commandList,
-		XMFLOAT4 diffuseColor, XMFLOAT4 ambientColor, XMFLOAT4 specularColor, XMFLOAT3 lightDirection) : Light(device, commandList)
+	DirectionalLight::DirectionalLight(XMFLOAT4 diffuseColor, XMFLOAT4 ambientColor, XMFLOAT4 specularColor, XMFLOAT3 lightDirection) : Light()
 	{
 		m_constantBufferData.ambientColor = ambientColor,
-			m_constantBufferData.diffuseColor = diffuseColor;
+		m_constantBufferData.diffuseColor = diffuseColor;
 		m_constantBufferData.specularColor = specularColor;
 		m_constantBufferData.lightDirection = lightDirection;
 
-		InitializeBuffers(device, commandList);
-	}
-
-	DirectionalLight::~DirectionalLight()
-	{
-		if (m_constantBuffer)
-			m_constantBuffer->Release();
+		InitializeBuffers();
 	}
 
 	ConstantBuffer* DirectionalLight::GetConstantBuffer()
@@ -24,15 +17,27 @@ namespace GoodaCore
 		return m_constantBuffer;
 	}
 
-	void DirectionalLight::InitializeBuffers(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
+	void DirectionalLight::InitializeBuffers()
 	{
 		//Create a constant buffer for this directional light
-		m_constantBuffer = new ConstantBuffer(&m_constantBufferData, sizeof(ConstantBufferData), device, commandList);
+		m_constantBuffer = new ConstantBuffer(&m_constantBufferData, sizeof(ConstantBufferData));
 	}
 
-	void DirectionalLight::Render(ID3D12GraphicsCommandList* commandList, int currentFrame, int rootIndex, CD3DX12_GPU_DESCRIPTOR_HANDLE handle)
+	bool DirectionalLight::Init()
 	{
-		//Set the constant buffer
-		m_constantBuffer->SetConstantBuffer(rootIndex, handle);
+		return true;
+	}
+
+	bool DirectionalLight::Frame(UINT frameIndex, D3D12_GPU_DESCRIPTOR_HANDLE handle) 
+	{
+		Light::Frame(frameIndex, handle);
+
+		return true;
+	}
+
+	bool DirectionalLight::Destroy()
+	{
+		m_constantBuffer->Release();
+		return true;
 	}
 }

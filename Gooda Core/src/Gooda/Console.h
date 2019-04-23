@@ -5,23 +5,27 @@
 #include <iostream>
 #include <string>
 #include <assert.h>
-#include "Gooda.h"
+#include <Gooda.h>
 
 namespace GoodaCore
 {
 	class Console : public Gooda
 	{
 	public:
-		Console();
-		~Console();
+		virtual ~Console() = default;
 
-		bool Frame(std::string&);
+		static Console* Instance();
+
+		virtual bool Init();
+		virtual bool Frame(std::string&);
+		virtual bool Destroy();
 
 	private:
+		Console() = default;
+		bool InputHandle(std::string&);
+
 		HANDLE m_stdOutputHandle;
 		HANDLE m_stdInputHandle;
 		HANDLE m_stdErrorHandle;
-
-		bool InputHandle(std::string&);
 	};
 }

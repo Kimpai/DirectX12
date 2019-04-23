@@ -2,31 +2,38 @@
 
 namespace GoodaCore
 {
-	Terrain::Terrain(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, char* file, int width, int height, float scale, XMFLOAT3 origin) : Model(device, commandList, origin),
+	Terrain::Terrain(char* file, int width, int height, float scale, XMFLOAT3 origin) : Model(origin),
 		m_height(height), m_width(width), m_scale(scale), m_file(file), m_heightMap(nullptr)
 	{
-		InitializeBuffers(device, commandList);
+		InitializeBuffers();
 	}
 
-	Terrain::~Terrain()
+	bool Terrain::Init()
 	{
-		if (m_vertexBuffer)
-		{
-			delete m_vertexBuffer;
-			m_vertexBuffer = nullptr;
-		}
+		return true;
+	}
 
-		if (m_indexBuffer)
-		{
-			delete m_indexBuffer;
-			m_indexBuffer = nullptr;
-		}
+	bool Terrain::Frame(UINT frameIndex, XMMATRIX viewMatrix, D3D12_GPU_DESCRIPTOR_HANDLE handle)
+	{
+		Model::Frame(frameIndex, viewMatrix, handle);
 
-		if (m_constantBuffer)
-		{
-			delete m_constantBuffer;
-			m_constantBuffer = nullptr;
-		}
+		//Set the vertex buffer
+		m_vertexBuffer->SetVertexBuffer();
+
+		//Set the index buffer
+		m_indexBuffer->SetIndexBuffer();
+
+		//Set constant buffer
+		m_constantBuffer->SetConstantBuffer(handle);
+
+		return true;
+	}
+
+	bool Terrain::Destroy()
+	{
+		m_vertexBuffer->Release();
+		m_indexBuffer->Release();
+		m_constantBuffer->Release();
 
 		if (m_file)
 		{
@@ -39,6 +46,8 @@ namespace GoodaCore
 			delete[] m_heightMap;
 			m_heightMap = nullptr;
 		}
+
+		return true;
 	}
 
 	ConstantBuffer* Terrain::GetConstantBuffer()
@@ -46,7 +55,7 @@ namespace GoodaCore
 		return m_constantBuffer;
 	}
 
-	void Terrain::InitializeBuffers(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
+	void Terrain::InitializeBuffers()
 	{
 		//Load the bitmap file
 		LoadBitmapHeightMap();
@@ -76,13 +85,13 @@ namespace GoodaCore
 		int indexBufferSize = size * sizeof(DWORD);
 
 		//Create a vertex buffer
-		m_vertexBuffer = new VertexBuffer(vertices, vertexBufferSize, sizeof(VertexPositionNormalColor), device, commandList);
+		m_vertexBuffer = new VertexBuffer(vertices, vertexBufferSize, sizeof(VertexPositionNormalColor));
 
 		//Create an index buffer
-		m_indexBuffer = new IndexBuffer(indices, indexBufferSize, sizeof(DWORD), device, commandList);
+		m_indexBuffer = new IndexBuffer(indices, indexBufferSize, sizeof(DWORD));
 
 		//Create a constant buffer for the world, view and projection matrices
-		m_constantBuffer = new ConstantBuffer(&m_constantBufferData, sizeof(ConstantBufferData), device, commandList);
+		m_constantBuffer = new ConstantBuffer(&m_constantBufferData, sizeof(ConstantBufferData));
 
 		//Release the vertex and index array now that we are done with them
 		if (vertices)
@@ -98,22 +107,13 @@ namespace GoodaCore
 		}
 	}
 
-	void Terrain::Render(ID3D12GraphicsCommandList* commandList, int currentFrame, int rootIndex, CD3DX12_GPU_DESCRIPTOR_HANDLE handle)
+	void Terrain::Draw()
 	{
 		//Set the primitive topology
-		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-		//Set the vertex buffer
-		m_vertexBuffer->SetVertexBuffer();
-
-		//Set the index buffer
-		m_indexBuffer->SetIndexBuffer();
-
-		//Set constant buffer
-		m_constantBuffer->SetConstantBuffer(rootIndex, handle);
+		Direct3D12::Instance()->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		//Draw
-		commandList->DrawIndexedInstanced(m_indices, 1, 0, 0, 0);
+		Direct3D12::Instance()->GetCommandList()->DrawIndexedInstanced(m_indices, 1, 0, 0, 0);
 	}
 
 	void Terrain::LoadBitmapHeightMap()

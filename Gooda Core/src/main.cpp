@@ -1,21 +1,47 @@
 #include <crtdbg.h>
-#include "Gooda/GD.h"
+#include <Gooda.h>
+#include "Gooda/GoodaDriver.h"
 
 using namespace GoodaCore;
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pScmdline, int iCmdshow)
 {
-	GoodaDevice* device;
+	MSG msg;
+	bool done, result;
 
-	//Create the device object
-	device = new GoodaDevice();
-	assert(device);
+	//Initialize the message structure
+	ZeroMemory(&msg, sizeof(MSG));
 
-	//Initialize and run the device object
-	device->Run();
+	GoodaDriver::Instance()->Init();
 
-	//Release the Gooda object
-	device->Release();
+	//Loop until there is a quit message from the window or the user
+	done = false;
+	while (!done)
+	{
+		//Handle the windows messages
+		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+
+		//If the windows signals to end the application then exit out
+		if (msg.message == WM_QUIT)
+		{
+			done = true;
+		}
+		else
+		{
+			//Otherwise do the frame processing
+			result = GoodaDriver::Instance()->Frame();
+			if (!result)
+			{
+				done = true;
+			}
+		}
+	}
+
+	GoodaDriver::Instance()->Destroy();
 
 	return 0;
 }

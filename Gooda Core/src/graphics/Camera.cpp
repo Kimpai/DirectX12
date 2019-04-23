@@ -2,7 +2,7 @@
 
 namespace GoodaCore
 {
-	Camera::Camera(Input* inputHandler, ID3D12Device* device, ID3D12GraphicsCommandList* commandList) : m_inputHandler(inputHandler)
+	Camera::Camera()
 	{
 		m_position = XMFLOAT3(0.0f, 3.0f, 0.0f);
 		m_rotation = XMFLOAT3(0.0f, 0.0f, 0.0f);
@@ -12,16 +12,10 @@ namespace GoodaCore
 		m_leftSpeed = 0.0f;
 		m_turnSpeed = 0.0f;
 		m_frameTime = 0.01f;
-		m_mouse.x = m_inputHandler->GetMousePosition().x;
-		m_mouse.y = m_inputHandler->GetMousePosition().y;
+		m_mouse.x = Input::Instance()->GetMousePosition().x;
+		m_mouse.y = Input::Instance()->GetMousePosition().y;
 
-		m_constantBuffer = new ConstantBuffer(&m_constantBufferData, sizeof(ConstantBufferData), device, commandList);
-	}
-
-	Camera::~Camera()
-	{
-		if (m_constantBuffer)
-			m_constantBuffer->Release();
+		m_constantBuffer = new ConstantBuffer(&m_constantBufferData, sizeof(ConstantBufferData));
 	}
 
 	void Camera::SetPosition(float x, float y, float z)
@@ -49,11 +43,16 @@ namespace GoodaCore
 		return m_constantBuffer;
 	}
 
-	void Camera::Frame(int frameIndex)
+	bool Camera::Init()
+	{
+		return true;
+	}
+
+	bool Camera::Frame(UINT frameIndex, D3D12_GPU_DESCRIPTOR_HANDLE handle)
 	{
 		m_constantBufferData.CameraPosition = m_position;
 		m_constantBuffer->UpdateConstantBufferData(frameIndex);
-
+		
 		Turn();
 
 		MoveForward();
@@ -65,12 +64,14 @@ namespace GoodaCore
 		MoveLeft();
 
 		BuildViewMatrix();
+
+		return true;
 	}
 
-	void Camera::Render(int rootIndex, CD3DX12_GPU_DESCRIPTOR_HANDLE handle)
+	bool Camera::Destroy()
 	{
-		//Set the constant buffer
-		m_constantBuffer->SetConstantBuffer(rootIndex, handle);
+		m_constantBuffer->Release();
+		return true;
 	}
 
 	XMMATRIX Camera::GetViewMatrix()
@@ -192,7 +193,7 @@ namespace GoodaCore
 		float radians;
 
 		//Update forward speed
-		if (m_inputHandler->IsKeyDown(VK_W))
+		if (Input::Instance()->IsKeyDown(VK_W))
 		{
 			m_forwardSpeed += m_frameTime * 1.0f;
 			if (m_forwardSpeed > (m_frameTime * 50.0f))
@@ -217,7 +218,7 @@ namespace GoodaCore
 	{
 		float radians;
 
-		if (m_inputHandler->IsKeyDown(VK_S))
+		if (Input::Instance()->IsKeyDown(VK_S))
 		{
 			m_backwardSpeed += m_frameTime * 1.0f;
 
@@ -246,7 +247,7 @@ namespace GoodaCore
 	{
 		float radians;
 
-		if (m_inputHandler->IsKeyDown(VK_D))
+		if (Input::Instance()->IsKeyDown(VK_D))
 		{
 			m_rightSpeed += m_frameTime * 1.0f;
 
@@ -276,7 +277,7 @@ namespace GoodaCore
 	{
 		float radians;
 
-		if (m_inputHandler->IsKeyDown(VK_A))
+		if (Input::Instance()->IsKeyDown(VK_A))
 		{
 			m_leftSpeed += m_frameTime * 1.0f;
 
@@ -304,16 +305,16 @@ namespace GoodaCore
 
 	void Camera::Turn()
 	{
-		if ((m_inputHandler->GetMousePosition().x != m_mouse.x) || (m_inputHandler->GetMousePosition().y != m_mouse.y))
+		if ((Input::Instance()->GetMousePosition().x != m_mouse.x) || (Input::Instance()->GetMousePosition().y != m_mouse.y))
 		{
 
 			m_rotation.y += m_mouse.x * m_frameTime * 5.0f;
 			m_rotation.x += m_mouse.y * m_frameTime * 5.0f;
 
-			m_mouse.x = m_inputHandler->GetMousePosition().x;
-			m_mouse.y = m_inputHandler->GetMousePosition().y;
+			m_mouse.x = Input::Instance()->GetMousePosition().x;
+			m_mouse.y = Input::Instance()->GetMousePosition().y;
 
-			std::cout << m_inputHandler->GetMousePosition().x << "	" << m_inputHandler->GetMousePosition().y << std::endl;
+			std::cout << Input::Instance()->GetMousePosition().x << "	" << Input::Instance()->GetMousePosition().y << std::endl;
 		}
 	}
 }

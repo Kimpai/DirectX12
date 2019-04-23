@@ -1,15 +1,15 @@
 #pragma once
 
-#include <Windows.h>
+#pragma comment(lib, "Gooda.lib")
+
 #include <iostream>
 #include <vector>
-#include "Gooda.h"
 
+#include "../graphics/Window.h"
 #include "../graphics/Camera.h"
-#include "../graphics/RenderManager.h"
 #include "../graphics/ShaderManager.h"
 #include "../graphics/Cube.h"
-#include "../graphics/Terrain.h"
+#include "../graphics/Renderer.h"
 #include "../graphics/DirectionalLight.h"
 
 namespace GoodaCore
@@ -17,15 +17,18 @@ namespace GoodaCore
 	class GoodaDriver : public Gooda
 	{
 	public:
-		GoodaDriver(HWND hwnd, Input*);
-		virtual ~GoodaDriver();
+		virtual ~GoodaDriver() = default;
+		static GoodaDriver* Instance();
 
-		void Frame();
+		virtual bool Init();
+		virtual bool Frame();
+		virtual bool Destroy();
 
 	private:
-		void Render();
+		GoodaDriver() = default;
 
 		Camera* m_camera;
+		Window* m_window;
 		std::vector<Model*> m_models;
 		std::vector<Light*> m_lights;
 	};

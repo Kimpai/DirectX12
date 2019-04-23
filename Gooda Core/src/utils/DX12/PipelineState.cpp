@@ -2,8 +2,8 @@
 
 namespace GoodaCore
 {
-	PipelineState::PipelineState(ID3D12Device* device, std::vector<Shader> shaders,
-		ShaderPipelineType shaderPipelineType, D3D12_DEPTH_STENCIL_DESC* depthStencilState, ID3D12RootSignature* rootSignature)
+	PipelineState::PipelineState(std::vector<Shader> shaders,
+		ShaderPipelineType shaderPipelineType, ID3D12RootSignature* rootSignature)
 	{
 		//Compile the necessary shaders
 		for (auto shader : shaders)
@@ -38,13 +38,14 @@ namespace GoodaCore
 
 		//Fill in the pipeline state object desc
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC pipelineStateDesc = {};
+		ZeroMemory(&pipelineStateDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
+
 		pipelineStateDesc.InputLayout = inputLayoutDesc;
 		pipelineStateDesc.pRootSignature = rootSignature;
 		pipelineStateDesc.VS = vertexShaderByteCode;
 		pipelineStateDesc.PS = pixelShaderByteCode;
 		pipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 		pipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
-		pipelineStateDesc.DepthStencilState = *depthStencilState;
 		pipelineStateDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
 		pipelineStateDesc.SampleDesc.Count = 1;
 		pipelineStateDesc.SampleDesc.Quality = 0;
@@ -54,12 +55,13 @@ namespace GoodaCore
 		pipelineStateDesc.NumRenderTargets = 1;
 
 		//Create a pipeline state object
-		assert(!device->CreateGraphicsPipelineState(&pipelineStateDesc, __uuidof(ID3D12PipelineState), (void**)& m_pipelineState));
+		assert(!Direct3D12::Instance()->GetDevice()->CreateGraphicsPipelineState(&pipelineStateDesc, __uuidof(ID3D12PipelineState), (void**)& m_pipelineState));
 		m_pipelineState->SetName(L"Color PipelineState");
 	}
 
-	PipelineState::~PipelineState()
+	void PipelineState::SetPipelineState()
 	{
+		Direct3D12::Instance()->GetCommandList()->SetPipelineState(m_pipelineState.Get());
 	}
 
 	ID3D12PipelineState* PipelineState::GetPipelineState()

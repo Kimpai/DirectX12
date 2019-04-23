@@ -30,10 +30,6 @@ namespace GoodaCore
 		m_rootParameter = rootParameter;
 	}
 
-	RootParameter::~RootParameter()
-	{
-	}
-
 	void RootParameter::AppendDescriptorToTable(UINT baseShaderRegister, ParameterType type, UINT numOfDescriptors)
 	{
 		m_descriptorRanges.push_back(GetDescriptorTableRange(numOfDescriptors, baseShaderRegister, type));

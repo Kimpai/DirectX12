@@ -7,12 +7,16 @@ namespace GoodaCore
 	class DirectionalLight : public Light
 	{
 	public:
-		DirectionalLight(ID3D12Device*, ID3D12GraphicsCommandList*, XMFLOAT4, XMFLOAT4, XMFLOAT4, XMFLOAT3);
-		~DirectionalLight();
+		DirectionalLight(XMFLOAT4, XMFLOAT4, XMFLOAT4, XMFLOAT3);
+		virtual ~DirectionalLight() = default;
+
+		virtual bool Init();
+		virtual bool Frame(UINT, D3D12_GPU_DESCRIPTOR_HANDLE);
+		virtual bool Destroy();
+
 		ConstantBuffer* GetConstantBuffer();
-		void Render(ID3D12GraphicsCommandList*, int, int, CD3DX12_GPU_DESCRIPTOR_HANDLE);
 
 	private:
-		void InitializeBuffers(ID3D12Device*, ID3D12GraphicsCommandList*);
+		void InitializeBuffers();
 	};
 }

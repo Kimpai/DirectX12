@@ -1,6 +1,5 @@
 #pragma once
 
-#include <d3d12.h>
 #include <DirectXMath.h>
 #include <iostream>
 #include <Gooda.h>
@@ -15,8 +14,8 @@ namespace GoodaCore
 	class Camera : public Gooda
 	{
 	public:
-		Camera(Input*, ID3D12Device*, ID3D12GraphicsCommandList*);
-		~Camera();
+		Camera();
+		virtual ~Camera() = default;
 
 		void SetPosition(float, float, float);
 		void SetRotation(float, float, float);
@@ -25,8 +24,10 @@ namespace GoodaCore
 		XMFLOAT3 GetRotation();
 		ConstantBuffer* GetConstanBuffer();
 
-		void Frame(int);
-		void Render(int, CD3DX12_GPU_DESCRIPTOR_HANDLE);
+		virtual bool Init();
+		virtual bool Frame(UINT, D3D12_GPU_DESCRIPTOR_HANDLE);
+		virtual bool Destroy();
+
 		XMMATRIX GetViewMatrix();
 		XMMATRIX GetBaseViewMatrix();
 
@@ -35,6 +36,7 @@ namespace GoodaCore
 		{
 			XMFLOAT3 CameraPosition;
 			float padding = 0.0f;
+
 		} m_constantBufferData;
 
 		void BuildBaseViewMatrix();
@@ -57,7 +59,6 @@ namespace GoodaCore
 		float m_frameTime;
 		XMFLOAT2 m_mouse;
 
-		Input* m_inputHandler;
 		ConstantBuffer* m_constantBuffer;
 	};
 }

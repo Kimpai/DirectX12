@@ -1,13 +1,11 @@
 #pragma once
 
-#include <d3d12.h>
-#include <d3dx12.h>
 #include <d3dcompiler.h>
 #include <assert.h>
 #include <vector>
 #include <wrl.h>
 
-using namespace Microsoft::WRL;
+#include "../DX12/Direct3D12.h"
 
 namespace GoodaCore
 {
@@ -25,9 +23,10 @@ namespace GoodaCore
 	class PipelineState
 	{
 	public:
-		PipelineState(ID3D12Device*, std::vector<Shader>, ShaderPipelineType, D3D12_DEPTH_STENCIL_DESC*, ID3D12RootSignature*);
-		~PipelineState();
+		PipelineState(std::vector<Shader>, ShaderPipelineType, ID3D12RootSignature*);
+		virtual ~PipelineState() = default;
 
+		void SetPipelineState();
 		ID3D12PipelineState* GetPipelineState();
 		ShaderPipelineType GetType();
 

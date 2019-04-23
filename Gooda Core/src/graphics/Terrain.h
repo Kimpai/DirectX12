@@ -7,6 +7,7 @@
 #include <fstream>
 
 #include "Model.h"
+#include "../utils/DX12/Direct3D12.h"
 
 using namespace DirectX;
 using namespace Microsoft::WRL;
@@ -16,14 +17,18 @@ namespace GoodaCore
 	class Terrain : public Model
 	{
 	public:
-		Terrain(ID3D12Device*, ID3D12GraphicsCommandList*, char*, int, int, float, XMFLOAT3);
-		~Terrain();
+		Terrain(char*, int, int, float, XMFLOAT3);
+		virtual ~Terrain() = default;
+
+		virtual bool Init();
+		virtual bool Frame(UINT, XMMATRIX, D3D12_GPU_DESCRIPTOR_HANDLE);
+		virtual bool Destroy();
 
 		ConstantBuffer* GetConstantBuffer();
+		virtual void Draw();
 
 	private:
-		void InitializeBuffers(ID3D12Device*, ID3D12GraphicsCommandList*);
-		void Render(ID3D12GraphicsCommandList*, int, int, CD3DX12_GPU_DESCRIPTOR_HANDLE);
+		void InitializeBuffers();
 
 		void LoadBitmapHeightMap();
 		void SetCoordinates();
@@ -35,6 +40,5 @@ namespace GoodaCore
 		int m_indices;
 
 		XMFLOAT3* m_heightMap;
-
 	};
 }

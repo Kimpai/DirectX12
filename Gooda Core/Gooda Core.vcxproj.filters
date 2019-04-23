@@ -34,9 +34,6 @@
     <ClCompile Include="src\Gooda\Console.cpp">
       <Filter>src\Gooda</Filter>
     </ClCompile>
-    <ClCompile Include="src\Gooda\GD.cpp">
-      <Filter>src\Gooda</Filter>
-    </ClCompile>
     <ClCompile Include="src\Gooda\GoodaDriver.cpp">
       <Filter>src\Gooda</Filter>
     </ClCompile>
@@ -88,9 +85,6 @@
     <ClCompile Include="src\graphics\Renderer.cpp">
       <Filter>src\graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\graphics\RenderManager.cpp">
-      <Filter>src\graphics</Filter>
-    </ClCompile>
     <ClCompile Include="src\utils\ConstantBuffer.cpp">
       <Filter>src\utils</Filter>
     </ClCompile>
@@ -100,12 +94,10 @@
     <ClCompile Include="src\utils\VertexBuffer.cpp">
       <Filter>src\utils</Filter>
     </ClCompile>
+    <ClCompile Include="src\graphics\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Gooda\Console.h">
-      <Filter>src\Gooda</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Gooda\GD.h">
       <Filter>src\Gooda</Filter>
     </ClInclude>
     <ClInclude Include="src\Gooda\GoodaDriver.h">
@@ -159,9 +151,6 @@
     <ClInclude Include="src\graphics\Renderer.h">
       <Filter>src\graphics</Filter>
     </ClInclude>
-    <ClInclude Include="src\graphics\RenderManager.h">
-      <Filter>src\graphics</Filter>
-    </ClInclude>
     <ClInclude Include="src\utils\ConstantBuffer.h">
       <Filter>src\utils</Filter>
     </ClInclude>
@@ -171,6 +160,7 @@
     <ClInclude Include="src\utils\VertexBuffer.h">
       <Filter>src\utils</Filter>
     </ClInclude>
+    <ClInclude Include="src\graphics\Window.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="resources\setup.txt">

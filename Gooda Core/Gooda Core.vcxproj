@@ -71,23 +71,23 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(ProjectDir)/include/DirectX12/;$(ProjectDir)/include/DirectX11/;$(ProjectDir)/include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)/lib/DirectX12/Win32/Debug;$(ProjectDir)/lib/DirectX11/Win32/Debug;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\include\DirectX12;$(SolutionDir)\include\DirectX11;$(SolutionDir)\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\lib\DirectX11\Win32\Debug;$(SolutionDir)\lib\DirectX12\Win32\Debug;$(SolutionDir)\lib\Win32\Debug;$(LibraryPath)</LibraryPath>
     <ReferencePath>$(ReferencePath)</ReferencePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(ProjectDir)/include/DirectX12/;$(ProjectDir)/include/DirectX11/;$(ProjectDir)/include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)/lib/DirectX12/Win32/Release;$(ProjectDir)/lib/DirectX11/Win32/Release;$(LibraryPath);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\include\DirectX12;$(SolutionDir)\include\DirectX11;$(SolutionDir)\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\lib\DirectX11\Win32\Release;$(SolutionDir)\lib\DirectX12\Win32\Release;$(SolutionDir)\lib\Win32\Release;$(LibraryPath)</LibraryPath>
     <ReferencePath>$(ReferencePath)</ReferencePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(ProjectDir)/include/DirectX12/;$(ProjectDir)/include/DirectX11/;$(ProjectDir)/include;$(IncludePath);$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)/lib/DirectX12/x64/Debug;$(ProjectDir)/lib/DirectX11/x64/Debug;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\include\DirectX12;$(SolutionDir)\include\DirectX11;$(SolutionDir)\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\lib\DirectX11\x64\Debug;$(SolutionDir)\lib\DirectX12\x64\Debug;$(SolutionDir)\lib\x64\Debug;$(LibraryPath)</LibraryPath>
     <ReferencePath>$(ReferencePath)</ReferencePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(ProjectDir)/include/DirectX12/;$(ProjectDir)/include/DirectX11/;$(ProjectDir)/include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)/lib/DirectX12/x64/Release;$(ProjectDir)/lib/DirectX11/x64/Release;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\include\DirectX12;$(SolutionDir)\include\DirectX11;$(SolutionDir)\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\lib\DirectX11\x64\Release;$(SolutionDir)\lib\DirectX12\x64\Release;$(SolutionDir)\lib\x64\Release;$(LibraryPath)</LibraryPath>
     <ReferencePath>$(ReferencePath)</ReferencePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -102,7 +102,7 @@
       </Command>
     </PostBuildEvent>
     <Link>
-      <AdditionalDependencies>DirectXTK12.lib;DirectXTK.lib;d3d12.lib;dxgi.lib;d3dcompiler.lib;dxguid.libd3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>DirectXTK12.lib;DirectXTK.lib;d3d12.lib;dxgi.lib;d3dcompiler.lib;Gooda.lib;dxguid.libd3d11.lib;%(AdditionalDependencies);%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
     </Link>
@@ -122,7 +122,7 @@
       </Command>
     </PostBuildEvent>
     <Link>
-      <AdditionalDependencies>DirectXTK12.lib;DirectXTK.lib;d3d12.lib;dxgi.lib;d3dcompiler.lib;d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>DirectXTK12.lib;DirectXTK.lib;d3d12.lib;dxgi.lib;d3dcompiler.lib;Gooda.lib;d3d11.lib;%(AdditionalDependencies);%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
     </Link>
@@ -143,7 +143,7 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>DirectXTK12.lib;DirectXTK.lib;d3d12.lib;dxgi.lib;d3dcompiler.lib;dxguid.libd3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>DirectXTK12.lib;DirectXTK.lib;d3d12.lib;dxgi.lib;d3dcompiler.lib;Gooda.lib;dxguid.libd3d11.lib;%(AdditionalDependencies);%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
     </Link>
@@ -165,7 +165,7 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>DirectXTK12.lib;DirectXTK.lib;d3d12.lib;dxgi.lib;d3dcompiler.lib;d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>DirectXTK12.lib;DirectXTK.lib;d3d12.lib;dxgi.lib;d3dcompiler.lib;Gooda.lib;d3d11.lib;%(AdditionalDependencies);%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
     </Link>
@@ -178,13 +178,12 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\graphics\Window.cpp" />
     <ClCompile Include="src\utils\ConstantBuffer.cpp" />
     <ClCompile Include="src\utils\IndexBuffer.cpp" />
     <ClCompile Include="src\graphics\Renderer.cpp" />
-    <ClCompile Include="src\graphics\RenderManager.cpp" />
     <ClCompile Include="src\utils\VertexBuffer.cpp" />
     <ClCompile Include="src\Gooda\Console.cpp" />
-    <ClCompile Include="src\Gooda\GD.cpp" />
     <ClCompile Include="src\Gooda\GoodaDriver.cpp" />
     <ClCompile Include="src\Gooda\Input.cpp" />
     <ClCompile Include="src\Gooda\LuaScript.cpp" />
@@ -204,13 +203,12 @@
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\graphics\Window.h" />
     <ClInclude Include="src\utils\ConstantBuffer.h" />
     <ClInclude Include="src\utils\IndexBuffer.h" />
     <ClInclude Include="src\graphics\Renderer.h" />
-    <ClInclude Include="src\graphics\RenderManager.h" />
     <ClInclude Include="src\utils\VertexBuffer.h" />
     <ClInclude Include="src\Gooda\Console.h" />
-    <ClInclude Include="src\Gooda\GD.h" />
     <ClInclude Include="src\Gooda\GoodaDriver.h" />
     <ClInclude Include="src\Gooda\Input.h" />
     <ClInclude Include="src\Gooda\LuaScript.h" />

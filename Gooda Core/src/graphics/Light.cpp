@@ -2,22 +2,15 @@
 
 namespace GoodaCore
 {
-	Light::Light(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
+	Light::Light()
 	{
 	}
 
-	Light::~Light()
-	{
-	}
-
-	void Light::Frame(int currentFrame)
+	bool Light::Frame(UINT frameIndex, D3D12_GPU_DESCRIPTOR_HANDLE handle)
 	{
 		//Update the constant buffer data
-		m_constantBuffer->UpdateConstantBufferData(currentFrame);
-	}
+		m_constantBuffer->UpdateConstantBufferData(frameIndex);
 
-	int Light::GetNumOfConstantBuffers()
-	{
-		return m_numOfConstantBuffers;
+		return true;
 	}
 }

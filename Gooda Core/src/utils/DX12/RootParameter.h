@@ -1,6 +1,5 @@
 #pragma once
 #include <d3d12.h>
-#include <d3dx12.h>
 #include <vector>
 #include <assert.h>
 
@@ -14,7 +13,7 @@ namespace GoodaCore
 		RootParameter(ParameterType type, UINT baseShaderRegister, D3D12_SHADER_VISIBILITY visibility, int rootIndex);
 		RootParameter(D3D12_ROOT_DESCRIPTOR_TABLE descriptorTable, UINT baseShaderRegister, D3D12_SHADER_VISIBILITY visibility,
 			ParameterType type, UINT numOfDescriptors, int rootIndex);
-		~RootParameter();
+		virtual ~RootParameter() = default;
 
 		void AppendDescriptorToTable(UINT baseShaderRegister, ParameterType type, UINT numOfDescriptors);
 		D3D12_ROOT_PARAMETER GetRootParameter();

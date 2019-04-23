@@ -2,7 +2,13 @@
 
 namespace GoodaCore
 {
-	Console::Console()
+	Console* Console::Instance()
+	{
+		static Console s_console;
+		return &s_console;
+	}
+
+	bool Console::Init()
 	{
 		FILE* fp = nullptr;
 
@@ -40,15 +46,18 @@ namespace GoodaCore
 		//Make cout, wcout, cin, wcin, wcerr, cerr, wclog and clog 
 		//point to console as well
 		std::ios::sync_with_stdio();
-	}
 
-	Console::~Console()
-	{
+		return true;
 	}
 
 	bool Console::Frame(std::string& input)
 	{
 		return InputHandle(input);
+	}
+
+	bool Console::Destroy()
+	{
+		return true;
 	}
 
 	bool Console::InputHandle(std::string& input)

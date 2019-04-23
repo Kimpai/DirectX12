@@ -2,8 +2,7 @@
 
 namespace GoodaCore
 {
-	VertexBuffer::VertexBuffer(const void* bufferData, int size, int offset, ID3D12Device* device, ID3D12GraphicsCommandList* commandList) :
-		m_Device(device), m_CommandList(commandList), m_bufferData(bufferData)
+	VertexBuffer::VertexBuffer(const void* bufferData, int size, int offset) : m_bufferData(bufferData)
 	{
 		m_size = size;
 		m_offset = offset;
@@ -18,39 +17,64 @@ namespace GoodaCore
 		CopyVertexBufferData();
 	}
 
-	VertexBuffer::~VertexBuffer()
-	{
-
-	}
-
 	void VertexBuffer::SetVertexBuffer()
 	{
 		//Set the vertex buffer using the vertex buffer view
-		m_CommandList->IASetVertexBuffers(0, 1, &m_bufferView);
+		Direct3D12::Instance()->GetCommandList()->IASetVertexBuffers(0, 1, &m_bufferView);
 	}
 
 	void VertexBuffer::CreateDefaultHeap()
 	{
+		D3D12_HEAP_PROPERTIES heapProp = {};
+		ZeroMemory(&heapProp, sizeof(D3D12_HEAP_PROPERTIES));
+		heapProp.Type = D3D12_HEAP_TYPE_DEFAULT;
+
+		D3D12_RESOURCE_DESC resourceDesc = {};
+		ZeroMemory(&resourceDesc, sizeof(D3D12_RESOURCE_DESC));
+		resourceDesc.Width = m_size;
+		resourceDesc.Height = 1;
+		resourceDesc.DepthOrArraySize = 1;
+		resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+		resourceDesc.MipLevels = 1;
+		resourceDesc.SampleDesc.Count = 1;
+		resourceDesc.SampleDesc.Quality = 0;
+		resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+
 		//Create default heap
 		//default heap is memory on the GPU. Only GPU have access to this memory
 		//To get data into this heap upload the data using an upload heap
-		assert(!m_Device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE,
-			&CD3DX12_RESOURCE_DESC::Buffer(m_size), D3D12_RESOURCE_STATE_COPY_DEST, NULL, __uuidof(ID3D12Resource), (void**)& m_DefaultHeap));
+		assert(!Direct3D12::Instance()->GetDevice()->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE,
+			&resourceDesc, D3D12_RESOURCE_STATE_COPY_DEST, NULL, __uuidof(ID3D12Resource), (void**)& m_defaultHeap));
 
 		//Give resource heaps a name so when debugging with the graphics debugger
 		//we know what we are looking at
-		m_DefaultHeap->SetName(L"Vertex Buffer Deafult Heap");
+		m_defaultHeap->SetName(L"Vertex Buffer Deafult Heap");
 	}
 
 	void VertexBuffer::CreateUploadHeap()
 	{
+		D3D12_HEAP_PROPERTIES heapProp = {};
+		ZeroMemory(&heapProp, sizeof(D3D12_HEAP_PROPERTIES));
+		heapProp.Type = D3D12_HEAP_TYPE_UPLOAD;
+
+		D3D12_RESOURCE_DESC resourceDesc = {};
+		ZeroMemory(&resourceDesc, sizeof(D3D12_RESOURCE_DESC));
+		resourceDesc.Width = m_size;
+		resourceDesc.Height = 1;
+		resourceDesc.DepthOrArraySize = 1;
+		resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+		resourceDesc.MipLevels = 1;
+		resourceDesc.SampleDesc.Count = 1;
+		resourceDesc.SampleDesc.Quality = 0;
+		resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+
 		//Create the upload heap
 		//Upload heaps are used to upload data to the GPU. CPU can write to it, GPU can read from it
-		assert(!m_Device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), D3D12_HEAP_FLAG_NONE,
-			&CD3DX12_RESOURCE_DESC::Buffer(m_size), D3D12_RESOURCE_STATE_GENERIC_READ, NULL, __uuidof(ID3D12Resource), (void**)& m_UploadHeap));
+		assert(!Direct3D12::Instance()->GetDevice()->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE,
+			&resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, NULL, __uuidof(ID3D12Resource), (void**)& m_uploadHeap));
 
 		//Give vertex buffer upload heap a name for debugging purposes
-		m_UploadHeap->SetName(L"Vertex Buffer Upload Resource Heap");
+		m_uploadHeap->SetName(L"Vertex Buffer Upload Resource Heap");
 	}
 
 	void VertexBuffer::CopyVertexBufferData()
@@ -63,15 +87,20 @@ namespace GoodaCore
 		vertexData.SlicePitch = m_size;
 
 		//Create a command with the command list to copy data from the upload heap to the default heap
-		UpdateSubresources(m_CommandList, m_DefaultHeap.Get(), m_UploadHeap.Get(), 0, 0, 1, &vertexData);
+		UpdateSubresources(Direct3D12::Instance()->GetCommandList(), m_defaultHeap.Get(), m_uploadHeap.Get(), 0, 0, 1, &vertexData);
 
 		//Transition the vertex buffer data from copy destination to vertex buffer state
-		m_CommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_DefaultHeap.Get(), D3D12_RESOURCE_STATE_COPY_DEST,
-			D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER));
+		D3D12_RESOURCE_BARRIER barrier = {};
+		ZeroMemory(&barrier, sizeof(D3D12_RESOURCE_BARRIER));
+		barrier.Transition.pResource = m_defaultHeap.Get();
+		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
+
+		Direct3D12::Instance()->GetCommandList()->ResourceBarrier(1, &barrier);
 
 		//Create a vertex buffer view for the triangle.
 		//Get the GPU memory address to the vertex pointer using GetGPUVirtualAddress()
-		m_bufferView.BufferLocation = m_DefaultHeap->GetGPUVirtualAddress();
+		m_bufferView.BufferLocation = m_defaultHeap->GetGPUVirtualAddress();
 		m_bufferView.StrideInBytes = m_offset;
 		m_bufferView.SizeInBytes = m_size;
 	}

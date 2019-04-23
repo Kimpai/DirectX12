@@ -1,14 +1,12 @@
 #pragma once
 
-#include <d3d12.h>
-#include <d3dx12.h>
-#include <wrl.h>
 #include <frame.h>
 #include <DirectXMath.h>
 #include <assert.h>
 #include <Gooda.h>
 
-using namespace Microsoft::WRL;
+#include "DX12/Direct3D12.h"
+
 using namespace DirectX;
 
 namespace GoodaCore
@@ -16,15 +14,14 @@ namespace GoodaCore
 	class ConstantBuffer : public Gooda
 	{
 	public:
-		ConstantBuffer(const void*, int, ID3D12Device*, ID3D12GraphicsCommandList*);
-		~ConstantBuffer();
+		ConstantBuffer(const void*, int);
+		virtual ~ConstantBuffer() = default;
 
-		void SetConstantBuffer(int, CD3DX12_GPU_DESCRIPTOR_HANDLE);
-		void UpdateConstantBufferData(int);
+		void SetConstantBuffer(D3D12_GPU_DESCRIPTOR_HANDLE);
+		void UpdateConstantBufferData(UINT);
 		int GetConstantBufferSize();
-		D3D12_GPU_VIRTUAL_ADDRESS GetBufferLocation(int);
-		D3D12_CONSTANT_BUFFER_VIEW_DESC* GetConstantBufferViewDesc(int);
-		D3D12_CONSTANT_BUFFER_VIEW_DESC* GetConstantBufferViewDesc();
+		D3D12_GPU_VIRTUAL_ADDRESS GetBufferLocation(UINT);
+		D3D12_CONSTANT_BUFFER_VIEW_DESC* GetConstantBufferViewDesc(UINT);
 
 	private:
 		void CreateUploadHeap();
@@ -33,8 +30,6 @@ namespace GoodaCore
 		ComPtr<ID3D12Resource> m_constantBufferUploadHeap[frameBufferCount];
 		UINT8* m_constantBufferGPUAddress[frameBufferCount];
 
-		ID3D12Device* m_device;
-		ID3D12GraphicsCommandList* m_commandList;
 		const void* m_bufferData;
 		int m_size;
 		D3D12_CONSTANT_BUFFER_VIEW_DESC m_cbvDesc[frameBufferCount];

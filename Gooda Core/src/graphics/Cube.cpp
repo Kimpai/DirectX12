@@ -2,22 +2,46 @@
 
 namespace GoodaCore
 {
-	Cube::Cube(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, XMFLOAT3 origin, XMFLOAT4 color) : Model(device, commandList, origin),
+	Cube::Cube(XMFLOAT3 origin, XMFLOAT4 color) : Model(origin),
 		m_origin(origin), m_color(color), m_indices(0)
 	{
-		InitializeBuffers(device, commandList);
+		InitializeBuffers();
 	}
 
-	Cube::~Cube()
+	bool Cube::Init()
 	{
-		if (m_vertexBuffer)
-			m_vertexBuffer->Release();
+		return true;
+	}
 
-		if (m_indexBuffer)
-			m_indexBuffer->Release();
+	bool Cube::Frame(UINT frameIndex, XMMATRIX viewMatrix, D3D12_GPU_DESCRIPTOR_HANDLE handle)
+	{
+		Model::Frame(frameIndex, viewMatrix, handle);
 
-		if (m_constantBuffer)
-			m_constantBuffer->Release();
+		//Set the primitive topology
+		Direct3D12::Instance()->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		//Set the vertex buffer
+		m_vertexBuffer->SetVertexBuffer();
+
+		//Set the index buffer
+		m_indexBuffer->SetIndexBuffer();
+
+		//Set the constant buffer
+		m_constantBuffer->SetConstantBuffer(handle);
+
+		//Draw
+		Direct3D12::Instance()->GetCommandList()->DrawIndexedInstanced(m_indices, 1, 0, 0, 0);
+
+		return true;
+	}
+
+	bool Cube::Destroy()
+	{
+		m_vertexBuffer->Release();
+		m_indexBuffer->Release();
+		m_constantBuffer->Release();
+
+		return true;
 	}
 
 	ConstantBuffer* Cube::GetConstantBuffer()
@@ -30,7 +54,7 @@ namespace GoodaCore
 		return m_origin;
 	}
 
-	void Cube::InitializeBuffers(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
+	void Cube::InitializeBuffers()
 	{
 		//Create vertex data
 		VertexPositionNormalColor vertices[] =
@@ -108,30 +132,17 @@ namespace GoodaCore
 		int indexBufferSize = _countof(indices) * sizeof(DWORD);
 
 		//Create a vertex buffer
-		m_vertexBuffer = new VertexBuffer(vertices, vertexBufferSize, sizeof(VertexPositionNormalColor), device, commandList);
+		m_vertexBuffer = new VertexBuffer(vertices, vertexBufferSize, sizeof(VertexPositionNormalColor));
 
 		//Create an index buffer
-		m_indexBuffer = new IndexBuffer(indices, indexBufferSize, sizeof(DWORD), device, commandList);
+		m_indexBuffer = new IndexBuffer(indices, indexBufferSize, sizeof(DWORD));
 
 		//Create a constant buffer for the world, view and projection matrices
-		m_constantBuffer = new ConstantBuffer(&m_constantBufferData, sizeof(ConstantBufferData), device, commandList);
+		m_constantBuffer = new ConstantBuffer(&m_constantBufferData, sizeof(ConstantBufferData));
 	}
 
-	void Cube::Render(ID3D12GraphicsCommandList * commandList, int currentFrame, int rootIndex, CD3DX12_GPU_DESCRIPTOR_HANDLE handle)
+	void Cube::Draw()
 	{
-		//Set the primitive topology
-		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-		//Set the vertex buffer
-		m_vertexBuffer->SetVertexBuffer();
-
-		//Set the index buffer
-		m_indexBuffer->SetIndexBuffer();
-
-		//Set the constant buffer
-		m_constantBuffer->SetConstantBuffer(rootIndex, handle);
-
-		//Draw
-		commandList->DrawIndexedInstanced(m_indices, 1, 0, 0, 0);
+		
 	}
 }
