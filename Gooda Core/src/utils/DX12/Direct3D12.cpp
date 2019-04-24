@@ -389,12 +389,12 @@ namespace GoodaCore
 #if _DEBUG
 		//Get the interface to DirectX 12 debugger
 		ComPtr<ID3D12Debug> debugController = nullptr;
-		//ComPtr<ID3D12Debug1> debugController1 = nullptr;
+		ComPtr<ID3D12Debug1> debugController1 = nullptr;
 		if (SUCCEEDED(D3D12GetDebugInterface(__uuidof(ID3D12Debug), (void**)debugController.GetAddressOf())))
 		{
 			debugController->EnableDebugLayer();
-			/*debugController->QueryInterface(__uuidof(ID3D12Debug1), (void**)& debugController1);
-			debugController1->SetEnableGPUBasedValidation(TRUE);*/
+			debugController->QueryInterface(__uuidof(ID3D12Debug1), (void**)&debugController1);
+			debugController1->SetEnableGPUBasedValidation(TRUE);
 		}
 
 		//Release the debug controller now that the debug layer has been enabled

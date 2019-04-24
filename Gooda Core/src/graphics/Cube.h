@@ -18,7 +18,6 @@ namespace GoodaCore
 		virtual ~Cube() = default;
 
 		virtual bool Init();
-		virtual bool Frame(UINT, XMMATRIX, D3D12_GPU_DESCRIPTOR_HANDLE);
 		virtual bool Destroy();
 
 		ConstantBuffer* GetConstantBuffer();

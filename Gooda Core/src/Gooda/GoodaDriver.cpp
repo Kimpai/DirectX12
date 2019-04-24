@@ -57,10 +57,7 @@ namespace GoodaCore
 	bool GoodaDriver::Frame()
 	{
 		//Update the mouse and keyboard
-		Input::Instance()->Frame();
-
-		//Check if user wan't to exit application
-		if (Input::Instance()->IsKeyPressed(VK_ESCAPE))
+		if (!Input::Instance()->Frame())
 			return false;
 
 		Direct3D12::Instance()->DeviceSynchronize(m_window->GetCurrentFrame());
@@ -71,16 +68,13 @@ namespace GoodaCore
 
 		ShaderManager::Instance()->Frame(m_window->GetCurrentFrame());
 
-		UINT descriptorSize = Direct3D12::Instance()->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-		D3D12_GPU_DESCRIPTOR_HANDLE handle(ShaderManager::Instance()->GetDescriptorHeap(m_window->GetCurrentFrame())->GetGPUDescriptorHandleForHeapStart());
-
 		for (auto model : m_models)
-			model->Frame(m_window->GetCurrentFrame(), m_camera->GetViewMatrix(), handle);
+			model->Frame(m_window->GetCurrentFrame());
 
 		for (auto light : m_lights)
-			light->Frame(m_window->GetCurrentFrame(), handle);
+			light->Frame(m_window->GetCurrentFrame());
 
-		m_camera->Frame(m_window->GetCurrentFrame(), handle);
+		m_camera->Frame(m_window->GetCurrentFrame());
 
 		Renderer::Instance()->Render(m_models);
 
@@ -91,6 +85,9 @@ namespace GoodaCore
 
 	bool GoodaCore::GoodaDriver::Destroy()
 	{
+		Direct3D12::Instance()->DeviceSynchronize(m_window->GetCurrentFrame());
+		Direct3D12::Instance()->FlushCommandQueue(m_window->GetCurrentFrame());
+
 		//Release Gooda objects
 		m_camera->Release();
 

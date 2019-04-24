@@ -27,7 +27,7 @@ namespace GoodaCore
 		Light();
 		virtual ~Light() = default;
 
-		virtual bool Frame(UINT, D3D12_GPU_DESCRIPTOR_HANDLE);
+		virtual bool Frame(UINT);
 		virtual ConstantBuffer* GetConstantBuffer() = 0;
 
 	private:

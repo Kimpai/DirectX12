@@ -13,22 +13,6 @@ namespace GoodaCore
 		return true;
 	}
 
-	bool Terrain::Frame(UINT frameIndex, XMMATRIX viewMatrix, D3D12_GPU_DESCRIPTOR_HANDLE handle)
-	{
-		Model::Frame(frameIndex, viewMatrix, handle);
-
-		//Set the vertex buffer
-		m_vertexBuffer->SetVertexBuffer();
-
-		//Set the index buffer
-		m_indexBuffer->SetIndexBuffer();
-
-		//Set constant buffer
-		m_constantBuffer->SetConstantBuffer(handle);
-
-		return true;
-	}
-
 	bool Terrain::Destroy()
 	{
 		m_vertexBuffer->Release();
@@ -111,6 +95,12 @@ namespace GoodaCore
 	{
 		//Set the primitive topology
 		Direct3D12::Instance()->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		//Set the vertex buffer
+		m_vertexBuffer->SetVertexBuffer();
+
+		//Set the index buffer
+		m_indexBuffer->SetIndexBuffer();
 
 		//Draw
 		Direct3D12::Instance()->GetCommandList()->DrawIndexedInstanced(m_indices, 1, 0, 0, 0);

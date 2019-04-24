@@ -22,7 +22,6 @@ namespace GoodaCore
 		struct ConstantBufferData
 		{
 			XMFLOAT4X4 worldMatrix;
-			XMFLOAT4X4 viewMatrix;
 			XMFLOAT4X4 projectionMatrix;
 
 		} m_constantBufferData;
@@ -33,18 +32,17 @@ namespace GoodaCore
 		virtual ConstantBuffer* GetConstantBuffer() = 0;
 
 		virtual bool Init();
-		virtual bool Frame(UINT, XMMATRIX, D3D12_GPU_DESCRIPTOR_HANDLE);
+		virtual bool Frame(UINT);
 		virtual bool Destroy();
 		virtual void Draw() = 0;
 
 	private:
-		void UpdateMatrices(XMMATRIX viewMatrix);
+		void UpdateMatrices();
 		virtual void BuildWorlViewProjectionMatrix(XMFLOAT3);
 		virtual void InitializeBuffers() = 0;
 
 		XMFLOAT3 m_origin;
 		XMFLOAT4X4 m_worldMatrix;
-		XMFLOAT4X4 m_viewMatrix;
 		XMFLOAT4X4 m_projectionMatrix;
 	};
 }

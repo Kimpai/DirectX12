@@ -6,7 +6,7 @@ namespace GoodaCore
 	{
 	}
 
-	bool Light::Frame(UINT frameIndex, D3D12_GPU_DESCRIPTOR_HANDLE handle)
+	bool Light::Frame(UINT frameIndex)
 	{
 		//Update the constant buffer data
 		m_constantBuffer->UpdateConstantBufferData(frameIndex);

@@ -28,13 +28,6 @@ namespace GoodaCore
 		return true;
 	}
 
-	bool DirectionalLight::Frame(UINT frameIndex, D3D12_GPU_DESCRIPTOR_HANDLE handle) 
-	{
-		Light::Frame(frameIndex, handle);
-
-		return true;
-	}
-
 	bool DirectionalLight::Destroy()
 	{
 		m_constantBuffer->Release();

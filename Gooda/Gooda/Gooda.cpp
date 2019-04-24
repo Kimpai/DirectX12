@@ -28,11 +28,12 @@ LRESULT Gooda::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam
 {
 	switch (umsg)
 	{
-		//Check if a key has been pressed on the keyboard
+	//Check if a key has been pressed on the keyboard
 	case WM_KEYDOWN:
 	{
 		//If a key is pressed send it to input object so it can record that state
 		GoodaCore::Input::Instance()->ProcessKeyboardMessage(umsg, wparam, lparam);
+
 		break;
 	}
 

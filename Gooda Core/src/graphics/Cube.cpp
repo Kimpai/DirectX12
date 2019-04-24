@@ -13,28 +13,6 @@ namespace GoodaCore
 		return true;
 	}
 
-	bool Cube::Frame(UINT frameIndex, XMMATRIX viewMatrix, D3D12_GPU_DESCRIPTOR_HANDLE handle)
-	{
-		Model::Frame(frameIndex, viewMatrix, handle);
-
-		//Set the primitive topology
-		Direct3D12::Instance()->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-		//Set the vertex buffer
-		m_vertexBuffer->SetVertexBuffer();
-
-		//Set the index buffer
-		m_indexBuffer->SetIndexBuffer();
-
-		//Set the constant buffer
-		m_constantBuffer->SetConstantBuffer(handle);
-
-		//Draw
-		Direct3D12::Instance()->GetCommandList()->DrawIndexedInstanced(m_indices, 1, 0, 0, 0);
-
-		return true;
-	}
-
 	bool Cube::Destroy()
 	{
 		m_vertexBuffer->Release();
@@ -143,6 +121,16 @@ namespace GoodaCore
 
 	void Cube::Draw()
 	{
-		
+		//Set the primitive topology
+		Direct3D12::Instance()->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		//Set the vertex buffer
+		m_vertexBuffer->SetVertexBuffer();
+
+		//Set the index buffer
+		m_indexBuffer->SetIndexBuffer();
+
+		//Draw
+		Direct3D12::Instance()->GetCommandList()->DrawIndexedInstanced(m_indices, 1, 0, 0, 0);
 	}
 }

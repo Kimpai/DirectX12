@@ -25,16 +25,17 @@ namespace GoodaCore
 		ConstantBuffer* GetConstanBuffer();
 
 		virtual bool Init();
-		virtual bool Frame(UINT, D3D12_GPU_DESCRIPTOR_HANDLE);
+		virtual bool Frame(UINT);
 		virtual bool Destroy();
 
-		XMMATRIX GetViewMatrix();
-		XMMATRIX GetBaseViewMatrix();
+		XMFLOAT4X4 GetViewMatrix();
+		XMFLOAT4X4 GetBaseViewMatrix();
 
 	private:
 		struct ConstantBufferData
 		{
-			XMFLOAT3 CameraPosition;
+			XMFLOAT4X4 viewMatrix;
+			XMFLOAT3 cameraPosition;
 			float padding = 0.0f;
 
 		} m_constantBufferData;
@@ -50,8 +51,8 @@ namespace GoodaCore
 
 		XMFLOAT3 m_position;
 		XMFLOAT3 m_rotation;
-		XMMATRIX m_viewMatrix;
-		XMMATRIX m_baseViewMatrix;
+		XMFLOAT4X4 m_viewMatrix;
+		XMFLOAT4X4 m_baseViewMatrix;
 
 		float m_forwardSpeed, m_backwardSpeed;
 		float m_rightSpeed, m_leftSpeed;

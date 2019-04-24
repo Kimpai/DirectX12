@@ -11,7 +11,6 @@ namespace GoodaCore
 		virtual ~DirectionalLight() = default;
 
 		virtual bool Init();
-		virtual bool Frame(UINT, D3D12_GPU_DESCRIPTOR_HANDLE);
 		virtual bool Destroy();
 
 		ConstantBuffer* GetConstantBuffer();

@@ -48,11 +48,8 @@ namespace GoodaCore
 		return true;
 	}
 
-	bool Camera::Frame(UINT frameIndex, D3D12_GPU_DESCRIPTOR_HANDLE handle)
+	bool Camera::Frame(UINT frameIndex)
 	{
-		m_constantBufferData.CameraPosition = m_position;
-		m_constantBuffer->UpdateConstantBufferData(frameIndex);
-		
 		Turn();
 
 		MoveForward();
@@ -65,6 +62,13 @@ namespace GoodaCore
 
 		BuildViewMatrix();
 
+		XMMATRIX transposed = XMMatrixTranspose(XMLoadFloat4x4(&m_viewMatrix));
+		XMStoreFloat4x4(&m_viewMatrix, transposed);
+
+		m_constantBufferData.cameraPosition = m_position;
+		m_constantBufferData.viewMatrix = m_viewMatrix;
+		m_constantBuffer->UpdateConstantBufferData(frameIndex);
+
 		return true;
 	}
 
@@ -74,7 +78,7 @@ namespace GoodaCore
 		return true;
 	}
 
-	XMMATRIX Camera::GetViewMatrix()
+	XMFLOAT4X4 Camera::GetViewMatrix()
 	{
 		return m_viewMatrix;
 	}
@@ -128,7 +132,7 @@ namespace GoodaCore
 		lookAtVector = XMVectorAdd(positionVector, lookAtVector);
 
 		//Finally cretae the view matrix from the updated vectors
-		m_baseViewMatrix = XMMatrixLookAtLH(positionVector, lookAtVector, upVector);
+		 XMStoreFloat4x4(&m_baseViewMatrix, XMMatrixLookAtLH(positionVector, lookAtVector, upVector));
 	}
 
 	void Camera::BuildViewMatrix()
@@ -180,10 +184,10 @@ namespace GoodaCore
 		lookAtVector = XMVectorAdd(positionVector, lookAtVector);
 
 		//Finally cretae the view matrix from the updated vectors
-		m_viewMatrix = XMMatrixLookAtLH(positionVector, lookAtVector, upVector);
+		XMStoreFloat4x4(&m_viewMatrix, XMMatrixLookAtLH(positionVector, lookAtVector, upVector));
 	}
 
-	XMMATRIX Camera::GetBaseViewMatrix()
+	XMFLOAT4X4 Camera::GetBaseViewMatrix()
 	{
 		return m_baseViewMatrix;
 	}

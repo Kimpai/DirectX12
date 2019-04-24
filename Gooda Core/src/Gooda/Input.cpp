@@ -82,6 +82,10 @@ namespace GoodaCore
 
 	bool Input::Frame()
 	{
+		//Check if user wan't to exit application
+		if (IsKeyPressed(VK_ESCAPE))
+			return false;
+
 		//Update the keyboard state
 		m_keyboardTracker->Update(m_keyboard->GetState());
 

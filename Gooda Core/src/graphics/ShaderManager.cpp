@@ -25,6 +25,9 @@ namespace GoodaCore
 		ID3D12DescriptorHeap* descriptorHeaps[] = { m_mainDescriptorHeap->GetDescriptorHeap(frameIndex) };
 		Direct3D12::Instance()->GetCommandList()->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
+		D3D12_GPU_DESCRIPTOR_HANDLE handle(ShaderManager::Instance()->GetDescriptorHeap(frameIndex)->GetGPUDescriptorHandleForHeapStart());
+		Direct3D12::Instance()->GetCommandList()->SetGraphicsRootDescriptorTable(0, handle);
+
 		return true;
 	}
 
