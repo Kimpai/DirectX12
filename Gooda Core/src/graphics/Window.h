@@ -13,14 +13,10 @@ namespace GoodaCore
 	class Window : public Gooda
 	{
 	public:
-		Window() = default;
-		virtual ~Window() = default;
-
-		virtual bool Init();
-		virtual bool Destroy();
+		Window();
+		virtual ~Window();
 		virtual bool Frame();
 
-		D3D12_CPU_DESCRIPTOR_HANDLE GetDepthStencilViewHandle();
 		HWND GetWindowHandle();
 
 		bool Present();

@@ -80,7 +80,7 @@ namespace GoodaCore
 			range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 			break;
 		default:
-			assert("Invalid root parameter type");
+			//"Invalid root parameter type"
 			break;
 		}
 

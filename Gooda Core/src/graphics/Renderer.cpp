@@ -36,13 +36,4 @@ namespace GoodaCore
 
 		return true;
 	}
-	bool Renderer::BeginScene(Window* window)
-	{
-		return false;
-	}
-
-	bool Renderer::EndScene(Window* window)
-	{
-		return false;
-	}
 }

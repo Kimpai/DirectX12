@@ -8,12 +8,7 @@ namespace GoodaCore
 		InitializeBuffers();
 	}
 
-	bool Terrain::Init()
-	{
-		return true;
-	}
-
-	bool Terrain::Destroy()
+	Terrain::~Terrain()
 	{
 		m_vertexBuffer->Release();
 		m_indexBuffer->Release();
@@ -30,13 +25,6 @@ namespace GoodaCore
 			delete[] m_heightMap;
 			m_heightMap = nullptr;
 		}
-
-		return true;
-	}
-
-	ConstantBuffer* Terrain::GetConstantBuffer()
-	{
-		return m_constantBuffer;
 	}
 
 	void Terrain::InitializeBuffers()

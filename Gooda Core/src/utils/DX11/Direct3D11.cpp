@@ -20,7 +20,7 @@ namespace GoodaCore
 
 	Direct3D11* Direct3D11::Instance()
 	{
-		Direct3D11 s_direct3D11;
+		static Direct3D11 s_direct3D11;
 		return &s_direct3D11;
 	}
 

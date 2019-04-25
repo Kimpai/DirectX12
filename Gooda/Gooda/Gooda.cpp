@@ -14,16 +14,6 @@ bool Gooda::Frame()
 	return true;
 }
 
-bool Gooda::Init()
-{
-	return true;
-}
-
-bool Gooda::Destroy()
-{
-	return true;
-}
-
 LRESULT Gooda::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam)
 {
 	switch (umsg)

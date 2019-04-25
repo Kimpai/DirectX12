@@ -28,13 +28,11 @@ namespace GoodaCore
 		} m_constantBufferData;
 
 		Model(XMFLOAT3);
-		virtual ~Model() = default;
+		virtual ~Model();
 
 		virtual ConstantBuffer* GetConstantBuffer() = 0;
 
-		virtual bool Init();
 		virtual bool Frame();
-		virtual bool Destroy();
 		virtual void Draw() = 0;
 
 	private:

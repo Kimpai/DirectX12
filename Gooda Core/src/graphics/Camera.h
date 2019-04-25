@@ -15,7 +15,7 @@ namespace GoodaCore
 	{
 	public:
 		Camera();
-		virtual ~Camera() = default;
+		virtual ~Camera();
 
 		void SetPosition(float, float, float);
 		void SetRotation(float, float, float);
@@ -24,9 +24,7 @@ namespace GoodaCore
 		XMFLOAT3 GetRotation();
 		ConstantBuffer* GetConstanBuffer();
 
-		virtual bool Init();
 		virtual bool Frame();
-		virtual bool Destroy();
 
 		XMFLOAT4X4 GetViewMatrix();
 		XMFLOAT4X4 GetBaseViewMatrix();

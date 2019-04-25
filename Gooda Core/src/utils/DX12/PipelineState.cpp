@@ -55,7 +55,7 @@ namespace GoodaCore
 		pipelineStateDesc.NumRenderTargets = 1;
 
 		//Create a pipeline state object
-		assert(!Direct3D12::Instance()->GetDevice()->CreateGraphicsPipelineState(&pipelineStateDesc, __uuidof(ID3D12PipelineState), (void**)& m_pipelineState));
+		Direct3D12::Instance()->GetDevice()->CreateGraphicsPipelineState(&pipelineStateDesc, __uuidof(ID3D12PipelineState), (void**)& m_pipelineState);
 		m_pipelineState->SetName(L"Color PipelineState");
 	}
 
@@ -74,20 +74,31 @@ namespace GoodaCore
 		return m_type;
 	}
 
-	void PipelineState::CompileShader(Shader shader)
+	bool PipelineState::CompileShader(Shader shader)
 	{
+		UINT flags = D3DCOMPILE_OPTIMIZATION_LEVEL0;
+
+#ifdef _DEBUG
+		flags |= D3DCOMPILE_DEBUG;
+#endif // DEBUG
+
 		switch (shader.m_type)
 		{
 		case ShaderType::VS:
-			assert(!D3DCompileFromFile(shader.m_shader, NULL, NULL, "main", "vs_5_0", D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, 0, &m_vertexShader, NULL));
+			if (FAILED(D3DCompileFromFile(shader.m_shader, NULL, NULL, "main", "vs_5_0", flags, 0, &m_vertexShader, NULL)))
+				return false;
+
 			break;
 		case ShaderType::PS:
-			assert(!D3DCompileFromFile(shader.m_shader, NULL, NULL, "main", "ps_5_0", D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, 0, &m_pixelShader, NULL));
+			if (FAILED(D3DCompileFromFile(shader.m_shader, NULL, NULL, "main", "ps_5_0", flags, 0, &m_pixelShader, NULL)))
+				return false;
+
 			break;
 		default:
-			assert("Invalid shader type");
+			//"Invalid shader type"
 			break;
 		}
 
+		return true;
 	}
 }

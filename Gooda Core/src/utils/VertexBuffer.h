@@ -1,6 +1,5 @@
 #pragma once
 
-#include <assert.h>
 #include <Gooda.h>
 
 #include "DX12/Direct3D12.h"

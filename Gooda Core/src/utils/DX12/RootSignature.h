@@ -1,8 +1,8 @@
 #pragma once
-#include <vector>
-#include <assert.h>
-#include "RootParameter.h"
 
+#include <vector>
+
+#include "RootParameter.h"
 #include "Direct3D12.h"
 
 namespace GoodaCore

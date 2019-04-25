@@ -41,7 +41,8 @@ namespace GoodaCore
 		resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 
 		//Create default heap to hold index buffer
-		assert(!Direct3D12::Instance()->GetDevice()->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_COPY_DEST, NULL, __uuidof(ID3D12Resource), (void**)& m_defaultHeap));
+		Direct3D12::Instance()->GetDevice()->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE, &resourceDesc, 
+			D3D12_RESOURCE_STATE_COPY_DEST, NULL, __uuidof(ID3D12Resource), (void**)m_defaultHeap.GetAddressOf());
 
 		//Give the resource a name for debugging purposes
 		m_defaultHeap->SetName(L"Index Buffer Resource Heap");
@@ -65,7 +66,8 @@ namespace GoodaCore
 		resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 
 		//Create upload heap to upload index buffer
-		assert(!Direct3D12::Instance()->GetDevice()->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, NULL, __uuidof(ID3D12Resource), (void**)& m_uploadHeap));
+		Direct3D12::Instance()->GetDevice()->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE, &resourceDesc, 
+			D3D12_RESOURCE_STATE_GENERIC_READ, NULL, __uuidof(ID3D12Resource), (void**)m_uploadHeap.GetAddressOf());
 
 		//Give the index buffer upload heap a name for debugging purposes
 		m_uploadHeap->SetName(L"Index Buffer Upload Resource Heap");
@@ -74,6 +76,7 @@ namespace GoodaCore
 	void IndexBuffer::CopyIndexBufferData()
 	{
 		D3D12_SUBRESOURCE_DATA indexData = {};
+		ZeroMemory(&indexData, sizeof(D3D12_SUBRESOURCE_DATA));
 
 		//Store index buffer in upload heap
 		indexData.pData = m_bufferData;

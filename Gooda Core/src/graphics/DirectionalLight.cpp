@@ -12,6 +12,11 @@ namespace GoodaCore
 		InitializeBuffers();
 	}
 
+	DirectionalLight::~DirectionalLight()
+	{
+		m_constantBuffer->Release();
+	}
+
 	ConstantBuffer* DirectionalLight::GetConstantBuffer()
 	{
 		return m_constantBuffer;
@@ -24,16 +29,5 @@ namespace GoodaCore
 
 		ShaderManager::Instance()->CreateDescriptor(ObjectType::LIGHT, m_constantBuffer);
 
-	}
-
-	bool DirectionalLight::Init()
-	{
-		return true;
-	}
-
-	bool DirectionalLight::Destroy()
-	{
-		m_constantBuffer->Release();
-		return true;
 	}
 }

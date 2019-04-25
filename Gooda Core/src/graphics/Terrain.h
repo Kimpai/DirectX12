@@ -1,16 +1,13 @@
 #pragma once
 
-#include <d3d12.h>
 #include <DirectXMath.h>
 #include <VertexTypes.h>
-#include <wrl.h>
 #include <fstream>
 
 #include "Model.h"
 #include "../utils/DX12/Direct3D12.h"
 
 using namespace DirectX;
-using namespace Microsoft::WRL;
 
 namespace GoodaCore
 {
@@ -18,12 +15,7 @@ namespace GoodaCore
 	{
 	public:
 		Terrain(char*, int, int, float, XMFLOAT3);
-		virtual ~Terrain() = default;
-
-		virtual bool Init();
-		virtual bool Destroy();
-
-		ConstantBuffer* GetConstantBuffer();
+		virtual ~Terrain();
 		virtual void Draw();
 
 	private:

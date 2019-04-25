@@ -7,14 +7,9 @@ namespace GoodaCore
 		BuildWorlViewProjectionMatrix(m_origin);
 	}
 
-	bool Model::Init()
+	Model::~Model()
 	{
-		return true;
-	}
 
-	bool Model::Destroy()
-	{
-		return true;
 	}
 
 	void Model::UpdateMatrices()

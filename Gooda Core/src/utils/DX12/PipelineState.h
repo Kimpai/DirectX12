@@ -1,7 +1,6 @@
 #pragma once
 
 #include <d3dcompiler.h>
-#include <assert.h>
 #include <vector>
 #include <wrl.h>
 
@@ -31,7 +30,7 @@ namespace GoodaCore
 		ShaderPipelineType GetType();
 
 	private:
-		void CompileShader(Shader);
+		bool CompileShader(Shader);
 
 		ComPtr<ID3DBlob> m_vertexShader;
 		ComPtr<ID3DBlob> m_pixelShader;

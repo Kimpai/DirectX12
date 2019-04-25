@@ -15,10 +15,7 @@ namespace GoodaCore
 	{
 	public:
 		Cube(XMFLOAT3, XMFLOAT4);
-		virtual ~Cube() = default;
-
-		virtual bool Init();
-		virtual bool Destroy();
+		virtual ~Cube();
 
 		ConstantBuffer* GetConstantBuffer();
 		XMFLOAT3 GetPosition();

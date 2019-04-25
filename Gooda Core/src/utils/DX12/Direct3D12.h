@@ -7,11 +7,10 @@
 #include <d3d12.h>
 #include <d3dx12.h>
 #include <dxgi1_5.h>
+#include <dxgidebug.h>
 #include <wrl.h>
-#include <assert.h>
 #include <frame.h>
 #include <Gooda.h>
-#include <map>
 
 using namespace Microsoft::WRL;
 
@@ -59,6 +58,7 @@ namespace GoodaCore
 		ComPtr<ID3D12CommandQueue> m_commandQueue;
 		ComPtr<ID3D12Fence> m_fence[frameBufferCount];
 		ComPtr<IDXGIAdapter3> m_adapter;
+		ComPtr<IDXGIDebug> m_dxgiDebug;
 
 		HANDLE m_fenceEvent;
 		UINT64 m_fenceValue[frameBufferCount];

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <assert.h>
 #include <frame.h>
 #include <vector>
 
@@ -29,8 +28,6 @@ namespace GoodaCore
 		Backend GetBackend();
 
 		bool Render(std::vector<Model*>&);
-		bool BeginScene(Window*);
-		bool EndScene(Window*);
 
 	private:
 		Renderer();

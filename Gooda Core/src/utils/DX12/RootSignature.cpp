@@ -14,9 +14,9 @@ namespace GoodaCore
 		rootSignatureDesc.NumStaticSamplers = 0;
 		rootSignatureDesc.pStaticSamplers = samplers;
 
-		assert(!D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &rootsignature, NULL));
+		D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &rootsignature, NULL);
 
-		assert(!Direct3D12::Instance()->GetDevice()->CreateRootSignature(0, rootsignature->GetBufferPointer(), rootsignature->GetBufferSize(), IID_PPV_ARGS(&m_rootSignature)));
+		Direct3D12::Instance()->GetDevice()->CreateRootSignature(0, rootsignature->GetBufferPointer(), rootsignature->GetBufferSize(), __uuidof(ID3D12RootSignature), (void**)m_rootSignature.GetAddressOf());
 
 		m_rootSignature->SetName(L"Root Signature");
 

@@ -8,18 +8,11 @@ namespace GoodaCore
 		InitializeBuffers();
 	}
 
-	bool Cube::Init()
-	{
-		return true;
-	}
-
-	bool Cube::Destroy()
+	Cube::~Cube()
 	{
 		m_vertexBuffer->Release();
 		m_indexBuffer->Release();
 		m_constantBuffer->Release();
-
-		return true;
 	}
 
 	ConstantBuffer* Cube::GetConstantBuffer()

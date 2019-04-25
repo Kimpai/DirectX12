@@ -18,7 +18,8 @@ namespace GoodaCore
 
 		//Redirect unbuffered STDOUT to the console
 		m_stdOutputHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-		assert(m_stdOutputHandle);
+		if (!m_stdOutputHandle)
+			return false;
 
 		freopen_s(&fp, "CONOUT$", "w", stdout);
 		setvbuf(stdout, NULL, _IONBF, 0);
@@ -100,6 +101,6 @@ namespace GoodaCore
 
 		FlushConsoleInputBuffer(m_stdInputHandle);
 
-		return false;
+		return true;
 	}
 }

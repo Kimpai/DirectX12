@@ -43,8 +43,8 @@ namespace GoodaCore
 		//Create default heap
 		//default heap is memory on the GPU. Only GPU have access to this memory
 		//To get data into this heap upload the data using an upload heap
-		assert(!Direct3D12::Instance()->GetDevice()->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE,
-			&resourceDesc, D3D12_RESOURCE_STATE_COPY_DEST, NULL, __uuidof(ID3D12Resource), (void**)& m_defaultHeap));
+		Direct3D12::Instance()->GetDevice()->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE,
+			&resourceDesc, D3D12_RESOURCE_STATE_COPY_DEST, NULL, __uuidof(ID3D12Resource), (void**)m_defaultHeap.GetAddressOf());
 
 		//Give resource heaps a name so when debugging with the graphics debugger
 		//we know what we are looking at
@@ -70,8 +70,8 @@ namespace GoodaCore
 
 		//Create the upload heap
 		//Upload heaps are used to upload data to the GPU. CPU can write to it, GPU can read from it
-		assert(!Direct3D12::Instance()->GetDevice()->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE,
-			&resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, NULL, __uuidof(ID3D12Resource), (void**)& m_uploadHeap));
+		Direct3D12::Instance()->GetDevice()->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE,
+			&resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, NULL, __uuidof(ID3D12Resource), (void**)m_uploadHeap.GetAddressOf());
 
 		//Give vertex buffer upload heap a name for debugging purposes
 		m_uploadHeap->SetName(L"Vertex Buffer Upload Resource Heap");
@@ -80,6 +80,7 @@ namespace GoodaCore
 	void VertexBuffer::CopyVertexBufferData()
 	{
 		D3D12_SUBRESOURCE_DATA vertexData = {};
+		ZeroMemory(&vertexData, sizeof(D3D12_SUBRESOURCE_DATA));
 
 		//Store vertex buffer in upload heap
 		vertexData.pData = m_bufferData;

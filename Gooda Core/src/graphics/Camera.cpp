@@ -20,6 +20,11 @@ namespace GoodaCore
 		ShaderManager::Instance()->CreateDescriptor(ObjectType::CAMERA, m_constantBuffer);
 	}
 
+	Camera::~Camera()
+	{
+		m_constantBuffer->Release();
+	}
+
 	void Camera::SetPosition(float x, float y, float z)
 	{
 		m_position = XMFLOAT3(x, y, z);
@@ -38,16 +43,6 @@ namespace GoodaCore
 	XMFLOAT3 Camera::GetRotation()
 	{
 		return m_rotation;
-	}
-
-	ConstantBuffer* Camera::GetConstanBuffer()
-	{
-		return m_constantBuffer;
-	}
-
-	bool Camera::Init()
-	{
-		return true;
 	}
 
 	bool Camera::Frame()
@@ -73,12 +68,6 @@ namespace GoodaCore
 		m_constantBufferData.viewMatrix = m_viewMatrix;
 		m_constantBuffer->UpdateConstantBufferData(frameIndex);
 
-		return true;
-	}
-
-	bool Camera::Destroy()
-	{
-		m_constantBuffer->Release();
 		return true;
 	}
 

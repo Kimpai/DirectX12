@@ -11,6 +11,7 @@
 #include "../graphics/Cube.h"
 #include "../graphics/Renderer.h"
 #include "../graphics/DirectionalLight.h"
+#include "Console.h"
 
 namespace GoodaCore
 {

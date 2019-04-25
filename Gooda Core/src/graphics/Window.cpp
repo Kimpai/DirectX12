@@ -2,10 +2,10 @@
 
 namespace GoodaCore
 {
-	bool Window::Init() 
+	Window::Window()
 	{
 		m_name = "Game Window";
-		
+
 		UINT screenHeight, screenWidth;
 		FLOAT screenNear, screenDepth;
 
@@ -111,11 +111,9 @@ namespace GoodaCore
 		Direct3D12::Instance()->CreateDepthStencil(depthStencilDesc, m_resources.m_depthStencilBuffer.GetAddressOf(), m_resources.m_depthStencilDescHeap.GetAddressOf());
 
 		CreateViewPortAndScissorRect(screenWidth, screenHeight, screenNear, screenDepth);
-
-		return true;
 	}
 
-	bool Window::Destroy()
+	Window::~Window()
 	{
 		//Show the mouse cursor
 		ShowCursor(true);
@@ -132,13 +130,12 @@ namespace GoodaCore
 
 		//Remove the application instance
 		UnregisterClassA(m_name, m_hinstance);
+
 		m_hinstance = NULL;
 
 		//Before shutting down set to windowed mode or when you release the swap chain it will throw an exception
 		if (m_swapChain)
 			m_swapChain->SetFullscreenState(false, nullptr);
-
-		return true;
 	}
 
 	bool Window::Frame()
@@ -195,11 +192,6 @@ namespace GoodaCore
 		return true;
 	}
 
-	D3D12_CPU_DESCRIPTOR_HANDLE Window::GetDepthStencilViewHandle()
-	{
-		return D3D12_CPU_DESCRIPTOR_HANDLE(m_resources.m_depthStencilDescHeap->GetCPUDescriptorHandleForHeapStart());
-	}
-
 	HWND Window::GetWindowHandle()
 	{
 		return m_windowHandle;
@@ -225,12 +217,14 @@ namespace GoodaCore
 		if (m_vsync)
 		{
 			//Lock to screen refresh rate.
-			assert(!m_swapChain->Present(1, 0));
+			if (FAILED(m_swapChain->Present(1, 0)))
+				return false;
 		}
 		else
 		{
 			//Present as fast as possible.
-			assert(!m_swapChain->Present(0, 0));
+			if (FAILED(m_swapChain->Present(0, 0)))
+				return false;
 		}
 
 		return true;

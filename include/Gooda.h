@@ -13,8 +13,6 @@ public:
 	virtual ~Gooda() = default;
 
 	virtual bool Frame();
-	virtual bool Init();
-	virtual bool Destroy();
 	void Release();
 
 	static LRESULT CALLBACK MessageHandler(HWND, UINT, WPARAM, LPARAM);
