@@ -4,8 +4,8 @@
 
 #include <DirectXMath.h>
 #include <frame.h>
-#include <vector>
 #include <Gooda.h>
+#include <map>
 
 #include "DX12/PipelineState.h"
 #include "ConstantBuffer.h"
@@ -17,6 +17,8 @@ using namespace DirectX;
 
 namespace GoodaCore
 {
+	enum class ObjectType { MODEL, LIGHT, CAMERA };
+
 	class ShaderManager : public Gooda
 	{
 	public:
@@ -32,19 +34,21 @@ namespace GoodaCore
 		ID3D12RootSignature* GetRootSignature();
 		ID3D12DescriptorHeap* GetDescriptorHeap(UINT);
 
-		void CreateDescriptor(ConstantBuffer* constantBuffer);
+		void CreateDescriptor(ObjectType, ConstantBuffer*);
+		
+
+	private:
+		ShaderManager();
+
 		void CreatePipelineState(std::vector<Shader>, ShaderPipelineType);
 		void CreateRootSignature();
 		void CreateRootDescriptorTable();
 		void CreateRootDescriptorHeap();
 
-	private:
-		ShaderManager();
-
 		DescriptorHeap* m_mainDescriptorHeap;
 		RootSignature* m_rootSignature;
 		std::vector<RootParameter*> m_rootParameters;
-		std::vector<ConstantBuffer*> m_constantBuffers;
+		std::map<ObjectType, ConstantBuffer*> m_constantBuffers;
 		std::vector<PipelineState*> m_pipelines;
 	};
 }

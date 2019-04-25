@@ -77,6 +77,9 @@ namespace GoodaCore
 		//Create a constant buffer for the world, view and projection matrices
 		m_constantBuffer = new ConstantBuffer(&m_constantBufferData, sizeof(ConstantBufferData));
 
+		ShaderManager::Instance()->CreateDescriptor(ObjectType::MODEL, m_constantBuffer);
+
+
 		//Release the vertex and index array now that we are done with them
 		if (vertices)
 		{

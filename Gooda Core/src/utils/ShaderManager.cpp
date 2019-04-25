@@ -14,6 +14,10 @@ namespace GoodaCore
 
 	bool ShaderManager::Init()
 	{
+		CreateRootSignature();
+		CreatePipelineState({ { ShaderType::VS, L"shaders/ColorVertexShader.hlsl" }, { ShaderType::PS, L"shaders/ColorPixelShader.hlsl" } },
+			ShaderPipelineType::COLOR);
+
 		return true;
 	}
 
@@ -49,9 +53,7 @@ namespace GoodaCore
 		if (m_rootSignature)
 			delete m_rootSignature;
 
-		for (auto buffer : m_constantBuffers)
-			if (buffer)
-				delete buffer;
+		m_constantBuffers.clear();
 
 		return true;
 	}
@@ -61,9 +63,10 @@ namespace GoodaCore
 		return m_rootSignature->GetRootSignature();
 	}
 
-	void ShaderManager::CreateDescriptor(ConstantBuffer * constantBuffer)
+	void ShaderManager::CreateDescriptor(ObjectType type, ConstantBuffer* constantBuffer)
 	{
-		m_constantBuffers.push_back(constantBuffer);
+		if (m_constantBuffers.count(type) == 0)
+			m_constantBuffers[type] = constantBuffer;
 	}
 
 	void ShaderManager::CreatePipelineState(std::vector<Shader> shaders, ShaderPipelineType type)
@@ -104,7 +107,9 @@ namespace GoodaCore
 	{
 		m_mainDescriptorHeap = new DescriptorHeap((UINT)m_constantBuffers.size(), true, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-		for (int j = 0; j < m_constantBuffers.size(); j++)
-			m_mainDescriptorHeap->AppendDescriptorToHeap(m_constantBuffers[j]->GetConstantBufferViewDesc(0));
+		std::map<ObjectType, ConstantBuffer*>::iterator it;
+
+		for (it = m_constantBuffers.begin(); it !=  m_constantBuffers.end(); it++)
+			m_mainDescriptorHeap->AppendDescriptorToHeap(it->second->GetConstantBufferViewDesc(0));
 	}
 }

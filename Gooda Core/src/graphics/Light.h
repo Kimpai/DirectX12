@@ -3,6 +3,7 @@
 #include <DirectXMath.h>
 #include <Gooda.h>
 
+#include "../utils/ShaderManager.h"
 #include "../utils/ConstantBuffer.h"
 
 using namespace DirectX;

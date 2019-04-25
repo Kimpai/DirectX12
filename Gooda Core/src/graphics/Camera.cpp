@@ -16,6 +16,8 @@ namespace GoodaCore
 		m_mouse.y = Input::Instance()->GetMousePosition().y;
 
 		m_constantBuffer = new ConstantBuffer(&m_constantBufferData, sizeof(ConstantBufferData));
+
+		ShaderManager::Instance()->CreateDescriptor(ObjectType::CAMERA, m_constantBuffer);
 	}
 
 	void Camera::SetPosition(float x, float y, float z)

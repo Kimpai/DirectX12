@@ -21,6 +21,9 @@ namespace GoodaCore
 	{
 		//Create a constant buffer for this directional light
 		m_constantBuffer = new ConstantBuffer(&m_constantBufferData, sizeof(ConstantBufferData));
+
+		ShaderManager::Instance()->CreateDescriptor(ObjectType::LIGHT, m_constantBuffer);
+
 	}
 
 	bool DirectionalLight::Init()

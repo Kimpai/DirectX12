@@ -7,9 +7,9 @@ namespace GoodaCore
 		
 	}
 
-	bool Renderer::Init()
+	bool Renderer::Init(Backend backend)
 	{
-		m_backend = Backend::DX12;
+		m_backend = backend;
 		return true;
 	}
 

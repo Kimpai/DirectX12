@@ -22,7 +22,7 @@ namespace GoodaCore
 	public:
 		virtual ~Renderer() = default;
 
-		virtual bool Init();
+		virtual bool Init(Backend);
 		virtual bool Destroy();
 
 		static Renderer* Instance();
