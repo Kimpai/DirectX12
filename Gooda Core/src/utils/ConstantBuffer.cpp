@@ -2,15 +2,10 @@
 
 namespace GoodaCore
 {
-	ConstantBuffer::ConstantBuffer(const void* bufferData, int size) : m_bufferData(bufferData), m_size(size)
+	ConstantBuffer::ConstantBuffer(const void* bufferData, UINT size) : m_bufferData(bufferData), m_size(size)
 	{
 		CreateUploadHeap();
 		CreateConstantBufferViewDesc();
-	}
-
-	void ConstantBuffer::SetConstantBuffer(D3D12_GPU_DESCRIPTOR_HANDLE handle)
-	{
-		Direct3D12::Instance()->GetCommandList()->SetGraphicsRootDescriptorTable(0, handle);
 	}
 
 	void ConstantBuffer::UpdateConstantBufferData(UINT currentFrame)

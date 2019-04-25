@@ -20,34 +20,29 @@ namespace GoodaCore
 		virtual bool Destroy();
 		virtual bool Frame();
 
-		UINT GetCurrentFrame();
 		D3D12_CPU_DESCRIPTOR_HANDLE GetDepthStencilViewHandle();
 		HWND GetWindowHandle();
 
 		bool Present();
 
 	protected:
-		struct Direct3D
+		struct Resources
 		{
 			ComPtr<ID3D12Resource> m_depthStencilBuffer;
 			ComPtr<ID3D12DescriptorHeap> m_depthStencilDescHeap;
 			ComPtr<ID3D12DescriptorHeap> m_renderTargetViewDescHeap;
 			ComPtr<ID3D12Resource> m_backBufferRenderTargetView[frameBufferCount];
 
-		} m_direct3D;
+		} m_resources;
 
 	private:
 		bool CreateViewPortAndScissorRect(UINT, UINT, FLOAT, FLOAT);
 
-		ComPtr<IDXGIOutput3> m_outputMonitor;
 		ComPtr<IDXGISwapChain3> m_swapChain;
-
 		D3D12_VIEWPORT m_viewport;
 		D3D12_RECT m_rect;
 		HINSTANCE m_hinstance;
 		HWND m_windowHandle;
-		UINT m_bufferIndex;
-		UINT m_frameIndex;
 		LPCSTR m_name;
 	};
 	

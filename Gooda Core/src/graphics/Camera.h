@@ -5,7 +5,7 @@
 #include <Gooda.h>
 
 #include "../Gooda/Input.h"
-#include "../utils/ConstantBuffer.h"
+#include "../utils/ShaderManager.h"
 
 using namespace DirectX;
 
@@ -25,7 +25,7 @@ namespace GoodaCore
 		ConstantBuffer* GetConstanBuffer();
 
 		virtual bool Init();
-		virtual bool Frame(UINT);
+		virtual bool Frame();
 		virtual bool Destroy();
 
 		XMFLOAT4X4 GetViewMatrix();

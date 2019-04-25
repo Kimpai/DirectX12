@@ -7,7 +7,7 @@
 
 #include "../graphics/Window.h"
 #include "../graphics/Camera.h"
-#include "../graphics/ShaderManager.h"
+#include "../utils/ShaderManager.h"
 #include "../graphics/Cube.h"
 #include "../graphics/Renderer.h"
 #include "../graphics/DirectionalLight.h"

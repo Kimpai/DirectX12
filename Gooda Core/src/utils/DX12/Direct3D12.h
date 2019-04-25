@@ -11,6 +11,7 @@
 #include <assert.h>
 #include <frame.h>
 #include <Gooda.h>
+#include <map>
 
 using namespace Microsoft::WRL;
 
@@ -25,21 +26,25 @@ namespace GoodaCore
 		virtual bool Init();
 		virtual bool Destroy();
 
-		bool CreateSwapChainAndDisplayInterface(IDXGISwapChain3**, IDXGIOutput3**,
-			UINT, UINT, HWND);
-		bool CreateRenderTargets(ID3D12Resource**, ID3D12DescriptorHeap**);
-		bool CreateBackBufferRenderTarget(IDXGISwapChain3*, ID3D12Resource**, ID3D12DescriptorHeap**);
+		bool BeginFrame();
+		bool EndFrame();
+
+		bool CreateSwapChainForHWND(UINT, UINT, HWND, IDXGISwapChain3**);
+
+		bool CreateRenderTargets(IDXGISwapChain3*, ID3D12Resource**, ID3D12DescriptorHeap**);
+		bool CreateBackBufferRenderTarget(IDXGISwapChain3*, ID3D12Resource**, ID3D12DescriptorHeap**, HWND);
 		bool CreateDepthStencil(D3D12_DEPTH_STENCIL_DESC&, ID3D12Resource**, ID3D12DescriptorHeap**);
 
 		bool CloseCommandList();
-		bool ResetCommandList(UINT);
-		bool ExecuteCommandList(UINT);
+		bool ResetCommandList();
+		bool ExecuteCommandList();
 
-		bool DeviceSynchronize(UINT);
-		bool FlushCommandQueue(UINT);
+		bool DeviceSynchronize();
+		bool FlushCommandQueue();
 
 		ID3D12Device* GetDevice();
 		ID3D12GraphicsCommandList* GetCommandList();
+		UINT GetCurrentFrame();
 
 	private:
 		Direct3D12();
@@ -48,15 +53,15 @@ namespace GoodaCore
 		bool CreateCommandInterface();
 		bool CreateFenceAndEventHandle();
 
-	private:
 		ComPtr<ID3D12Device> m_device;
 		ComPtr<ID3D12CommandAllocator> m_commandAllocator[frameBufferCount];
 		ComPtr<ID3D12GraphicsCommandList> m_commandList;
 		ComPtr<ID3D12CommandQueue> m_commandQueue;
 		ComPtr<ID3D12Fence> m_fence[frameBufferCount];
-		ComPtr<IDXGIAdapter3> m_GPUAdapter;
+		ComPtr<IDXGIAdapter3> m_adapter;
 
 		HANDLE m_fenceEvent;
 		UINT64 m_fenceValue[frameBufferCount];
+		UINT m_frameIndex;
 	};
 }

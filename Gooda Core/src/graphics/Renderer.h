@@ -2,12 +2,12 @@
 
 #include <assert.h>
 #include <frame.h>
-#include <memory>
+#include <vector>
 
 #include "Window.h"
 #include "Model.h"
 #include "Light.h"
-#include "ShaderManager.h"
+#include "../utils/ShaderManager.h"
 #include "../utils/DX11/Direct3D11.h"
 #include "../utils/DX12/Direct3D12.h"
 

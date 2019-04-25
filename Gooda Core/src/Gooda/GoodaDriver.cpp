@@ -49,44 +49,43 @@ namespace GoodaCore
 		Direct3D12::Instance()->CloseCommandList();
 
 		//Execute the command list
-		Direct3D12::Instance()->ExecuteCommandList(m_window->GetCurrentFrame());
+		Direct3D12::Instance()->ExecuteCommandList();
 
 		return true;
 	}
 
 	bool GoodaDriver::Frame()
 	{
+		Direct3D12::Instance()->BeginFrame();
+
 		//Update the mouse and keyboard
 		if (!Input::Instance()->Frame())
 			return false;
 
-		Direct3D12::Instance()->DeviceSynchronize(m_window->GetCurrentFrame());
-
-		Direct3D12::Instance()->ResetCommandList(m_window->GetCurrentFrame());
-
 		m_window->Frame();
 
-		ShaderManager::Instance()->Frame(m_window->GetCurrentFrame());
+		ShaderManager::Instance()->Frame();
 
 		for (auto model : m_models)
-			model->Frame(m_window->GetCurrentFrame());
+			model->Frame();
 
 		for (auto light : m_lights)
-			light->Frame(m_window->GetCurrentFrame());
+			light->Frame();
 
-		m_camera->Frame(m_window->GetCurrentFrame());
+		m_camera->Frame();
 
 		Renderer::Instance()->Render(m_models);
 
 		m_window->Present();
+
+		Direct3D12::Instance()->EndFrame();
 
 		return true;
 	}
 
 	bool GoodaCore::GoodaDriver::Destroy()
 	{
-		Direct3D12::Instance()->DeviceSynchronize(m_window->GetCurrentFrame());
-		Direct3D12::Instance()->FlushCommandQueue(m_window->GetCurrentFrame());
+		Direct3D12::Instance()->FlushCommandQueue();
 
 		//Release Gooda objects
 		m_camera->Release();

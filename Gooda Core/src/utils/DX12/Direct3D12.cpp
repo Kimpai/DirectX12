@@ -48,20 +48,19 @@ namespace GoodaCore
 		//Create a basic command list.
 		assert(!m_device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_commandAllocator[0].Get(), NULL, __uuidof(ID3D12GraphicsCommandList), (void**)& m_commandList));
 
+		m_frameIndex = 0;
+
 		return true;
 	}
 
-	bool Direct3D12::CreateSwapChainAndDisplayInterface(IDXGISwapChain3** swapChain3, IDXGIOutput3** outputMonitor,
-		UINT screenWidth, UINT screenHeight, HWND hwnd)
+	bool Direct3D12::CreateSwapChainForHWND(UINT screenWidth, UINT screenHeight, HWND hwnd, IDXGISwapChain3** swapChain3)
 	{
 		//Enumerate the primary monitor
 		IDXGIOutput* output = nullptr;
-		assert(!m_GPUAdapter->EnumOutputs(0, &output));
-		output->QueryInterface(__uuidof(IDXGIOutput3), (void**)&*outputMonitor);
+		assert(!m_adapter->EnumOutputs(0, &output));
 
 		//Get the number of modes
 		unsigned int numModes = 0;
-
 
 		assert(!output->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numModes, nullptr));
 
@@ -94,7 +93,7 @@ namespace GoodaCore
 
 		//Get the adapter desc
 		DXGI_ADAPTER_DESC adapterDesc = {};
-		assert(!m_GPUAdapter->GetDesc(&adapterDesc));
+		assert(!m_adapter->GetDesc(&adapterDesc));
 
 		//Store the dedicated video card memory in megabytes
 		unsigned long long videoCardMemory = 0;
@@ -161,23 +160,23 @@ namespace GoodaCore
 
 		//Finally create the swap chain using the swap chain description.	
 		IDXGIFactory5* factory = nullptr;
-		m_GPUAdapter->GetParent(__uuidof(IDXGIFactory5), (void**)& factory);
+		m_adapter->GetParent(__uuidof(IDXGIFactory5), (void**)& factory);
 
 		assert(!factory->CreateSwapChain(m_commandQueue.Get(), &swapChainDesc, &swapChain));
 
 		//Next upgrade the IDXGISwapChain to a IDXGISwapChain3 interface and store it in a private member variable named m_swapChain.
 		//This will allow us to use the newer functionality such as getting the current back buffer index.
-		assert(!swapChain->QueryInterface(__uuidof(IDXGISwapChain3), (void**)&*swapChain3));
+		assert(!swapChain->QueryInterface(__uuidof(IDXGISwapChain3), (void**)swapChain3));
 
 		return true;
 	}
 
-	bool Direct3D12::CreateRenderTargets(ID3D12Resource** renderTargetView, ID3D12DescriptorHeap** descriptorHeap)
+	bool Direct3D12::CreateRenderTargets(IDXGISwapChain3* swapChain3, ID3D12Resource** renderTargetView, ID3D12DescriptorHeap** descriptorHeap)
 	{
 		return true;
 	}
 
-	bool Direct3D12::CreateBackBufferRenderTarget(IDXGISwapChain3* swapChain, ID3D12Resource** renderTargetView, ID3D12DescriptorHeap** descriptorHeap)
+	bool Direct3D12::CreateBackBufferRenderTarget(IDXGISwapChain3* swapChain3, ID3D12Resource** renderTargetView, ID3D12DescriptorHeap** descriptorHeap, HWND hwnd)
 	{
 		unsigned int renderTargetViewDescriptorSize;
 		D3D12_DESCRIPTOR_HEAP_DESC renderTargetViewHeapDesc = {};
@@ -203,7 +202,7 @@ namespace GoodaCore
 		for (int i = 0; i < frameBufferCount; i++)
 		{
 			//Get a pointer to the back buffer from the swap chain.
-			assert(!swapChain->GetBuffer(i, __uuidof(ID3D12Resource), (void**)&renderTargetView[i]));
+			assert(!swapChain3->GetBuffer(i, __uuidof(ID3D12Resource), (void**)&renderTargetView[i]));
 
 			//Create a render target view for the back buffer.
 			m_device->CreateRenderTargetView(renderTargetView[i], NULL, renderTargetViewHandle);
@@ -217,40 +216,26 @@ namespace GoodaCore
 
 	bool Direct3D12::CreateDepthStencil(D3D12_DEPTH_STENCIL_DESC& depthStencilDesc, ID3D12Resource** depthStencilBuffer, ID3D12DescriptorHeap** depthStencilDescHeap)
 	{
-		//Fill out a depth stencil desc structure
-		depthStencilDesc.DepthEnable = TRUE;
-		depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-		depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
-		depthStencilDesc.StencilEnable = FALSE;
-		depthStencilDesc.StencilReadMask = D3D12_DEFAULT_STENCIL_READ_MASK;
-		depthStencilDesc.StencilWriteMask = D3D12_DEFAULT_STENCIL_WRITE_MASK;
-
-		//Fill out a stencil operation structure
-		D3D12_DEPTH_STENCILOP_DESC depthStencilOPDesc = {};
-		depthStencilOPDesc.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
-		depthStencilOPDesc.StencilPassOp = D3D12_STENCIL_OP_KEEP;
-		depthStencilOPDesc.StencilFailOp = D3D12_STENCIL_OP_KEEP;
-		depthStencilOPDesc.StencilFunc = D3D12_COMPARISON_FUNC_ALWAYS;
-
-		depthStencilDesc.FrontFace = depthStencilOPDesc;
-		depthStencilDesc.BackFace = depthStencilOPDesc;
-
 		//Create a depth stencil descriptor heap so we can get a pointer to the depth stencil buffer
 		D3D12_DESCRIPTOR_HEAP_DESC depthStencilViewHeapDesc = {};
 		depthStencilViewHeapDesc.NumDescriptors = 1;
 		depthStencilViewHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
 		depthStencilViewHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 
-		assert(!m_device->CreateDescriptorHeap(&depthStencilViewHeapDesc, __uuidof(ID3D12DescriptorHeap), (void**)&*depthStencilDescHeap));
+		assert(!m_device->CreateDescriptorHeap(&depthStencilViewHeapDesc, __uuidof(ID3D12DescriptorHeap), (void**)depthStencilDescHeap));
 
 		//Fill out a depth stencil desc structure
 		D3D12_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc = {};
+		ZeroMemory(&depthStencilViewDesc, sizeof(D3D12_DEPTH_STENCIL_VIEW_DESC));
+
 		depthStencilViewDesc.Format = DXGI_FORMAT_D32_FLOAT;
 		depthStencilViewDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
 		depthStencilViewDesc.Flags = D3D12_DSV_FLAG_NONE;
 
 		//Fil out a depth clear value sturcture
 		D3D12_CLEAR_VALUE depthOptimizedClearValue = {};
+		ZeroMemory(&depthOptimizedClearValue, sizeof(D3D12_CLEAR_VALUE));
+
 		depthOptimizedClearValue.Format = DXGI_FORMAT_D32_FLOAT;
 		depthOptimizedClearValue.DepthStencil.Depth = 1.0f;
 		depthOptimizedClearValue.DepthStencil.Stencil = 0;
@@ -264,7 +249,7 @@ namespace GoodaCore
 		ZeroMemory(&resourceDesc, sizeof(resourceDesc));
 		resourceDesc.Alignment = 0;
 		resourceDesc.DepthOrArraySize = 1;
-		resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL | D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE;
+		resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
 		resourceDesc.Format = DXGI_FORMAT_D32_FLOAT;
 		resourceDesc.Height = m_screenHeight;
 		resourceDesc.Width = m_screenWidth;
@@ -275,7 +260,7 @@ namespace GoodaCore
 		resourceDesc.SampleDesc.Quality = 0;
 
 		assert(!m_device->CreateCommittedResource(&properties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE,
-			&depthOptimizedClearValue, __uuidof(ID3D12Resource), (void**)&* depthStencilBuffer));
+			&depthOptimizedClearValue, __uuidof(ID3D12Resource), (void**)depthStencilBuffer));
 
 		//Give the resource a name for debugging purposes
 		depthStencilDescHeap[0]->SetName(L"Depth/Stencil Resource Heap");
@@ -293,15 +278,19 @@ namespace GoodaCore
 		return true;
 	}
 
-	bool Direct3D12::ResetCommandList(UINT frameIndex)
+	bool Direct3D12::ResetCommandList()
 	{
-		assert(!m_commandAllocator[frameIndex]->Reset());
-		assert(!m_commandList->Reset(m_commandAllocator[frameIndex].Get(), nullptr));
+		m_frameIndex++;
+		if (m_frameIndex > (frameBufferCount - 1))
+			m_frameIndex = 0;
+
+		assert(!m_commandAllocator[m_frameIndex]->Reset());
+		assert(!m_commandList->Reset(m_commandAllocator[m_frameIndex].Get(), nullptr));
 
 		return true;
 	}
 
-	bool Direct3D12::ExecuteCommandList(UINT frameIndex)
+	bool Direct3D12::ExecuteCommandList()
 	{
 		ID3D12CommandList* ppCommandLists[] = { m_commandList.Get() };
 
@@ -312,44 +301,46 @@ namespace GoodaCore
 		m_commandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
 
 		//Signal and increment the fence value.
-		m_fenceValue[frameIndex]++;
-		assert(!m_commandQueue->Signal(m_fence[frameIndex].Get(), m_fenceValue[frameIndex]));
+		m_fenceValue[m_frameIndex]++;
+		assert(!m_commandQueue->Signal(m_fence[m_frameIndex].Get(), m_fenceValue[m_frameIndex]));
 
 		return true;
 	}
 
-	bool Direct3D12::DeviceSynchronize(UINT frameIndex)
+	bool Direct3D12::DeviceSynchronize()
 	{
 		//If the current fence value is still less than the "m_fenceValue", then GPU has not finished
 		//the command queue since it has not reached the "m_commandQueue->Signal" command
-		if (m_fence[frameIndex]->GetCompletedValue() < m_fenceValue[frameIndex])
+		if (m_fence[m_frameIndex]->GetCompletedValue() < m_fenceValue[m_frameIndex])
 		{
-			assert(!m_fence[frameIndex]->SetEventOnCompletion(m_fenceValue[frameIndex], m_fenceEvent));
+			assert(!m_fence[m_frameIndex]->SetEventOnCompletion(m_fenceValue[m_frameIndex], m_fenceEvent));
 
 			//Wait until the fence has triggered the correct fence event
 			WaitForSingleObject(m_fenceEvent, INFINITE);
 		}
 
 		//Increment m_fenceValue for next frame
-		m_fenceValue[frameIndex]++;
+		m_fenceValue[m_frameIndex]++;
 
 		return true;
 	}
 
-	bool Direct3D12::FlushCommandQueue(UINT frameIndex)
+	bool Direct3D12::FlushCommandQueue()
 	{
-		//Signal and increment the fence value one last time to flush the command queue
-		m_fenceValue[frameIndex]++;
-		assert(!m_commandQueue->Signal(m_fence[frameIndex].Get(), m_fenceValue[frameIndex]));
-
-		if (m_fence[frameIndex]->GetCompletedValue() < m_fenceValue[frameIndex])
+		for (UINT i = 0; i < frameBufferCount; i++)
 		{
-			assert(!m_fence[frameIndex]->SetEventOnCompletion(m_fenceValue[frameIndex], m_fenceEvent));
+			//Signal and increment the fence value one last time to flush the command queue
+			m_fenceValue[i]++;
+			assert(!m_commandQueue->Signal(m_fence[i].Get(), m_fenceValue[i]));
 
-			//Wait until the fence has triggered the event
-			WaitForSingleObject(m_fenceEvent, INFINITE);
+			if (m_fence[i]->GetCompletedValue() < m_fenceValue[i])
+			{
+				assert(!m_fence[i]->SetEventOnCompletion(m_fenceValue[i], m_fenceEvent));
+
+				//Wait until the fence has triggered the event
+				WaitForSingleObject(m_fenceEvent, INFINITE);
+			}
 		}
-
 		return true;
 	}
 
@@ -365,11 +356,44 @@ namespace GoodaCore
 		CreateCommandInterface();
 		CreateFenceAndEventHandle();
 
+		m_frameIndex = 0;
+
 		return true;
 	}
 
 	bool Direct3D12::Destroy()
 	{
+		return true;
+	}
+
+	bool Direct3D12::BeginFrame()
+	{
+		DeviceSynchronize();
+		ResetCommandList();
+
+		return true;
+	}
+
+	bool Direct3D12::EndFrame()
+	{
+		switch (m_frameIndex)
+		{
+		case 0:
+			m_frameIndex++;
+			break;
+
+		case 1:
+			m_frameIndex++;
+			break;
+
+		case frameBufferCount - 1:
+			m_frameIndex = 0;
+			break;
+
+		default:
+			break;
+		}
+
 		return true;
 	}
 
@@ -383,22 +407,27 @@ namespace GoodaCore
 		return m_commandList.Get();
 	}
 
+	UINT Direct3D12::GetCurrentFrame()
+	{
+		return m_frameIndex;
+	}
+
 	bool Direct3D12::CreateDirect3DDevice()
 	{
 
 #if _DEBUG
 		//Get the interface to DirectX 12 debugger
-		ComPtr<ID3D12Debug> debugController = nullptr;
-		ComPtr<ID3D12Debug1> debugController1 = nullptr;
-		if (SUCCEEDED(D3D12GetDebugInterface(__uuidof(ID3D12Debug), (void**)debugController.GetAddressOf())))
+		ID3D12Debug* debugController = nullptr;
+		ID3D12Debug1* debugController1 = nullptr;
+		if (SUCCEEDED(D3D12GetDebugInterface(__uuidof(ID3D12Debug), (void**)&debugController)))
 		{
-			debugController->EnableDebugLayer();
 			debugController->QueryInterface(__uuidof(ID3D12Debug1), (void**)&debugController1);
+			debugController1->EnableDebugLayer();
 			debugController1->SetEnableGPUBasedValidation(TRUE);
-		}
 
-		//Release the debug controller now that the debug layer has been enabled
-		debugController = nullptr;
+			debugController->Release();
+			debugController1->Release();
+		}
 #endif
 
 		//Create temporary factory to use when creating Device
@@ -427,10 +456,10 @@ namespace GoodaCore
 		{
 			//Create warp device if no adapter was found
 			factory->EnumWarpAdapter(__uuidof(IDXGIAdapter1), (void**)&adapter);
-			assert(!D3D12CreateDevice(adapter, D3D_FEATURE_LEVEL_11_0, __uuidof(ID3D12Device), (void**)& m_device));
+			assert(!D3D12CreateDevice(adapter, D3D_FEATURE_LEVEL_11_0, __uuidof(ID3D12Device), (void**)m_device.GetAddressOf()));
 		}
 
-		adapter->QueryInterface(__uuidof(IDXGIAdapter3), (void**)& m_GPUAdapter);
+		adapter->QueryInterface(__uuidof(IDXGIAdapter3), (void**)m_adapter.GetAddressOf());
 		adapter->Release();
 
 		return true;

@@ -14,10 +14,9 @@ namespace GoodaCore
 	class ConstantBuffer : public Gooda
 	{
 	public:
-		ConstantBuffer(const void*, int);
+		ConstantBuffer(const void*, UINT);
 		virtual ~ConstantBuffer() = default;
 
-		void SetConstantBuffer(D3D12_GPU_DESCRIPTOR_HANDLE);
 		void UpdateConstantBufferData(UINT);
 		int GetConstantBufferSize();
 		D3D12_GPU_VIRTUAL_ADDRESS GetBufferLocation(UINT);
@@ -31,7 +30,7 @@ namespace GoodaCore
 		UINT8* m_constantBufferGPUAddress[frameBufferCount];
 
 		const void* m_bufferData;
-		int m_size;
+		UINT m_size;
 		D3D12_CONSTANT_BUFFER_VIEW_DESC m_cbvDesc[frameBufferCount];
 	};
 }

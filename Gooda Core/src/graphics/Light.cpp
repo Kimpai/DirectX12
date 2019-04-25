@@ -6,8 +6,10 @@ namespace GoodaCore
 	{
 	}
 
-	bool Light::Frame(UINT frameIndex)
+	bool Light::Frame()
 	{
+		UINT frameIndex = Direct3D12::Instance()->GetCurrentFrame();
+
 		//Update the constant buffer data
 		m_constantBuffer->UpdateConstantBufferData(frameIndex);
 

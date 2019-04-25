@@ -43,8 +43,10 @@ namespace GoodaCore
 		XMStoreFloat4x4(&m_worldMatrix, matrix);
 	}
 
-	bool Model::Frame(UINT frameIndex)
+	bool Model::Frame()
 	{
+		UINT frameIndex = Direct3D12::Instance()->GetCurrentFrame();
+
 		//Update the matrices before copying them to the GPU
 		UpdateMatrices();
 

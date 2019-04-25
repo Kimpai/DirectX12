@@ -198,7 +198,7 @@
     <ClCompile Include="src\utils\DX12\RootSignature.cpp" />
     <ClCompile Include="src\graphics\Light.cpp" />
     <ClCompile Include="src\graphics\Model.cpp" />
-    <ClCompile Include="src\graphics\ShaderManager.cpp" />
+    <ClCompile Include="src\utils\ShaderManager.cpp" />
     <ClCompile Include="src\graphics\Terrain.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
@@ -223,7 +223,7 @@
     <ClInclude Include="src\utils\DX12\RootSignature.h" />
     <ClInclude Include="src\graphics\Light.h" />
     <ClInclude Include="src\graphics\Model.h" />
-    <ClInclude Include="src\graphics\ShaderManager.h" />
+    <ClInclude Include="src\utils\ShaderManager.h" />
     <ClInclude Include="src\graphics\Terrain.h" />
   </ItemGroup>
   <ItemGroup>

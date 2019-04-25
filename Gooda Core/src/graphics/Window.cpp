@@ -81,18 +81,34 @@ namespace GoodaCore
 		//Hide the mouse cursor
 		ShowCursor(false);
 
+		Direct3D12::Instance()->CreateSwapChainForHWND(screenWidth, screenHeight, m_windowHandle, m_swapChain.GetAddressOf());
 
-		Direct3D12::Instance()->CreateSwapChainAndDisplayInterface(m_swapChain.GetAddressOf(), m_outputMonitor.GetAddressOf(), screenWidth, screenHeight, m_windowHandle);
+		Direct3D12::Instance()->CreateBackBufferRenderTarget(m_swapChain.Get(), m_resources.m_backBufferRenderTargetView[0].GetAddressOf(), m_resources.m_renderTargetViewDescHeap.GetAddressOf(), m_windowHandle);
 
-		//Initialize the frameIndex to the current back buffer index
-		m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
+		//Fill out a depth stencil desc structure
+		D3D12_DEPTH_STENCIL_DESC depthStencilDesc = {};
+		ZeroMemory(&depthStencilDesc, sizeof(D3D12_DEPTH_STENCIL_DESC));
 
-		Direct3D12::Instance()->CreateBackBufferRenderTarget(m_swapChain.Get(), m_direct3D.m_backBufferRenderTargetView[0].GetAddressOf(), m_direct3D.m_renderTargetViewDescHeap.GetAddressOf());
+		depthStencilDesc.DepthEnable = TRUE;
+		depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+		depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
+		depthStencilDesc.StencilEnable = FALSE;
+		depthStencilDesc.StencilReadMask = D3D12_DEFAULT_STENCIL_READ_MASK;
+		depthStencilDesc.StencilWriteMask = D3D12_DEFAULT_STENCIL_WRITE_MASK;
 
-		D3D12_DEPTH_STENCIL_DESC desc = {};
-		ZeroMemory(&desc, sizeof(D3D12_DEPTH_STENCIL_DESC));
+		// Fill out a stencil operation structure
+		D3D12_DEPTH_STENCILOP_DESC depthStencilOPDesc = {};
+		ZeroMemory(&depthStencilOPDesc, sizeof(D3D12_DEPTH_STENCILOP_DESC));
 
-		Direct3D12::Instance()->CreateDepthStencil(desc, m_direct3D.m_depthStencilBuffer.GetAddressOf(), m_direct3D.m_depthStencilDescHeap.GetAddressOf());
+		depthStencilOPDesc.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
+		depthStencilOPDesc.StencilPassOp = D3D12_STENCIL_OP_KEEP;
+		depthStencilOPDesc.StencilFailOp = D3D12_STENCIL_OP_KEEP;
+		depthStencilOPDesc.StencilFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+
+		depthStencilDesc.FrontFace = depthStencilOPDesc;
+		depthStencilDesc.BackFace = depthStencilOPDesc;
+
+		Direct3D12::Instance()->CreateDepthStencil(depthStencilDesc, m_resources.m_depthStencilBuffer.GetAddressOf(), m_resources.m_depthStencilDescHeap.GetAddressOf());
 
 		CreateViewPortAndScissorRect(screenWidth, screenHeight, screenNear, screenDepth);
 
@@ -127,11 +143,13 @@ namespace GoodaCore
 
 	bool Window::Frame()
 	{
+		UINT frameIndex = m_swapChain->GetCurrentBackBufferIndex();
+
 		//Record commands in the command list now.
 		//Start by setting the resource barrier.
 		D3D12_RESOURCE_BARRIER barrier = {};
 		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		barrier.Transition.pResource = m_direct3D.m_backBufferRenderTargetView[m_frameIndex].Get();
+		barrier.Transition.pResource = m_resources.m_backBufferRenderTargetView[frameIndex].Get();
 		barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
 		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
@@ -139,10 +157,10 @@ namespace GoodaCore
 		Direct3D12::Instance()->GetCommandList()->ResourceBarrier(1, &barrier);
 
 		//Set the back buffer as the render target.
-		D3D12_CPU_DESCRIPTOR_HANDLE renderTargetViewHandle = m_direct3D.m_renderTargetViewDescHeap->GetCPUDescriptorHandleForHeapStart();
-		renderTargetViewHandle.ptr += Direct3D12::Instance()->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV) * (UINT64)m_frameIndex;
+		D3D12_CPU_DESCRIPTOR_HANDLE renderTargetViewHandle = m_resources.m_renderTargetViewDescHeap->GetCPUDescriptorHandleForHeapStart();
+		renderTargetViewHandle.ptr += Direct3D12::Instance()->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV) * (UINT64)frameIndex;
 
-		D3D12_CPU_DESCRIPTOR_HANDLE depthStencilHandle = m_direct3D.m_depthStencilDescHeap->GetCPUDescriptorHandleForHeapStart();
+		D3D12_CPU_DESCRIPTOR_HANDLE depthStencilHandle = m_resources.m_depthStencilDescHeap->GetCPUDescriptorHandleForHeapStart();
 
 		Direct3D12::Instance()->GetCommandList()->OMSetRenderTargets(1, &renderTargetViewHandle, FALSE, &depthStencilHandle);
 
@@ -177,14 +195,9 @@ namespace GoodaCore
 		return true;
 	}
 
-	UINT Window::GetCurrentFrame()
-	{
-		return m_swapChain->GetCurrentBackBufferIndex();
-	}
-
 	D3D12_CPU_DESCRIPTOR_HANDLE Window::GetDepthStencilViewHandle()
 	{
-		return D3D12_CPU_DESCRIPTOR_HANDLE(m_direct3D.m_depthStencilDescHeap->GetCPUDescriptorHandleForHeapStart());
+		return D3D12_CPU_DESCRIPTOR_HANDLE(m_resources.m_depthStencilDescHeap->GetCPUDescriptorHandleForHeapStart());
 	}
 
 	HWND Window::GetWindowHandle()
@@ -194,16 +207,19 @@ namespace GoodaCore
 
 	bool Window::Present()
 	{
+		UINT frameIndex = m_swapChain->GetCurrentBackBufferIndex();
+
 		//Indicate that the back buffer will now be used to present.
 		D3D12_RESOURCE_BARRIER barrier = {};
 		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		barrier.Transition.pResource = m_direct3D.m_backBufferRenderTargetView[m_frameIndex].Get();
+		barrier.Transition.pResource = m_resources.m_backBufferRenderTargetView[frameIndex].Get();
 		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
 		Direct3D12::Instance()->GetCommandList()->ResourceBarrier(1, &barrier);
 
+		//Close and Send the command list to the GPU
 		Direct3D12::Instance()->CloseCommandList();
-		Direct3D12::Instance()->ExecuteCommandList(m_frameIndex);
+		Direct3D12::Instance()->ExecuteCommandList();
 
 		//Present the back buffer to the screen since rendering is complete.
 		if (m_vsync)
@@ -216,9 +232,6 @@ namespace GoodaCore
 			//Present as fast as possible.
 			assert(!m_swapChain->Present(0, 0));
 		}
-
-		//Swap the current render target view buffer index so drawing is done on the correct buffer
-		m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
 
 		return true;
 	}

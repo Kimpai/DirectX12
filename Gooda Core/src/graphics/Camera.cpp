@@ -48,8 +48,10 @@ namespace GoodaCore
 		return true;
 	}
 
-	bool Camera::Frame(UINT frameIndex)
+	bool Camera::Frame()
 	{
+		UINT frameIndex = Direct3D12::Instance()->GetCurrentFrame();
+
 		Turn();
 
 		MoveForward();

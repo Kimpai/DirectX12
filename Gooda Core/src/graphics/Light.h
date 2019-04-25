@@ -27,7 +27,7 @@ namespace GoodaCore
 		Light();
 		virtual ~Light() = default;
 
-		virtual bool Frame(UINT);
+		virtual bool Frame();
 		virtual ConstantBuffer* GetConstantBuffer() = 0;
 
 	private:

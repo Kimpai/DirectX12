@@ -17,8 +17,10 @@ namespace GoodaCore
 		return true;
 	}
 
-	bool ShaderManager::Frame(UINT frameIndex)
+	bool ShaderManager::Frame()
 	{
+		UINT frameIndex = Direct3D12::Instance()->GetCurrentFrame();
+
 		m_pipelines[0]->SetPipelineState();
 		m_rootSignature->SetRootSignature();
 
@@ -46,6 +48,10 @@ namespace GoodaCore
 
 		if (m_rootSignature)
 			delete m_rootSignature;
+
+		for (auto buffer : m_constantBuffers)
+			if (buffer)
+				delete buffer;
 
 		return true;
 	}

@@ -7,12 +7,11 @@
 #include <vector>
 #include <Gooda.h>
 
-#include "../utils/DX12/PipelineState.h"
-#include "../utils/ConstantBuffer.h"
-#include "../utils/DX12/DescriptorHeap.h"
-#include "../utils/DX12/RootSignature.h"
-#include "../utils/DX12/RootParameter.h"
-#include "Renderer.h"
+#include "DX12/PipelineState.h"
+#include "ConstantBuffer.h"
+#include "DX12/DescriptorHeap.h"
+#include "DX12/RootSignature.h"
+#include "DX12/RootParameter.h"
 
 using namespace DirectX;
 
@@ -26,7 +25,7 @@ namespace GoodaCore
 		static ShaderManager* Instance();
 
 		virtual bool Init();
-		virtual bool Frame(UINT);
+		virtual bool Frame();
 		virtual bool Destroy();
 
 		ID3D12PipelineState* GetPipelineState(ShaderPipelineType);

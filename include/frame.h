@@ -1,4 +1,4 @@
 #pragma once
 
 //Frame setting for application
-const int frameBufferCount = 3;
+static const unsigned int frameBufferCount = 3;

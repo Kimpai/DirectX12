@@ -4,6 +4,7 @@
 #include <frame.h>
 #include <Gooda.h>
 
+#include "../utils/ShaderManager.h"
 #include "../utils/VertexBuffer.h"
 #include "../utils/IndexBuffer.h"
 #include "../utils/ConstantBuffer.h"
@@ -32,7 +33,7 @@ namespace GoodaCore
 		virtual ConstantBuffer* GetConstantBuffer() = 0;
 
 		virtual bool Init();
-		virtual bool Frame(UINT);
+		virtual bool Frame();
 		virtual bool Destroy();
 		virtual void Draw() = 0;
 
