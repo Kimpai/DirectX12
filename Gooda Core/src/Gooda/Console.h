@@ -1,30 +1,30 @@
 #pragma once
 
-#include <Windows.h>
 #include <stdio.h>
 #include <iostream>
 #include <string>
-#include <Gooda.h>
+#include <vector>
+#include <Windows.h>
 
 namespace GoodaCore
 {
-	class Console : public Gooda
+	class Console
 	{
 	public:
 		virtual ~Console() = default;
 
 		static Console* Instance();
-
-		virtual bool Init();
-		virtual bool Frame(std::string&);
-		virtual bool Destroy();
+		void Frame();
+		void LOG(std::string);
 
 	private:
-		Console() = default;
+		Console();
 		bool InputHandle(std::string&);
 
 		HANDLE m_stdOutputHandle;
 		HANDLE m_stdInputHandle;
 		HANDLE m_stdErrorHandle;
+
+		std::vector<std::string> m_messages;
 	};
 }

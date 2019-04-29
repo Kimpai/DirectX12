@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Gooda.h>
-
 #include "DX12/Direct3D12.h"
 
 namespace GoodaCore
@@ -9,7 +7,7 @@ namespace GoodaCore
 	class VertexBuffer : public Gooda
 	{
 	public:
-		VertexBuffer(const void*, int, int);
+		VertexBuffer(void*, int, int);
 		virtual ~VertexBuffer() = default;
 
 		void SetVertexBuffer();
@@ -22,7 +20,7 @@ namespace GoodaCore
 		int m_offset;
 		ComPtr<ID3D12Resource> m_defaultHeap;
 		ComPtr<ID3D12Resource> m_uploadHeap;
-		const void* m_bufferData;
+		void* m_bufferData;
 		D3D12_VERTEX_BUFFER_VIEW m_bufferView;
 	};
 }

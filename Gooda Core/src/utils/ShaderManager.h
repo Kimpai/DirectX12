@@ -4,7 +4,6 @@
 
 #include <DirectXMath.h>
 #include <frame.h>
-#include <Gooda.h>
 #include <map>
 
 #include "DX12/PipelineState.h"
@@ -34,8 +33,7 @@ namespace GoodaCore
 		ID3D12RootSignature* GetRootSignature();
 		ID3D12DescriptorHeap* GetDescriptorHeap(UINT);
 
-		void CreateDescriptor(ObjectType, ConstantBuffer*);
-		
+		void CreateDescriptor(ObjectType, D3D12_CONSTANT_BUFFER_VIEW_DESC*);
 
 	private:
 		ShaderManager();
@@ -48,7 +46,7 @@ namespace GoodaCore
 		DescriptorHeap* m_mainDescriptorHeap;
 		RootSignature* m_rootSignature;
 		std::vector<RootParameter*> m_rootParameters;
-		std::map<ObjectType, ConstantBuffer*> m_constantBuffers;
+		std::map<ObjectType, D3D12_CONSTANT_BUFFER_VIEW_DESC*> m_descriptors;
 		std::vector<PipelineState*> m_pipelines;
 	};
 }

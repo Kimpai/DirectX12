@@ -8,7 +8,8 @@
 #include <wrl.h>
 #include <assert.h>
 #include <frame.h>
-#include <Gooda.h>
+
+#include "../../Gooda/Gooda.h"
 
 using namespace Microsoft::WRL;
 

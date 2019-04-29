@@ -6,6 +6,8 @@ namespace GoodaCore
 		m_origin(origin), m_color(color), m_indices(0)
 	{
 		InitializeBuffers();
+
+		ShaderManager::Instance()->CreateDescriptor(ObjectType::MODEL, m_constantBuffer->GetConstantBufferViewDesc(0));
 	}
 
 	Cube::~Cube()
@@ -13,16 +15,6 @@ namespace GoodaCore
 		m_vertexBuffer->Release();
 		m_indexBuffer->Release();
 		m_constantBuffer->Release();
-	}
-
-	ConstantBuffer* Cube::GetConstantBuffer()
-	{
-		return m_constantBuffer;
-	}
-
-	XMFLOAT3 Cube::GetPosition()
-	{
-		return m_origin;
 	}
 
 	void Cube::InitializeBuffers()
@@ -68,7 +60,7 @@ namespace GoodaCore
 		};
 
 		//Create index data
-		DWORD indices[] =
+		UINT indices[] =
 		{
 			//Front face
 			0, 1, 2, //First triangle
@@ -96,22 +88,20 @@ namespace GoodaCore
 		};
 
 		//Determine how many indices to draw
-		m_indices = sizeof(indices) / sizeof(*indices);
+		m_indices = sizeof(indices) / sizeof(UINT);
 
 		//Determine the size of the vertex and index buffer
-		int vertexBufferSize = _countof(vertices) * sizeof(VertexPositionNormalColor);
-		int indexBufferSize = _countof(indices) * sizeof(DWORD);
+		UINT vertexBufferSize = _countof(vertices) * sizeof(VertexPositionNormalColor);
+		UINT indexBufferSize = _countof(indices) * sizeof(UINT);
 
 		//Create a vertex buffer
 		m_vertexBuffer = new VertexBuffer(vertices, vertexBufferSize, sizeof(VertexPositionNormalColor));
 
 		//Create an index buffer
-		m_indexBuffer = new IndexBuffer(indices, indexBufferSize, sizeof(DWORD));
+		m_indexBuffer = new IndexBuffer(indices, indexBufferSize, sizeof(UINT));
 
-		//Create a constant buffer for the world, view and projection matrices
+		//Create a constant buffer for the world, projection matrices
 		m_constantBuffer = new ConstantBuffer(&m_constantBufferData, sizeof(ConstantBufferData));
-
-		ShaderManager::Instance()->CreateDescriptor(ObjectType::MODEL, m_constantBuffer);
 	}
 
 	void Cube::Draw()

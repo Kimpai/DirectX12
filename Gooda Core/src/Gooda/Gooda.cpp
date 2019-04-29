@@ -1,7 +1,6 @@
-// Gooda.cpp : Defines the functions for the static library.
-//
-#include <Gooda.h>
-#include "..\..\Gooda Core\src\Gooda\Input.h"
+#include "Gooda.h"
+#include "Console.h"
+#include "Input.h"
 
 void Gooda::Release()
 {
@@ -35,9 +34,21 @@ LRESULT Gooda::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam
 		break;
 	}
 
+	case WM_ACTIVATEAPP:
+	case WM_INPUT:
 	case WM_MOUSEMOVE:
+	case WM_LBUTTONDOWN:
+	case WM_LBUTTONUP:
+	case WM_RBUTTONDOWN:
+	case WM_RBUTTONUP:
+	case WM_MBUTTONDOWN:
+	case WM_MBUTTONUP:
+	case WM_MOUSEWHEEL:
+	case WM_XBUTTONDOWN:
+	case WM_XBUTTONUP:
+	case WM_MOUSEHOVER:
 	{
-		//If mouse was moved send to input object to update the camera
+		//If mouse was moved send to input object to update the mouse
 		GoodaCore::Input::Instance()->ProcessMouseMessage(umsg, wparam, lparam);
 		break;
 	}

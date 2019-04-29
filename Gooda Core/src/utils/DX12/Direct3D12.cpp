@@ -227,7 +227,7 @@ namespace GoodaCore
 		return true;
 	}
 
-	bool Direct3D12::CreateDepthStencil(D3D12_DEPTH_STENCIL_DESC& depthStencilDesc, ID3D12Resource** depthStencilBuffer, ID3D12DescriptorHeap** depthStencilDescHeap)
+	bool Direct3D12::CreateDepthStencil(ID3D12Resource** depthStencilBuffer, ID3D12DescriptorHeap** depthStencilDescHeap)
 	{
 		//Create a depth stencil descriptor heap so we can get a pointer to the depth stencil buffer
 		D3D12_DESCRIPTOR_HEAP_DESC depthStencilViewHeapDesc = {};
@@ -254,28 +254,37 @@ namespace GoodaCore
 		depthOptimizedClearValue.DepthStencil.Depth = 1.0f;
 		depthOptimizedClearValue.DepthStencil.Stencil = 0;
 
-		//Create a resource and the resource heap to store the resource 
-		D3D12_HEAP_PROPERTIES properties = {};
-		ZeroMemory(&properties, sizeof(properties));
-		properties.Type = D3D12_HEAP_TYPE_DEFAULT;
+		////Create a resource and the resource heap to store the resource 
+		//D3D12_HEAP_PROPERTIES properties = {};
+		//ZeroMemory(&properties, sizeof(properties));
+		//properties.Type = D3D12_HEAP_TYPE_DEFAULT;
 
-		D3D12_RESOURCE_DESC resourceDesc = {};
-		ZeroMemory(&resourceDesc, sizeof(resourceDesc));
-		resourceDesc.Alignment = 0;
-		resourceDesc.DepthOrArraySize = 1;
-		resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
-		resourceDesc.Format = DXGI_FORMAT_D32_FLOAT;
-		resourceDesc.Height = m_screenHeight;
-		resourceDesc.Width = m_screenWidth;
-		resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-		resourceDesc.MipLevels = 0;
-		resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-		resourceDesc.SampleDesc.Count = 1;
-		resourceDesc.SampleDesc.Quality = 0;
+		//D3D12_RESOURCE_DESC resourceDesc = {};
+		//ZeroMemory(&resourceDesc, sizeof(resourceDesc));
+		//resourceDesc.Alignment = 0;
+		//resourceDesc.DepthOrArraySize = 1;
+		//resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+		//resourceDesc.Format = DXGI_FORMAT_D32_FLOAT;
+		//resourceDesc.Height = m_screenHeight;
+		//resourceDesc.Width = m_screenWidth;
+		//resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+		//resourceDesc.MipLevels = 0;
+		//resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+		//resourceDesc.SampleDesc.Count = 1;
+		//resourceDesc.SampleDesc.Quality = 0;
 
-		if (FAILED(m_device->CreateCommittedResource(&properties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE,
-			&depthOptimizedClearValue, __uuidof(ID3D12Resource), (void**)depthStencilBuffer)))
-			return false;
+		//if (FAILED(m_device->CreateCommittedResource(&properties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE,
+		//	&depthOptimizedClearValue, __uuidof(ID3D12Resource), (void**)depthStencilBuffer)))
+		//	return false;
+
+		m_device->CreateCommittedResource(
+			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+			D3D12_HEAP_FLAG_NONE,
+			&CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_D32_FLOAT, m_screenWidth, m_screenHeight, 1, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL),
+			D3D12_RESOURCE_STATE_DEPTH_WRITE,
+			&depthOptimizedClearValue,
+			IID_PPV_ARGS(depthStencilBuffer)
+		);
 
 		//Give the resource a name for debugging purposes
 		depthStencilDescHeap[0]->SetName(L"Depth/Stencil Resource Heap");
@@ -452,7 +461,7 @@ namespace GoodaCore
 			debugController1->SetEnableGPUBasedValidation(TRUE);
 
 			typedef HRESULT(WINAPI * LPDXGIGETDEBUGINTERFACE)(REFIID, void**);
-			HMODULE dxgidebug = LoadLibraryEx("DXGIDEBUG.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
+			HMODULE dxgidebug = LoadLibraryEx(L"DXGIDEBUG.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
 			if (dxgidebug)
 			{
 				LPDXGIGETDEBUGINTERFACE DxgiGetDebugInterface = (LPDXGIGETDEBUGINTERFACE)GetProcAddress(dxgidebug, "DXGIGetDebugInterface");

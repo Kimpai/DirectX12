@@ -3,7 +3,6 @@
 #include <frame.h>
 #include <DirectXMath.h>
 #include <assert.h>
-#include <Gooda.h>
 
 #include "DX12/Direct3D12.h"
 

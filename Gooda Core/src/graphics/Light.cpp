@@ -4,6 +4,7 @@ namespace GoodaCore
 {
 	Light::Light()
 	{
+
 	}
 
 	bool Light::Frame()

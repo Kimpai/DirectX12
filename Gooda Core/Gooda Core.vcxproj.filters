@@ -31,16 +31,7 @@
     <ClCompile Include="src\main.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\Gooda\Console.cpp">
-      <Filter>src\Gooda</Filter>
-    </ClCompile>
     <ClCompile Include="src\Gooda\GoodaDriver.cpp">
-      <Filter>src\Gooda</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Gooda\Input.cpp">
-      <Filter>src\Gooda</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Gooda\LuaScript.cpp">
       <Filter>src\Gooda</Filter>
     </ClCompile>
     <ClCompile Include="src\utils\DX11\Direct3D11.cpp">
@@ -64,19 +55,10 @@
     <ClCompile Include="src\graphics\Camera.cpp">
       <Filter>src\graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\graphics\Cube.cpp">
-      <Filter>src\graphics</Filter>
-    </ClCompile>
     <ClCompile Include="src\graphics\DirectionalLight.cpp">
       <Filter>src\graphics</Filter>
     </ClCompile>
     <ClCompile Include="src\graphics\Light.cpp">
-      <Filter>src\graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="src\graphics\Model.cpp">
-      <Filter>src\graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="src\graphics\Terrain.cpp">
       <Filter>src\graphics</Filter>
     </ClCompile>
     <ClCompile Include="src\graphics\Renderer.cpp">
@@ -95,18 +77,21 @@
     <ClCompile Include="src\utils\ShaderManager.cpp">
       <Filter>src\graphics</Filter>
     </ClCompile>
+    <ClCompile Include="src\resources\Model.cpp">
+      <Filter>src\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\resources\Cube.cpp">
+      <Filter>src\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Gooda\Input.cpp" />
+    <ClCompile Include="src\Gooda\Console.cpp" />
+    <ClCompile Include="src\Gooda\Gooda.cpp" />
+    <ClCompile Include="src\resources\Plane.cpp">
+      <Filter>src\graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Gooda\Console.h">
-      <Filter>src\Gooda</Filter>
-    </ClInclude>
     <ClInclude Include="src\Gooda\GoodaDriver.h">
-      <Filter>src\Gooda</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Gooda\Input.h">
-      <Filter>src\Gooda</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Gooda\LuaScript.h">
       <Filter>src\Gooda</Filter>
     </ClInclude>
     <ClInclude Include="src\utils\DX11\Direct3D11.h">
@@ -130,19 +115,10 @@
     <ClInclude Include="src\graphics\Camera.h">
       <Filter>src\graphics</Filter>
     </ClInclude>
-    <ClInclude Include="src\graphics\Cube.h">
-      <Filter>src\graphics</Filter>
-    </ClInclude>
     <ClInclude Include="src\graphics\DirectionalLight.h">
       <Filter>src\graphics</Filter>
     </ClInclude>
     <ClInclude Include="src\graphics\Light.h">
-      <Filter>src\graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="src\graphics\Model.h">
-      <Filter>src\graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="src\graphics\Terrain.h">
       <Filter>src\graphics</Filter>
     </ClInclude>
     <ClInclude Include="src\graphics\Renderer.h">
@@ -159,6 +135,18 @@
     </ClInclude>
     <ClInclude Include="src\graphics\Window.h" />
     <ClInclude Include="src\utils\ShaderManager.h">
+      <Filter>src\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\resources\Model.h">
+      <Filter>src\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\resources\Cube.h">
+      <Filter>src\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Gooda\Console.h" />
+    <ClInclude Include="src\Gooda\Gooda.h" />
+    <ClInclude Include="src\Gooda\Input.h" />
+    <ClInclude Include="src\resources\Plane.h">
       <Filter>src\graphics</Filter>
     </ClInclude>
   </ItemGroup>

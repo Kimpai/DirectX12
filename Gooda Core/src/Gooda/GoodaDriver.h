@@ -1,14 +1,13 @@
 #pragma once
 
-#pragma comment(lib, "Gooda.lib")
-
 #include <iostream>
 #include <vector>
 
 #include "../graphics/Window.h"
 #include "../graphics/Camera.h"
 #include "../utils/ShaderManager.h"
-#include "../graphics/Cube.h"
+#include "../resources/Cube.h"
+#include "../resources/Plane.h"
 #include "../graphics/Renderer.h"
 #include "../graphics/DirectionalLight.h"
 #include "Console.h"
@@ -22,11 +21,13 @@ namespace GoodaCore
 		static GoodaDriver* Instance();
 
 		virtual bool Init();
-		virtual bool Frame();
+		virtual bool Run();
 		virtual bool Destroy();
 
 	private:
 		GoodaDriver() = default;
+
+		virtual bool Frame();
 
 		Camera* m_camera;
 		Window* m_window;

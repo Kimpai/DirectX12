@@ -10,13 +10,14 @@
 #include <Keyboard.h>
 #include <Mouse.h>
 #include <iostream>
-#include <Gooda.h>
+
+#include "Gooda.h"
 
 using namespace DirectX;
 
 namespace GoodaCore
 {
-	class Input : public Gooda
+	class Input
 	{
 	public:
 		virtual ~Input() = default;

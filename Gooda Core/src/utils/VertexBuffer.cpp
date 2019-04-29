@@ -2,7 +2,7 @@
 
 namespace GoodaCore
 {
-	VertexBuffer::VertexBuffer(const void* bufferData, int size, int offset) : m_bufferData(bufferData)
+	VertexBuffer::VertexBuffer(void* bufferData, int size, int offset) : m_bufferData(bufferData)
 	{
 		m_size = size;
 		m_offset = offset;
@@ -83,7 +83,7 @@ namespace GoodaCore
 		ZeroMemory(&vertexData, sizeof(D3D12_SUBRESOURCE_DATA));
 
 		//Store vertex buffer in upload heap
-		vertexData.pData = m_bufferData;
+		vertexData.pData = reinterpret_cast<BYTE*>(m_bufferData);
 		vertexData.RowPitch = m_size;
 		vertexData.SlicePitch = m_size;
 

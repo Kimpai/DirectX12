@@ -53,7 +53,7 @@ namespace GoodaCore
 		if (m_rootSignature)
 			delete m_rootSignature;
 
-		m_constantBuffers.clear();
+		m_descriptors.clear();
 
 		return true;
 	}
@@ -63,10 +63,10 @@ namespace GoodaCore
 		return m_rootSignature->GetRootSignature();
 	}
 
-	void ShaderManager::CreateDescriptor(ObjectType type, ConstantBuffer* constantBuffer)
+	void ShaderManager::CreateDescriptor(ObjectType type, D3D12_CONSTANT_BUFFER_VIEW_DESC* cbvDesc)
 	{
-		if (m_constantBuffers.count(type) == 0)
-			m_constantBuffers[type] = constantBuffer;
+		if (m_descriptors.count(type) == 0)
+			m_descriptors[type] = cbvDesc;
 	}
 
 	void ShaderManager::CreatePipelineState(std::vector<Shader> shaders, ShaderPipelineType type)
@@ -100,16 +100,16 @@ namespace GoodaCore
 	void ShaderManager::CreateRootDescriptorTable()
 	{
 		D3D12_ROOT_DESCRIPTOR_TABLE descriptorTable = {};
-		m_rootParameters.push_back(new RootParameter(descriptorTable, 0, D3D12_SHADER_VISIBILITY_ALL, ParameterType::CBV, (UINT)m_constantBuffers.size(), 0));
+		m_rootParameters.push_back(new RootParameter(descriptorTable, 0, D3D12_SHADER_VISIBILITY_ALL, ParameterType::CBV, (UINT)m_descriptors.size(), 0));
 	}
 
 	void ShaderManager::CreateRootDescriptorHeap()
 	{
-		m_mainDescriptorHeap = new DescriptorHeap((UINT)m_constantBuffers.size(), true, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		m_mainDescriptorHeap = new DescriptorHeap((UINT)m_descriptors.size(), true, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-		std::map<ObjectType, ConstantBuffer*>::iterator it;
+		std::map<ObjectType, D3D12_CONSTANT_BUFFER_VIEW_DESC*>::iterator it;
 
-		for (it = m_constantBuffers.begin(); it !=  m_constantBuffers.end(); it++)
-			m_mainDescriptorHeap->AppendDescriptorToHeap(it->second->GetConstantBufferViewDesc(0));
+		for (it = m_descriptors.begin(); it !=  m_descriptors.end(); it++)
+			m_mainDescriptorHeap->AppendDescriptorToHeap(it->second);
 	}
 }

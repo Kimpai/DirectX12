@@ -14,10 +14,6 @@ namespace GoodaCore
 		if (!Direct3D12::Instance()->Init())
 			return false;
 
-		//Initialize Console
-		if (!Console::Instance()->Init())
-			return false;
-
 		//Create a Window object used for rendering
 		m_window = new Window();
 		if (!m_window)
@@ -28,9 +24,10 @@ namespace GoodaCore
 			return false;
 
 		//Create the Model object
-		m_models.push_back(new Cube(XMFLOAT3(0.0f, 1.0f, 5.0f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)));
-		m_models.push_back(new Cube(XMFLOAT3(5.0f, 1.0f, 5.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f)));
-		m_models.push_back(new Cube(XMFLOAT3(-5.0f, 1.0f, 5.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)));
+		m_models.push_back(new Cube(XMFLOAT3(0.0f, 0.0f, 5.0f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)));
+		m_models.push_back(new Cube(XMFLOAT3(5.0f, 0.0f, 5.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f)));
+		m_models.push_back(new Cube(XMFLOAT3(-5.0f, 0.0f, 5.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f)));
+		m_models.push_back(new Plane(20, 20, XMFLOAT3(0.0f, -0.5f, 0.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)));
 
 		//Create the light object
 		m_lights.push_back(new DirectionalLight(XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f), XMFLOAT4(0.15f, 0.15f, 0.15f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f)));
@@ -64,7 +61,8 @@ namespace GoodaCore
 		if (!Direct3D12::Instance()->BeginFrame())
 			return false;
 
-		//Update the mouse and keyboard
+		Console::Instance()->Frame();
+
 		if (!Input::Instance()->Frame())
 			return false;
 
@@ -97,6 +95,41 @@ namespace GoodaCore
 		return true;
 	}
 
+	bool GoodaDriver::Run()
+	{
+		//Initialize the message structure
+		MSG msg;
+		ZeroMemory(&msg, sizeof(MSG));
+
+		//Loop until there is a quit message from the window or the user
+		bool done = false;
+		while (!done)
+		{
+			//Handle the application messages
+			if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+			{
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}
+
+			switch (msg.message)
+			{
+			case WM_QUIT:
+				done = true;
+				break;
+
+			default:
+				if (!Frame())
+				{
+					done = true;
+				}
+				break;
+			}
+		}
+
+		return true;
+	}
+
 	bool GoodaCore::GoodaDriver::Destroy()
 	{
 		//Flush the command queue to make sure the GPU is not using any objects
@@ -116,7 +149,6 @@ namespace GoodaCore
 		Renderer::Instance()->Destroy();
 		ShaderManager::Instance()->Destroy();
 		Input::Instance()->Destroy();
-		Console::Instance()->Destroy();
 		Direct3D12::Instance()->Destroy();
 
 		return true;

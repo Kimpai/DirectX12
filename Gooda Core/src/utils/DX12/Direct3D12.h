@@ -9,8 +9,9 @@
 #include <dxgi1_5.h>
 #include <dxgidebug.h>
 #include <wrl.h>
-#include <frame.h>
-#include <Gooda.h>
+#include <Frame.h>
+
+#include "../../Gooda/Gooda.h"
 
 using namespace Microsoft::WRL;
 
@@ -32,7 +33,7 @@ namespace GoodaCore
 
 		bool CreateRenderTargets(IDXGISwapChain3*, ID3D12Resource**, ID3D12DescriptorHeap**);
 		bool CreateBackBufferRenderTarget(IDXGISwapChain3*, ID3D12Resource**, ID3D12DescriptorHeap**, HWND);
-		bool CreateDepthStencil(D3D12_DEPTH_STENCIL_DESC&, ID3D12Resource**, ID3D12DescriptorHeap**);
+		bool CreateDepthStencil(ID3D12Resource**, ID3D12DescriptorHeap**);
 
 		bool CloseCommandList();
 		bool ResetCommandList();

@@ -4,8 +4,6 @@ namespace GoodaCore
 {
 	Window::Window()
 	{
-		m_name = "Game Window";
-
 		UINT screenHeight, screenWidth;
 		FLOAT screenNear, screenDepth;
 
@@ -15,26 +13,24 @@ namespace GoodaCore
 		screenNear = m_screenNear;
 		screenDepth = m_screenDepth;
 
-		WNDCLASSEX wc;
 		DEVMODE dmScreenSettings;
 		int posX, posY;
 
 		//Setup the windows class with the default settings
-		wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
-		wc.lpfnWndProc = WndProc;
-		wc.cbClsExtra = 0;
-		wc.cbWndExtra = 0;
-		wc.hInstance = m_hinstance;
-		wc.hIcon = LoadIcon(NULL, IDI_WINLOGO);
-		wc.hIconSm = wc.hIcon;
-		wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-		wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
-		wc.lpszMenuName = NULL;
-		wc.lpszClassName = m_name;
-		wc.cbSize = sizeof(WNDCLASSEX);
+		ZeroMemory(&m_wc, sizeof(WNDCLASSEX));
+		m_wc.style = CS_HREDRAW | CS_VREDRAW;
+		m_wc.lpfnWndProc = WndProc;
+		m_wc.cbClsExtra = 0;
+		m_wc.cbWndExtra = 0;
+		m_wc.hInstance = m_hinstance;
+		m_wc.hIcon = LoadIcon(m_hinstance, IDI_APPLICATION);
+		m_wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+		m_wc.hbrBackground = (HBRUSH)COLOR_WINDOW;;
+		m_wc.lpszClassName = L"Gooda Engine";
+		m_wc.cbSize = sizeof(WNDCLASSEX);
 
 		//Register the window class
-		RegisterClassEx(&wc);
+		RegisterClassEx(&m_wc);
 
 		//Determine the resolution of the clients desktop screen
 		screenHeight = GetSystemMetrics(SM_CYSCREEN);
@@ -69,14 +65,21 @@ namespace GoodaCore
 		}
 
 		//Create the window with the screen settings and get the handle to it
-		m_windowHandle = CreateWindowEx(WS_EX_APPWINDOW, m_name, m_name,
-			WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_POPUP, posX, posY, screenWidth,
-			screenHeight, NULL, NULL, m_hinstance, NULL);
+		m_windowHandle = CreateWindowEx(NULL,
+			m_wc.lpszClassName,
+			L"Game Window",
+			WS_OVERLAPPEDWINDOW,
+			posX, 
+			posY, 
+			screenWidth,
+			screenHeight, 
+			NULL, 
+			NULL, 
+			m_hinstance, 
+			NULL);
 
 		//Bring the window up on the screen and set it as main focus
 		ShowWindow(m_windowHandle, SW_SHOW);
-		SetForegroundWindow(m_windowHandle);
-		SetFocus(m_windowHandle);
 
 		//Hide the mouse cursor
 		ShowCursor(false);
@@ -85,30 +88,7 @@ namespace GoodaCore
 
 		Direct3D12::Instance()->CreateBackBufferRenderTarget(m_swapChain.Get(), m_resources.m_backBufferRenderTargetView[0].GetAddressOf(), m_resources.m_renderTargetViewDescHeap.GetAddressOf(), m_windowHandle);
 
-		//Fill out a depth stencil desc structure
-		D3D12_DEPTH_STENCIL_DESC depthStencilDesc = {};
-		ZeroMemory(&depthStencilDesc, sizeof(D3D12_DEPTH_STENCIL_DESC));
-
-		depthStencilDesc.DepthEnable = TRUE;
-		depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-		depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
-		depthStencilDesc.StencilEnable = FALSE;
-		depthStencilDesc.StencilReadMask = D3D12_DEFAULT_STENCIL_READ_MASK;
-		depthStencilDesc.StencilWriteMask = D3D12_DEFAULT_STENCIL_WRITE_MASK;
-
-		// Fill out a stencil operation structure
-		D3D12_DEPTH_STENCILOP_DESC depthStencilOPDesc = {};
-		ZeroMemory(&depthStencilOPDesc, sizeof(D3D12_DEPTH_STENCILOP_DESC));
-
-		depthStencilOPDesc.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
-		depthStencilOPDesc.StencilPassOp = D3D12_STENCIL_OP_KEEP;
-		depthStencilOPDesc.StencilFailOp = D3D12_STENCIL_OP_KEEP;
-		depthStencilOPDesc.StencilFunc = D3D12_COMPARISON_FUNC_ALWAYS;
-
-		depthStencilDesc.FrontFace = depthStencilOPDesc;
-		depthStencilDesc.BackFace = depthStencilOPDesc;
-
-		Direct3D12::Instance()->CreateDepthStencil(depthStencilDesc, m_resources.m_depthStencilBuffer.GetAddressOf(), m_resources.m_depthStencilDescHeap.GetAddressOf());
+		Direct3D12::Instance()->CreateDepthStencil(m_resources.m_depthStencilBuffer.GetAddressOf(), m_resources.m_depthStencilDescHeap.GetAddressOf());
 
 		CreateViewPortAndScissorRect(screenWidth, screenHeight, screenNear, screenDepth);
 	}
@@ -129,7 +109,7 @@ namespace GoodaCore
 		m_windowHandle = NULL;
 
 		//Remove the application instance
-		UnregisterClassA(m_name, m_hinstance);
+		UnregisterClassA((LPCSTR)m_wc.lpszClassName, m_hinstance);
 
 		m_hinstance = NULL;
 
@@ -157,7 +137,7 @@ namespace GoodaCore
 		D3D12_CPU_DESCRIPTOR_HANDLE renderTargetViewHandle = m_resources.m_renderTargetViewDescHeap->GetCPUDescriptorHandleForHeapStart();
 		renderTargetViewHandle.ptr += Direct3D12::Instance()->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV) * (UINT64)frameIndex;
 
-		D3D12_CPU_DESCRIPTOR_HANDLE depthStencilHandle = m_resources.m_depthStencilDescHeap->GetCPUDescriptorHandleForHeapStart();
+		CD3DX12_CPU_DESCRIPTOR_HANDLE depthStencilHandle(m_resources.m_depthStencilDescHeap->GetCPUDescriptorHandleForHeapStart());
 
 		Direct3D12::Instance()->GetCommandList()->OMSetRenderTargets(1, &renderTargetViewHandle, FALSE, &depthStencilHandle);
 
@@ -180,8 +160,8 @@ namespace GoodaCore
 		m_viewport.TopLeftY = 0;
 		m_viewport.Width = (float)screenWidth;
 		m_viewport.Height = (float)screenHeight;
-		m_viewport.MinDepth = screenNear;
-		m_viewport.MaxDepth = screenFar;
+		m_viewport.MinDepth = 0.0f;
+		m_viewport.MaxDepth = 1.0f;
 
 		//Fill out a scissor rect
 		m_rect.left = 0;
@@ -230,7 +210,7 @@ namespace GoodaCore
 		return true;
 	}
 
-	LRESULT CALLBACK WndProc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam)
+	LRESULT CALLBACK Window::WndProc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam)
 	{
 		switch (umessage)
 		{
@@ -248,24 +228,10 @@ namespace GoodaCore
 			break;
 		}
 
-		case WM_ACTIVATEAPP:
-		case WM_INPUT:
-		case WM_MOUSEMOVE:
-		case WM_LBUTTONDOWN:
-		case WM_LBUTTONUP:
-		case WM_RBUTTONDOWN:
-		case WM_RBUTTONUP:
-		case WM_MBUTTONDOWN:
-		case WM_MBUTTONUP:
-		case WM_MOUSEWHEEL:
-		case WM_XBUTTONDOWN:
-		case WM_XBUTTONUP:
-		case WM_MOUSEHOVER:
+		case WM_STYLECHANGED:
 		{
-			Mouse::ProcessMessage(umessage, wparam, lparam);
-			break;
+			ShowWindow(hwnd, SW_SHOW);
 		}
-
 		//All other messages pass to the message handler
 		default:
 		{

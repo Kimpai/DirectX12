@@ -2,7 +2,6 @@
 
 #include <DirectXMath.h>
 #include <frame.h>
-#include <Gooda.h>
 
 #include "../utils/ShaderManager.h"
 #include "../utils/VertexBuffer.h"
@@ -29,8 +28,6 @@ namespace GoodaCore
 
 		Model(XMFLOAT3);
 		virtual ~Model();
-
-		virtual ConstantBuffer* GetConstantBuffer() = 0;
 
 		virtual bool Frame();
 		virtual void Draw() = 0;

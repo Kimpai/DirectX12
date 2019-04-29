@@ -3,10 +3,7 @@
 #include <Windows.h>
 #include <string>
 
-#include "../Gooda/Input.h"
 #include "../utils/DX12/Direct3D12.h"
-
-using namespace DirectX;
 
 namespace GoodaCore
 {
@@ -20,6 +17,8 @@ namespace GoodaCore
 		HWND GetWindowHandle();
 
 		bool Present();
+
+		static LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
 	protected:
 		struct Resources
@@ -39,8 +38,7 @@ namespace GoodaCore
 		D3D12_RECT m_rect;
 		HINSTANCE m_hinstance;
 		HWND m_windowHandle;
-		LPCSTR m_name;
+		WNDCLASSEX m_wc;
 	};
 	
-	static LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 }

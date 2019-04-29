@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Gooda.h>
-
 #include "DX12/Direct3D12.h"
 
 namespace GoodaCore

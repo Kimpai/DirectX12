@@ -1,12 +1,9 @@
 #pragma once
 
-#include <frame.h>
 #include <vector>
 
-#include "Window.h"
-#include "Model.h"
-#include "Light.h"
-#include "../utils/ShaderManager.h"
+#include "../Gooda/Console.h"
+#include "../resources/Model.h"
 #include "../utils/DX11/Direct3D11.h"
 #include "../utils/DX12/Direct3D12.h"
 
@@ -26,13 +23,13 @@ namespace GoodaCore
 
 		static Renderer* Instance();
 		Backend GetBackend();
+		void SetBackend(Backend);
 
 		bool Render(std::vector<Model*>&);
 
 	private:
 		Renderer();
 
-	private:
 		Backend m_backend;
 	};
 }

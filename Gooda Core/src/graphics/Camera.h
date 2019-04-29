@@ -2,7 +2,6 @@
 
 #include <DirectXMath.h>
 #include <iostream>
-#include <Gooda.h>
 
 #include "../Gooda/Input.h"
 #include "../utils/ShaderManager.h"
@@ -22,7 +21,6 @@ namespace GoodaCore
 
 		XMFLOAT3 GetPosition();
 		XMFLOAT3 GetRotation();
-		ConstantBuffer* GetConstanBuffer();
 
 		virtual bool Frame();
 

@@ -36,6 +36,29 @@ namespace GoodaCore
 		inputLayoutDesc.NumElements = sizeof(inputElementDesc) / sizeof(D3D12_INPUT_ELEMENT_DESC);
 		inputLayoutDesc.pInputElementDescs = inputElementDesc;
 
+		//Fill out a depth stencil desc structure
+		D3D12_DEPTH_STENCIL_DESC depthStencilDesc = {};
+		ZeroMemory(&depthStencilDesc, sizeof(D3D12_DEPTH_STENCIL_DESC));
+
+		depthStencilDesc.DepthEnable = TRUE;
+		depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+		depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+		depthStencilDesc.StencilEnable = TRUE;
+		depthStencilDesc.StencilReadMask = D3D12_DEFAULT_STENCIL_READ_MASK;
+		depthStencilDesc.StencilWriteMask = D3D12_DEFAULT_STENCIL_WRITE_MASK;
+
+		// Fill out a stencil operation structure
+		D3D12_DEPTH_STENCILOP_DESC depthStencilOPDesc = {};
+		ZeroMemory(&depthStencilOPDesc, sizeof(D3D12_DEPTH_STENCILOP_DESC));
+
+		depthStencilOPDesc.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
+		depthStencilOPDesc.StencilPassOp = D3D12_STENCIL_OP_KEEP;
+		depthStencilOPDesc.StencilFailOp = D3D12_STENCIL_OP_KEEP;
+		depthStencilOPDesc.StencilFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+
+		depthStencilDesc.FrontFace = depthStencilOPDesc;
+		depthStencilDesc.BackFace = depthStencilOPDesc;
+
 		//Fill in the pipeline state object desc
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC pipelineStateDesc = {};
 		ZeroMemory(&pipelineStateDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
@@ -46,16 +69,17 @@ namespace GoodaCore
 		pipelineStateDesc.PS = pixelShaderByteCode;
 		pipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 		pipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
-		pipelineStateDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
 		pipelineStateDesc.SampleDesc.Count = 1;
 		pipelineStateDesc.SampleDesc.Quality = 0;
 		pipelineStateDesc.SampleMask = 0xffffffff;
+		pipelineStateDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
+		pipelineStateDesc.DepthStencilState = depthStencilDesc;
 		pipelineStateDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 		pipelineStateDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 		pipelineStateDesc.NumRenderTargets = 1;
 
 		//Create a pipeline state object
-		Direct3D12::Instance()->GetDevice()->CreateGraphicsPipelineState(&pipelineStateDesc, __uuidof(ID3D12PipelineState), (void**)& m_pipelineState);
+		Direct3D12::Instance()->GetDevice()->CreateGraphicsPipelineState(&pipelineStateDesc, __uuidof(ID3D12PipelineState), (void**)m_pipelineState.GetAddressOf());
 		m_pipelineState->SetName(L"Color PipelineState");
 	}
 
@@ -79,7 +103,7 @@ namespace GoodaCore
 		UINT flags = D3DCOMPILE_OPTIMIZATION_LEVEL0;
 
 #ifdef _DEBUG
-		flags |= D3DCOMPILE_DEBUG;
+		flags |= D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
 #endif // DEBUG
 
 		switch (shader.m_type)

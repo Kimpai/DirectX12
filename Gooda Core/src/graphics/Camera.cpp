@@ -4,7 +4,7 @@ namespace GoodaCore
 {
 	Camera::Camera()
 	{
-		m_position = XMFLOAT3(0.0f, 3.0f, 0.0f);
+		m_position = XMFLOAT3(0.0f, 1.0f, -4.0f);
 		m_rotation = XMFLOAT3(0.0f, 0.0f, 0.0f);
 		m_forwardSpeed = 0.0f;
 		m_backwardSpeed = 0.0f;
@@ -17,7 +17,7 @@ namespace GoodaCore
 
 		m_constantBuffer = new ConstantBuffer(&m_constantBufferData, sizeof(ConstantBufferData));
 
-		ShaderManager::Instance()->CreateDescriptor(ObjectType::CAMERA, m_constantBuffer);
+		ShaderManager::Instance()->CreateDescriptor(ObjectType::CAMERA, m_constantBuffer->GetConstantBufferViewDesc(0));
 	}
 
 	Camera::~Camera()

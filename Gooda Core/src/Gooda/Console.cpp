@@ -2,13 +2,7 @@
 
 namespace GoodaCore
 {
-	Console* Console::Instance()
-	{
-		static Console s_console;
-		return &s_console;
-	}
-
-	bool Console::Init()
+	Console::Console()
 	{
 		FILE* fp = nullptr;
 
@@ -18,47 +12,44 @@ namespace GoodaCore
 
 		//Redirect unbuffered STDOUT to the console
 		m_stdOutputHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-		if (!m_stdOutputHandle)
-			return false;
 
 		freopen_s(&fp, "CONOUT$", "w", stdout);
 		setvbuf(stdout, NULL, _IONBF, 0);
 
-		////Redirect unbuffered STDIN to the console
-		//m_stdInputHandle = GetStdHandle(STD_INPUT_HANDLE);
-		//if (m_stdInputHandle == INVALID_HANDLE_VALUE)
-		//{
-		//	return false;
-		//}
-		//
-		//freopen_s(&fp, "CONIN$", "r", stdin);
-		////setvbuf(stdin, NULL, _IONBF, 0);
+		//Redirect unbuffered STDIN to the console
+		m_stdInputHandle = GetStdHandle(STD_INPUT_HANDLE);
 
-		////Redirect unbuffered STDERR to the console
-		//m_stdErrorHandle = GetStdHandle(STD_ERROR_HANDLE);
-		//if (m_stdErrorHandle == INVALID_HANDLE_VALUE)
-		//{
-		//	return false;
-		//}
-		//
-		//freopen_s(&fp, "CONOUT$", "w", stderr);
-		////setvbuf(stderr, NULL, _IONBF, 0);
+		freopen_s(&fp, "CONIN$", "r", stdin);
+		//setvbuf(stdin, NULL, _IONBF, 0);
+
+		//Redirect unbuffered STDERR to the console
+		m_stdErrorHandle = GetStdHandle(STD_ERROR_HANDLE);
+
+		freopen_s(&fp, "CONOUT$", "w", stderr);
+		setvbuf(stderr, NULL, _IONBF, 0);
 
 		//Make cout, wcout, cin, wcin, wcerr, cerr, wclog and clog 
 		//point to console as well
 		std::ios::sync_with_stdio();
-
-		return true;
 	}
 
-	bool Console::Frame(std::string& input)
+	Console* Console::Instance()
 	{
-		return InputHandle(input);
+		static Console s_console;
+		return &s_console;
 	}
 
-	bool Console::Destroy()
+	void Console::Frame()
 	{
-		return true;
+		for (auto message : m_messages)
+		{
+			std::cout << message << std::endl;
+		}
+	}
+
+	void Console::LOG(std::string message)
+	{
+		m_messages.push_back(message);
 	}
 
 	bool Console::InputHandle(std::string& input)
