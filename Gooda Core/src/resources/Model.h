@@ -29,7 +29,7 @@ namespace GoodaCore
 		Model(XMFLOAT3);
 		virtual ~Model();
 
-		virtual bool Frame();
+		virtual bool Frame(UINT);
 		virtual void Draw() = 0;
 
 	private:

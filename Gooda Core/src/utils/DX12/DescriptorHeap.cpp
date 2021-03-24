@@ -19,6 +19,12 @@ namespace GoodaCore
 		m_size = 0;
 	}
 
+	DescriptorHeap::~DescriptorHeap()
+	{
+		for (int i = 0; i < frameBufferCount; i++)
+			m_descriptorHeap[i]->Release();
+	}
+
 	D3D12_CPU_DESCRIPTOR_HANDLE DescriptorHeap::GetCPUIncrementHandle(UINT frameIndex, UINT descriptorIndex)
 	{
 		D3D12_CPU_DESCRIPTOR_HANDLE handle;
@@ -53,6 +59,6 @@ namespace GoodaCore
 
 	ID3D12DescriptorHeap* DescriptorHeap::GetDescriptorHeap(UINT frameIndex)
 	{
-		return m_descriptorHeap[frameIndex].Get();
+		return m_descriptorHeap[frameIndex];
 	}
 }

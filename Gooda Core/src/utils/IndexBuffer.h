@@ -8,7 +8,7 @@ namespace GoodaCore
 	{
 	public:
 		IndexBuffer(const void*, int, int);
-		virtual ~IndexBuffer() = default;
+		virtual ~IndexBuffer();
 
 		void SetIndexBuffer();
 
@@ -19,8 +19,8 @@ namespace GoodaCore
 
 		int m_size;
 		int m_offset;
-		ComPtr<ID3D12Resource> m_defaultHeap;
-		ComPtr<ID3D12Resource> m_uploadHeap;
+		ID3D12Resource* m_defaultHeap;
+		ID3D12Resource* m_uploadHeap;
 		const void* m_bufferData;
 		D3D12_INDEX_BUFFER_VIEW m_bufferView;
 	};

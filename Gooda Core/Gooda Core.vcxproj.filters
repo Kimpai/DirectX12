@@ -73,7 +73,6 @@
     <ClCompile Include="src\utils\VertexBuffer.cpp">
       <Filter>src\utils</Filter>
     </ClCompile>
-    <ClCompile Include="src\graphics\Window.cpp" />
     <ClCompile Include="src\utils\ShaderManager.cpp">
       <Filter>src\graphics</Filter>
     </ClCompile>
@@ -89,6 +88,8 @@
     <ClCompile Include="src\resources\Plane.cpp">
       <Filter>src\graphics</Filter>
     </ClCompile>
+    <ClCompile Include="src\utils\Timer.cpp" />
+    <ClCompile Include="src\Gooda\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Gooda\GoodaDriver.h">
@@ -133,7 +134,6 @@
     <ClInclude Include="src\utils\VertexBuffer.h">
       <Filter>src\utils</Filter>
     </ClInclude>
-    <ClInclude Include="src\graphics\Window.h" />
     <ClInclude Include="src\utils\ShaderManager.h">
       <Filter>src\graphics</Filter>
     </ClInclude>
@@ -149,6 +149,8 @@
     <ClInclude Include="src\resources\Plane.h">
       <Filter>src\graphics</Filter>
     </ClInclude>
+    <ClInclude Include="src\utils\Timer.h" />
+    <ClInclude Include="src\Gooda\Window.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="resources\setup.txt">

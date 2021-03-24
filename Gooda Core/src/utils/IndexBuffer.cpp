@@ -17,6 +17,12 @@ namespace GoodaCore
 		CopyIndexBufferData();
 	}
 
+	IndexBuffer::~IndexBuffer()
+	{
+		m_defaultHeap->Release();
+		m_uploadHeap->Release();
+	}
+
 	void IndexBuffer::SetIndexBuffer()
 	{
 		//Set the index buffer using the index buffer view
@@ -42,7 +48,7 @@ namespace GoodaCore
 
 		//Create default heap to hold index buffer
 		Direct3D12::Instance()->GetDevice()->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE, &resourceDesc, 
-			D3D12_RESOURCE_STATE_COPY_DEST, NULL, __uuidof(ID3D12Resource), (void**)m_defaultHeap.GetAddressOf());
+			D3D12_RESOURCE_STATE_COPY_DEST, NULL, __uuidof(ID3D12Resource), (void**)&m_defaultHeap);
 
 		//Give the resource a name for debugging purposes
 		m_defaultHeap->SetName(L"Index Buffer Resource Heap");
@@ -67,7 +73,7 @@ namespace GoodaCore
 
 		//Create upload heap to upload index buffer
 		Direct3D12::Instance()->GetDevice()->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE, &resourceDesc, 
-			D3D12_RESOURCE_STATE_GENERIC_READ, NULL, __uuidof(ID3D12Resource), (void**)m_uploadHeap.GetAddressOf());
+			D3D12_RESOURCE_STATE_GENERIC_READ, NULL, __uuidof(ID3D12Resource), (void**)&m_uploadHeap);
 
 		//Give the index buffer upload heap a name for debugging purposes
 		m_uploadHeap->SetName(L"Index Buffer Upload Resource Heap");
@@ -84,12 +90,12 @@ namespace GoodaCore
 		indexData.SlicePitch = m_size;
 
 		//Create command to copy data from upload heap to default heap
-		UpdateSubresources(Direct3D12::Instance()->GetCommandList(), m_defaultHeap.Get(), m_uploadHeap.Get(), 0, 0, 1, &indexData);
+		UpdateSubresources(Direct3D12::Instance()->GetCommandList(), m_defaultHeap, m_uploadHeap, 0, 0, 1, &indexData);
 
 		//Transition the index buffer data form copy destination state to index buffer state
 		D3D12_RESOURCE_BARRIER barrier = {};
 		ZeroMemory(&barrier, sizeof(D3D12_RESOURCE_BARRIER));
-		barrier.Transition.pResource = m_defaultHeap.Get();
+		barrier.Transition.pResource = m_defaultHeap;
 		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
 		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
 

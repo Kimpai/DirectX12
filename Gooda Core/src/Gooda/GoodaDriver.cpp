@@ -15,12 +15,13 @@ namespace GoodaCore
 			return false;
 
 		//Create a Window object used for rendering
-		m_window = new Window();
-		if (!m_window)
+		if (!Window::Instance()->Init())
 			return false;
 
+		UINT currentFrame = Window::Instance()->GetCurrentFrameIndex();
+
 		//Initiate Input object
-		if (!Input::Instance()->Init(m_window->GetWindowHandle()))
+		if (!Input::Instance()->Init(Window::Instance()->GetWindowHandle()))
 			return false;
 
 		//Create the Model object
@@ -46,11 +47,11 @@ namespace GoodaCore
 			return false;
 
 		//Close the command list now that all the commands have been recorded
-		if (!Direct3D12::Instance()->CloseCommandList())
+		if (!Direct3D12::Instance()->CloseCommandList(currentFrame))
 			return false;
 
 		//Execute the command list
-		if (!Direct3D12::Instance()->ExecuteCommandList())
+		if (!Direct3D12::Instance()->ExecuteCommandList(currentFrame))
 			return false;
 
 		return true;
@@ -58,7 +59,9 @@ namespace GoodaCore
 
 	bool GoodaDriver::Frame()
 	{
-		if (!Direct3D12::Instance()->BeginFrame())
+		UINT currentFrame = Window::Instance()->GetCurrentFrameIndex();
+
+		if (!Direct3D12::Instance()->BeginFrame(currentFrame))
 			return false;
 
 		Console::Instance()->Frame();
@@ -66,30 +69,30 @@ namespace GoodaCore
 		if (!Input::Instance()->Frame())
 			return false;
 
-		if (!m_window->Frame())
+		if (!Window::Instance()->BeginScene())
 			return false;
 
-		if (!ShaderManager::Instance()->Frame())
+		if (!ShaderManager::Instance()->Frame(currentFrame))
 			return false;
 
 		for (auto model : m_models)
-			if (!model->Frame())
+			if (!model->Frame(currentFrame))
 				return false;
 
 		for (auto light : m_lights)
-			if (!light->Frame())
+			if (!light->Frame(currentFrame))
 				return false;
 
-		if (!m_camera->Frame())
+		if (!m_camera->Frame(currentFrame))
 			return false;
 
 		if (!Renderer::Instance()->Render(m_models))
 			return false;
 
-		if (!m_window->Present())
+		if (!Window::Instance()->EndScene())
 			return false;
 
-		if (!Direct3D12::Instance()->EndFrame())
+		if (!Direct3D12::Instance()->EndFrame(currentFrame))
 			return false;
 
 		return true;
@@ -144,11 +147,10 @@ namespace GoodaCore
 		for (auto light : m_lights)
 			light->Release();
 
-		m_window->Release();
-
 		Renderer::Instance()->Destroy();
 		ShaderManager::Instance()->Destroy();
 		Input::Instance()->Destroy();
+		Window::Instance()->Destroy();
 		Direct3D12::Instance()->Destroy();
 
 		return true;

@@ -8,6 +8,14 @@ namespace GoodaCore
 		CreateConstantBufferViewDesc();
 	}
 
+	ConstantBuffer::~ConstantBuffer()
+	{
+		for (int i = 0; i < frameBufferCount; i++)
+		{
+			m_constantBufferUploadHeap[i]->Release();
+		}
+	}
+
 	void ConstantBuffer::UpdateConstantBufferData(UINT currentFrame)
 	{
 		//Copy the ConstantBuffer instance to the mapped constant buffer resource

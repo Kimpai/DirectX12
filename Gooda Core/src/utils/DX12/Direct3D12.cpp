@@ -2,21 +2,14 @@
 
 namespace GoodaCore
 {
-	Direct3D12::Direct3D12()
-	{
-		
-	}
-
 	bool Direct3D12::CreateFenceAndEventHandle()
 	{
-		for (int i = 0; i < frameBufferCount; i++)
-		{
-			//Create a fence for GPU synchronization.
-			if (FAILED(m_device->CreateFence(0, D3D12_FENCE_FLAG_NONE, __uuidof(ID3D12Fence), (void**)& m_fence[i])))
-				return false;
+		
+		//Create a fence for GPU synchronization.
+		if (FAILED(m_device->CreateFence(0, D3D12_FENCE_FLAG_NONE, __uuidof(ID3D12Fence), (void**)&m_fence)))
+			return false;
 
-			m_fenceValue[i] = 0;
-		}
+		m_fenceValue = 0;
 
 		//Create an event object for the fence.
 		m_fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
@@ -38,22 +31,19 @@ namespace GoodaCore
 		commandQueueDesc.NodeMask = 0;
 
 		//Create the command queue.
-		if (FAILED(m_device->CreateCommandQueue(&commandQueueDesc, __uuidof(ID3D12CommandQueue), (void**)m_commandQueue.GetAddressOf())))
+		if (FAILED(m_device->CreateCommandQueue(&commandQueueDesc, __uuidof(ID3D12CommandQueue), (void**)&m_commandQueue)))
 			return false;
 
 		for (int i = 0; i < frameBufferCount; ++i)
 		{
 			//Create a command allocator.
-			if (FAILED(m_device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, __uuidof(ID3D12CommandAllocator), (void**)m_commandAllocator[i].GetAddressOf())))
+			if (FAILED(m_device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, __uuidof(ID3D12CommandAllocator), (void**)&m_commandAllocator[i])))
 				return false;
 		}
 
 		//Create a basic command list.
-		if (FAILED(m_device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_commandAllocator[0].Get(), NULL, __uuidof(ID3D12GraphicsCommandList), (void**)& m_commandList)))
+		if (FAILED(m_device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_commandAllocator[0], NULL, __uuidof(ID3D12GraphicsCommandList), (void**)&m_commandList)))
 			return false;
-
-		//Set inital frame index to zero
-		m_frameIndex = 0;
 
 		return true;
 	}
@@ -65,31 +55,37 @@ namespace GoodaCore
 		if (FAILED(m_adapter->EnumOutputs(0, &output)))
 			return false;
 
-		//Get the number of modes
-		unsigned int numModes = 0;
+		IDXGIOutput1* output1 = nullptr;
+		if (FAILED(output->QueryInterface(__uuidof(IDXGIOutput1), (void**)&output1)))
+			return false;
 
-		if (FAILED(output->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numModes, nullptr)))
+		if (output)
+			output->Release();
+
+		//Initialize numModes to zero
+		UINT numModes = 0;
+
+		//Get the number of modes
+		if (FAILED(output1->GetDisplayModeList1(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numModes, nullptr)))
 			return false;
 
 		//Create and hold all the possible display modes for this monitor/graphcis card combination
-		DXGI_MODE_DESC* displayModeList = new DXGI_MODE_DESC[numModes];
+		DXGI_MODE_DESC1* displayModeList = new DXGI_MODE_DESC1[numModes];
 
-		//Now fill thr display mode list struct
-		if (FAILED(output->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numModes, displayModeList)))
+		//Now fill the display mode list struct
+		if (FAILED(output1->GetDisplayModeList1(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numModes, displayModeList)))
 			return false;
 
 		//Now go through all the display modes and find one that matches the screen height and width
-		//When a match is found  store the numerator and denominator of the refresh rate for thr monitor
-		unsigned int numerator = 0, denominator = 0;
-		for (unsigned int i = 0; i < numModes; i++)
+		//When a match is found  store the numerator and denominator of the refresh rate for the monitor
+		UINT numerator = 0, denominator = 0;
+
+		for (UINT i = 0; i < numModes; i++)
 		{
-			if (displayModeList[i].Height == screenHeight)
+			if (displayModeList[i].Width == screenWidth && displayModeList[i].Height == screenHeight)
 			{
-				if (displayModeList[i].Width == screenWidth)
-				{
-					numerator = displayModeList[i].RefreshRate.Numerator;
-					denominator = displayModeList[i].RefreshRate.Denominator;
-				}
+				numerator = displayModeList[i].RefreshRate.Numerator;
+				denominator = displayModeList[i].RefreshRate.Denominator;
 			}
 		}
 
@@ -171,13 +167,22 @@ namespace GoodaCore
 		m_adapter->GetParent(__uuidof(IDXGIFactory5), (void**)& factory);
 
 		IDXGISwapChain* swapChain = nullptr;
-		if (FAILED(factory->CreateSwapChain(m_commandQueue.Get(), &swapChainDesc, &swapChain)))
+		if (FAILED(factory->CreateSwapChain(m_commandQueue, &swapChainDesc, &swapChain)))
 			return false;
+
+		if (FAILED(factory->MakeWindowAssociation(hwnd, DXGI_MWA_NO_ALT_ENTER)))
+			return false;
+
+		if (factory)
+			factory->Release();
 
 		//Next upgrade the IDXGISwapChain to a IDXGISwapChain3 interface and store it in a private member variable named m_swapChain.
 		//This will allow us to use the newer functionality such as getting the current back buffer index.
 		if (FAILED(swapChain->QueryInterface(__uuidof(IDXGISwapChain3), (void**)swapChain3)))
 			return false;
+
+		if (swapChain)
+			swapChain->Release();
 
 		return true;
 	}
@@ -193,7 +198,7 @@ namespace GoodaCore
 		D3D12_DESCRIPTOR_HEAP_DESC renderTargetViewHeapDesc = {};
 		D3D12_CPU_DESCRIPTOR_HANDLE renderTargetViewHandle = {};
 
-		//Initialize the render target view heap description for the two back buffers.
+		//Initialize the render target view heap description for the back buffers.
 		ZeroMemory(&renderTargetViewHeapDesc, sizeof(D3D12_DESCRIPTOR_HEAP_DESC));
 
 		//Set the number of descriptors to two for our two back buffers.  Also set the heap type to render target views.
@@ -295,7 +300,29 @@ namespace GoodaCore
 		return true;
 	}
 
-	bool Direct3D12::CloseCommandList()
+	bool Direct3D12::UpdateBackBufferRenderTarget(IDXGISwapChain3* swapChain3, ID3D12Resource** renderTargetView, ID3D12DescriptorHeap** descriptorHeap, HWND hwnd)
+	{
+		unsigned int renderTargetViewDescriptorSize;
+		D3D12_CPU_DESCRIPTOR_HANDLE renderTargetViewHandle = {};
+
+		renderTargetViewDescriptorSize = m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+		renderTargetViewHandle = descriptorHeap[0]->GetCPUDescriptorHandleForHeapStart();
+
+		for (unsigned int i = 0; i < frameBufferCount; i++)
+		{
+			if (FAILED(swapChain3->GetBuffer(i, IID_PPV_ARGS(&renderTargetView[i]))))
+				return false;
+
+			m_device->CreateRenderTargetView(renderTargetView[i], NULL, renderTargetViewHandle);
+
+			//Increment the render target view handle by the render target view desc size
+			renderTargetViewHandle.ptr += renderTargetViewDescriptorSize;
+		}
+
+		return true;
+	}
+
+	bool Direct3D12::CloseCommandList(UINT frameIndex)
 	{
 		if (FAILED(m_commandList->Close()))
 			return false;
@@ -303,77 +330,83 @@ namespace GoodaCore
 		return true;
 	}
 
-	bool Direct3D12::ResetCommandList()
+	bool Direct3D12::ResetCommandList(UINT frameIndex)
 	{
-		m_frameIndex++;
-		if (m_frameIndex > (frameBufferCount - 1))
-			m_frameIndex = 0;
-
-		if (FAILED(m_commandAllocator[m_frameIndex]->Reset()))
+		if (FAILED(m_commandAllocator[frameIndex]->Reset()))
 			return false;
 
-		if (FAILED(m_commandList->Reset(m_commandAllocator[m_frameIndex].Get(), nullptr)))
+		if (FAILED(m_commandList->Reset(m_commandAllocator[frameIndex], nullptr)))
 			return false;
 
 		return true;
 	}
 
-	bool Direct3D12::ExecuteCommandList()
+	bool Direct3D12::ExecuteCommandList(UINT frameIndex)
 	{
-		ID3D12CommandList* ppCommandLists[] = { m_commandList.Get() };
+		ID3D12CommandList* ppCommandLists[] = { m_commandList };
 
 		//Load the command list array (only one command list for now).
-		ppCommandLists[0] = m_commandList.Get();
+		ppCommandLists[0] = m_commandList;
 
 		//Execute the list of commands.
 		m_commandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
 
 		//Signal and increment the fence value.
-		m_fenceValue[m_frameIndex]++;
-		if (FAILED(m_commandQueue->Signal(m_fence[m_frameIndex].Get(), m_fenceValue[m_frameIndex])))
+		m_fenceValue++;
+		if (FAILED(m_commandQueue->Signal(m_fence, m_fenceValue)))
 			return false;
 
 		return true;
 	}
 
-	bool Direct3D12::DeviceSynchronize()
+	bool Direct3D12::DeviceSynchronize(UINT frameIndex)
 	{
 		//If the current fence value is still less than the "m_fenceValue", then GPU has not finished
 		//the command queue since it has not reached the "m_commandQueue->Signal" command
-		if (m_fence[m_frameIndex]->GetCompletedValue() < m_fenceValue[m_frameIndex])
+		if (m_fence->GetCompletedValue() < m_fenceValue)
 		{
-			if (FAILED(m_fence[m_frameIndex]->SetEventOnCompletion(m_fenceValue[m_frameIndex], m_fenceEvent)))
+			if (FAILED(m_fence->SetEventOnCompletion(m_fenceValue, m_fenceEvent)))
 				return false;
 
 			//Wait until the fence has triggered the correct fence event
 			WaitForSingleObject(m_fenceEvent, INFINITE);
 		}
 
-		//Increment m_fenceValue for next frame
-		m_fenceValue[m_frameIndex]++;
-
 		return true;
 	}
 
 	bool Direct3D12::FlushCommandQueue()
 	{
-		for (UINT i = 0; i < frameBufferCount; i++)
+		//Signal and increment the fence value to flush the command queue
+		m_fenceValue++;
+		if (FAILED(m_commandQueue->Signal(m_fence, m_fenceValue)))
+			return false;
+
+		if (m_fence->GetCompletedValue() < m_fenceValue)
 		{
-			//Signal and increment the fence value one last time to flush the command queue
-			m_fenceValue[i]++;
-			if (FAILED(m_commandQueue->Signal(m_fence[i].Get(), m_fenceValue[i])))
+			if (FAILED(m_fence->SetEventOnCompletion(m_fenceValue, m_fenceEvent)))
 				return false;
 
-			if (m_fence[i]->GetCompletedValue() < m_fenceValue[i])
-			{
-				if (FAILED(m_fence[i]->SetEventOnCompletion(m_fenceValue[i], m_fenceEvent)))
-					return false;
-
-				//Wait until the fence has triggered the event
-				WaitForSingleObject(m_fenceEvent, INFINITE);
-			}
+			//Wait until the fence has triggered the event
+			WaitForSingleObject(m_fenceEvent, INFINITE);
 		}
 		return true;
+	}
+
+	void Direct3D12::TransitionResource(ID3D12Resource* resource, D3D12_RESOURCE_STATES stateBefore, D3D12_RESOURCE_STATES stateAfter)
+	{
+		//Record commands in the command list now.
+		//Start by setting the resource barrier.
+		D3D12_RESOURCE_BARRIER barrier = {};
+		ZeroMemory(&barrier, sizeof(D3D12_RESOURCE_BARRIER));
+
+		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+		barrier.Transition.pResource = resource;
+		barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+		barrier.Transition.StateBefore = stateBefore;
+		barrier.Transition.StateAfter = stateAfter;
+
+		Direct3D12::Instance()->GetCommandList()->ResourceBarrier(1, &barrier);
 	}
 
 	Direct3D12* Direct3D12::Instance()
@@ -388,63 +421,49 @@ namespace GoodaCore
 		CreateCommandInterface();
 		CreateFenceAndEventHandle();
 
-		m_frameIndex = 0;
-
 		return true;
 	}
 
 	bool Direct3D12::Destroy()
 	{
-		if (m_dxgiDebug)
-			m_dxgiDebug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_DETAIL);
+		m_adapter->Release();
+		m_fence->Release();
+		m_commandList->Release();
+		
+		for (int i = 0; i < frameBufferCount; i++)
+			m_commandAllocator[i]->Release();
+
+		m_commandQueue->Release();
+
+		m_device->Release();
+
+		m_dxgiDebug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_FLAGS(DXGI_DEBUG_RLO_DETAIL | DXGI_DEBUG_RLO_IGNORE_INTERNAL));
+		m_dxgiDebug->Release();
 
 		return true;
 	}
 
-	bool Direct3D12::BeginFrame()
+	bool Direct3D12::BeginFrame(UINT frameIndex)
 	{
-		DeviceSynchronize();
-		ResetCommandList();
+		DeviceSynchronize(frameIndex);
+		ResetCommandList(frameIndex);
 
 		return true;
 	}
 
-	bool Direct3D12::EndFrame()
+	bool Direct3D12::EndFrame(UINT frameIndex)
 	{
-		switch (m_frameIndex)
-		{
-		case 0:
-			m_frameIndex++;
-			break;
-
-		case 1:
-			m_frameIndex++;
-			break;
-
-		case frameBufferCount - 1:
-			m_frameIndex = 0;
-			break;
-
-		default:
-			break;
-		}
-
 		return true;
 	}
 
 	ID3D12Device* Direct3D12::GetDevice()
 	{
-		return m_device.Get();
+		return m_device;
 	}
 
 	ID3D12GraphicsCommandList* Direct3D12::GetCommandList()
 	{
-		return m_commandList.Get();
-	}
-
-	UINT Direct3D12::GetCurrentFrame()
-	{
-		return m_frameIndex;
+		return m_commandList;
 	}
 
 	bool Direct3D12::CreateDirect3DDevice()
@@ -465,13 +484,14 @@ namespace GoodaCore
 			if (dxgidebug)
 			{
 				LPDXGIGETDEBUGINTERFACE DxgiGetDebugInterface = (LPDXGIGETDEBUGINTERFACE)GetProcAddress(dxgidebug, "DXGIGetDebugInterface");
-				HRESULT hr = DxgiGetDebugInterface(__uuidof(IDXGIDebug), (void**)m_dxgiDebug.GetAddressOf());
+				HRESULT hr = DxgiGetDebugInterface(__uuidof(IDXGIDebug), (void**)&m_dxgiDebug);
 				if (FAILED(hr))
 					return false;
 			}
 			debugController->Release();
 			debugController1->Release();
 		}
+
 #endif
 
 		//Create temporary factory to use when creating Device
@@ -494,20 +514,58 @@ namespace GoodaCore
 		if (adapter)
 		{
 			//Create the device
-			if (FAILED(D3D12CreateDevice(adapter, D3D_FEATURE_LEVEL_12_1, __uuidof(ID3D12Device), (void**)m_device.GetAddressOf())))
+			if (FAILED(D3D12CreateDevice(adapter, D3D_FEATURE_LEVEL_12_1, __uuidof(ID3D12Device), (void**)&m_device)))
 				return false;
 		}
 		else
 		{
 			//Create warp device if no adapter was found
 			factory->EnumWarpAdapter(__uuidof(IDXGIAdapter1), (void**)&adapter);
-			if (FAILED(D3D12CreateDevice(adapter, D3D_FEATURE_LEVEL_11_0, __uuidof(ID3D12Device), (void**)m_device.GetAddressOf())))
+			if (FAILED(D3D12CreateDevice(adapter, D3D_FEATURE_LEVEL_11_0, __uuidof(ID3D12Device), (void**)&m_device)))
 				return false;
 		}
 
-		adapter->QueryInterface(__uuidof(IDXGIAdapter3), (void**)m_adapter.GetAddressOf());
+		adapter->QueryInterface(__uuidof(IDXGIAdapter3), (void**)&m_adapter);
 		adapter->Release();
 
+#ifdef _DEBUG
+		//Enable debug messages in debug mode.
+		ID3D12InfoQueue* infoQueue = nullptr;
+		if (SUCCEEDED(m_device->QueryInterface(__uuidof(ID3D12InfoQueue), (void**)&infoQueue)))
+		{
+			infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, true);
+			infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, true);
+
+			//Suppress whole categories of messages
+			//D3D12_MESSAGE_CATEGORY Categories[] = {};
+
+			//Suppress messages based on their severity level
+			D3D12_MESSAGE_SEVERITY Severities[] =
+			{
+				D3D12_MESSAGE_SEVERITY_INFO
+			};
+
+			//Suppress individual messages by their ID
+			D3D12_MESSAGE_ID DenyIds[] = {
+				D3D12_MESSAGE_ID_CLEARRENDERTARGETVIEW_MISMATCHINGCLEARVALUE,   // I'm really not sure how to avoid this message.
+				D3D12_MESSAGE_ID_MAP_INVALID_NULLRANGE,                         // This warning occurs when using capture frame while graphics debugging.
+				D3D12_MESSAGE_ID_UNMAP_INVALID_NULLRANGE,                       // This warning occurs when using capture frame while graphics debugging.
+			};
+
+			D3D12_INFO_QUEUE_FILTER NewFilter = {};
+			//NewFilter.DenyList.NumCategories = _countof(Categories);
+			//NewFilter.DenyList.pCategoryList = Categories;
+			NewFilter.DenyList.NumSeverities = _countof(Severities);
+			NewFilter.DenyList.pSeverityList = Severities;
+			NewFilter.DenyList.NumIDs = _countof(DenyIds);
+			NewFilter.DenyList.pIDList = DenyIds;
+
+			if (FAILED((infoQueue->PushStorageFilter(&NewFilter))))
+				return false;
+
+			infoQueue->Release();
+		}
+#endif
 		return true;
 	}
 }

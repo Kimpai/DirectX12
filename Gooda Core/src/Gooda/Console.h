@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <Windows.h>
+#include <shellapi.h>
 
 namespace GoodaCore
 {
@@ -19,7 +20,7 @@ namespace GoodaCore
 
 	private:
 		Console();
-		bool InputHandle(std::string&);
+		void ParseCommandLineArgument();
 
 		HANDLE m_stdOutputHandle;
 		HANDLE m_stdInputHandle;

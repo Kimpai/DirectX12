@@ -12,23 +12,25 @@ namespace GoodaCore
 	class Light : public Gooda
 	{
 	public:
-		ConstantBuffer* m_constantBuffer;
+		ConstantBuffer* m_constantBuffer = nullptr;
 
 		struct ConstantBufferData
 		{
-			XMFLOAT4 ambientColor;
-			XMFLOAT4 diffuseColor;
-			XMFLOAT4 specularColor;
-			XMFLOAT3 lightDirection;
+			XMFLOAT4 ambientColor = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
+			XMFLOAT4 diffuseColor = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
+			XMFLOAT4 specularColor = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
+			XMFLOAT3 lightDirection = XMFLOAT3(0.0f, 0.0f, 0.0f);
 			float specFactor = 32.0f;
 
 		} m_constantBufferData;
 
-		Light();
 		virtual ~Light() = default;
 
-		virtual bool Frame();
+		virtual bool Frame(UINT);
 		virtual ConstantBuffer* GetConstantBuffer() = 0;
+
+	protected:
+		Light() = default;
 
 	private:
 		virtual void InitializeBuffers() = 0;

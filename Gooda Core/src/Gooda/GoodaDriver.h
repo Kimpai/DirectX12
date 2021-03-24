@@ -3,7 +3,7 @@
 #include <iostream>
 #include <vector>
 
-#include "../graphics/Window.h"
+#include "Window.h"
 #include "../graphics/Camera.h"
 #include "../utils/ShaderManager.h"
 #include "../resources/Cube.h"
@@ -30,7 +30,6 @@ namespace GoodaCore
 		virtual bool Frame();
 
 		Camera* m_camera;
-		Window* m_window;
 		std::vector<Model*> m_models;
 		std::vector<Light*> m_lights;
 	};

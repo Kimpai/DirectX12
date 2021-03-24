@@ -45,10 +45,8 @@ namespace GoodaCore
 		return m_rotation;
 	}
 
-	bool Camera::Frame()
+	bool Camera::Frame(UINT frameIndex)
 	{
-		UINT frameIndex = Direct3D12::Instance()->GetCurrentFrame();
-
 		Turn();
 
 		MoveForward();

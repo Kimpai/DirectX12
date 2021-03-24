@@ -23,7 +23,7 @@ namespace GoodaCore
 	{
 	public:
 		PipelineState(std::vector<Shader>, ShaderPipelineType, ID3D12RootSignature*);
-		virtual ~PipelineState() = default;
+		virtual ~PipelineState();
 
 		void SetPipelineState();
 		ID3D12PipelineState* GetPipelineState();
@@ -32,9 +32,9 @@ namespace GoodaCore
 	private:
 		bool CompileShader(Shader);
 
-		ComPtr<ID3DBlob> m_vertexShader;
-		ComPtr<ID3DBlob> m_pixelShader;
+		ID3DBlob* m_vertexShader;
+		ID3DBlob* m_pixelShader;
 		ShaderPipelineType m_type;
-		ComPtr<ID3D12PipelineState> m_pipelineState;
+		ID3D12PipelineState* m_pipelineState;
 	};
 }

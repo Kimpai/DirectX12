@@ -43,7 +43,7 @@ namespace GoodaCore
 	{
 		for (auto message : m_messages)
 		{
-			std::cout << message << std::endl;
+			//std::cout << message << std::endl;
 		}
 	}
 
@@ -52,46 +52,27 @@ namespace GoodaCore
 		m_messages.push_back(message);
 	}
 
-	bool Console::InputHandle(std::string& input)
+	void Console::ParseCommandLineArgument()
 	{
-		DWORD result;
-		char inputBuffer[512] = { 0 };
-		INPUT_RECORD buffer[128];
-		DWORD read;
+		int argc;
+		wchar_t** argv = ::CommandLineToArgvW(::GetCommandLineW(), &argc);
 
-		result = WaitForSingleObject(m_stdInputHandle, 0);
-
-		if (result == WAIT_OBJECT_0)
+		for (size_t i = 0; i < argc; i++)
 		{
-			PeekConsoleInput(m_stdInputHandle, buffer, 128, &read);
-
-			switch (buffer->EventType)
+			if (::wcscmp(argv[i], L"-w") == 0 || ::wcscmp(argv[i], L"--width") == 0)
 			{
-			case FOCUS_EVENT:
-				FlushConsoleInputBuffer(m_stdInputHandle);
-				break;
-
-			case KEY_EVENT:
-				ReadConsole(m_stdInputHandle, inputBuffer, 512, &read, NULL);
-				input = inputBuffer;
-				FlushConsoleInputBuffer(m_stdInputHandle);
-				return true;
-
-			case MOUSE_EVENT:
-				FlushConsoleInputBuffer(m_stdInputHandle);
-				break;
-
-			case MENU_EVENT:
-				FlushConsoleInputBuffer(m_stdInputHandle);
-				break;
-
-			default:
-				break;
+				UINT32 width = ::wcstol(argv[++i], nullptr, 10);
+				LOG("--width :" + std::to_string(width));
+			}
+			if (::wcscmp(argv[i], L"-h") == 0 || ::wcscmp(argv[i], L"--height") == 0)
+			{
+				UINT32 height = ::wcstol(argv[++i], nullptr, 10);
+				LOG("--height :" + std::to_string(height));
+			}
+			if (::wcscmp(argv[i], L"-warp") == 0 || ::wcscmp(argv[i], L"--warp") == 0)
+			{
+				LOG("--warp :" + std::to_string(true));
 			}
 		}
-
-		FlushConsoleInputBuffer(m_stdInputHandle);
-
-		return true;
 	}
 }

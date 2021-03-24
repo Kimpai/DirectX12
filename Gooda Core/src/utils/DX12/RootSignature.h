@@ -13,12 +13,12 @@ namespace GoodaCore
 		RootSignature(UINT size, UINT staticSamplers, RootParameter* rootParameter,
 			D3D12_STATIC_SAMPLER_DESC* samplers, D3D12_ROOT_SIGNATURE_FLAGS flags);
 
-		virtual ~RootSignature() = default;
+		virtual ~RootSignature();
 
 		void SetRootSignature();
 		ID3D12RootSignature* GetRootSignature();
 
 	private:
-		ComPtr<ID3D12RootSignature> m_rootSignature;
+		ID3D12RootSignature* m_rootSignature;
 	};
 }

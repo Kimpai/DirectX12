@@ -79,18 +79,25 @@ namespace GoodaCore
 		pipelineStateDesc.NumRenderTargets = 1;
 
 		//Create a pipeline state object
-		Direct3D12::Instance()->GetDevice()->CreateGraphicsPipelineState(&pipelineStateDesc, __uuidof(ID3D12PipelineState), (void**)m_pipelineState.GetAddressOf());
+		Direct3D12::Instance()->GetDevice()->CreateGraphicsPipelineState(&pipelineStateDesc, __uuidof(ID3D12PipelineState), (void**)&m_pipelineState);
 		m_pipelineState->SetName(L"Color PipelineState");
+	}
+
+	PipelineState::~PipelineState()
+	{
+		m_vertexShader->Release();
+		m_pixelShader->Release();
+		m_pipelineState->Release();
 	}
 
 	void PipelineState::SetPipelineState()
 	{
-		Direct3D12::Instance()->GetCommandList()->SetPipelineState(m_pipelineState.Get());
+		Direct3D12::Instance()->GetCommandList()->SetPipelineState(m_pipelineState);
 	}
 
 	ID3D12PipelineState* PipelineState::GetPipelineState()
 	{
-		return m_pipelineState.Get();
+		return m_pipelineState;
 	}
 
 	ShaderPipelineType PipelineState::GetType()

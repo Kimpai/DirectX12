@@ -22,7 +22,7 @@ namespace GoodaCore
 		XMFLOAT3 GetPosition();
 		XMFLOAT3 GetRotation();
 
-		virtual bool Frame();
+		virtual bool Frame(UINT);
 
 		XMFLOAT4X4 GetViewMatrix();
 		XMFLOAT4X4 GetBaseViewMatrix();

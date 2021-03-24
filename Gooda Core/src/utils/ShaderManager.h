@@ -26,7 +26,7 @@ namespace GoodaCore
 		static ShaderManager* Instance();
 
 		virtual bool Init();
-		virtual bool Frame();
+		virtual bool Frame(UINT);
 		virtual bool Destroy();
 
 		ID3D12PipelineState* GetPipelineState(ShaderPipelineType);
@@ -36,7 +36,7 @@ namespace GoodaCore
 		void CreateDescriptor(ObjectType, D3D12_CONSTANT_BUFFER_VIEW_DESC*);
 
 	private:
-		ShaderManager();
+		ShaderManager() = default;
 
 		void CreatePipelineState(std::vector<Shader>, ShaderPipelineType);
 		void CreateRootSignature();

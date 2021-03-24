@@ -8,7 +8,7 @@ namespace GoodaCore
 	{
 	public:
 		VertexBuffer(void*, int, int);
-		virtual ~VertexBuffer() = default;
+		virtual ~VertexBuffer();
 
 		void SetVertexBuffer();
 	private:
@@ -18,8 +18,8 @@ namespace GoodaCore
 
 		int m_size;
 		int m_offset;
-		ComPtr<ID3D12Resource> m_defaultHeap;
-		ComPtr<ID3D12Resource> m_uploadHeap;
+		ID3D12Resource* m_defaultHeap;
+		ID3D12Resource* m_uploadHeap;
 		void* m_bufferData;
 		D3D12_VERTEX_BUFFER_VIEW m_bufferView;
 	};

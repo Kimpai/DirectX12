@@ -6,7 +6,7 @@
 
 #include <d3d12.h>
 #include <d3dx12.h>
-#include <dxgi1_5.h>
+#include <dxgi1_6.h>
 #include <dxgidebug.h>
 #include <wrl.h>
 #include <Frame.h>
@@ -26,8 +26,8 @@ namespace GoodaCore
 		virtual bool Init();
 		virtual bool Destroy();
 
-		bool BeginFrame();
-		bool EndFrame();
+		bool BeginFrame(UINT);
+		bool EndFrame(UINT);
 
 		bool CreateSwapChainForHWND(UINT, UINT, HWND, IDXGISwapChain3**);
 
@@ -35,34 +35,36 @@ namespace GoodaCore
 		bool CreateBackBufferRenderTarget(IDXGISwapChain3*, ID3D12Resource**, ID3D12DescriptorHeap**, HWND);
 		bool CreateDepthStencil(ID3D12Resource**, ID3D12DescriptorHeap**);
 
-		bool CloseCommandList();
-		bool ResetCommandList();
-		bool ExecuteCommandList();
+		bool UpdateBackBufferRenderTarget(IDXGISwapChain3*, ID3D12Resource**, ID3D12DescriptorHeap**, HWND);
 
-		bool DeviceSynchronize();
+		bool CloseCommandList(UINT);
+		bool ResetCommandList(UINT);
+		bool ExecuteCommandList(UINT);
+
+		bool DeviceSynchronize(UINT);
 		bool FlushCommandQueue();
+
+		void TransitionResource(ID3D12Resource*, D3D12_RESOURCE_STATES, D3D12_RESOURCE_STATES);
 
 		ID3D12Device* GetDevice();
 		ID3D12GraphicsCommandList* GetCommandList();
-		UINT GetCurrentFrame();
 
 	private:
-		Direct3D12();
-
 		bool CreateDirect3DDevice();
 		bool CreateCommandInterface();
 		bool CreateFenceAndEventHandle();
 
-		ComPtr<ID3D12Device> m_device;
-		ComPtr<ID3D12CommandAllocator> m_commandAllocator[frameBufferCount];
-		ComPtr<ID3D12GraphicsCommandList> m_commandList;
-		ComPtr<ID3D12CommandQueue> m_commandQueue;
-		ComPtr<ID3D12Fence> m_fence[frameBufferCount];
-		ComPtr<IDXGIAdapter3> m_adapter;
-		ComPtr<IDXGIDebug> m_dxgiDebug;
+		ID3D12Device* m_device;
+		ID3D12CommandAllocator* m_commandAllocator[frameBufferCount];
+		ID3D12GraphicsCommandList* m_commandList;
+		ID3D12CommandQueue* m_commandQueue;
+		ID3D12Fence* m_fence;
+		IDXGIAdapter3* m_adapter;
+		IDXGIDebug* m_dxgiDebug;
 
 		HANDLE m_fenceEvent;
-		UINT64 m_fenceValue[frameBufferCount];
-		UINT m_frameIndex;
+		UINT64 m_fenceValue;
+
+		Direct3D12() = default;
 	};
 }

@@ -6,6 +6,23 @@
 #include <stdio.h>
 #include <iostream>
 #include <fstream>
+#include <algorithm>
+
+// The min/max macros conflict with like-named member functions.
+// Only use std::min and std::max defined in <algorithm>.
+#if defined(min)
+#undef min
+#endif
+
+#if defined(max)
+#undef max
+#endif
+
+// In order to define a function called CreateWindow, the Windows macro needs to
+// be undefined.
+#if defined(CreateWindow)
+#undef CreateWindow
+#endif
 
 class Gooda
 {
@@ -14,8 +31,6 @@ public:
 
 	virtual bool Frame();
 	void Release();
-
-	static LRESULT CALLBACK MessageHandler(HWND, UINT, WPARAM, LPARAM);
 
 protected:
 	Gooda() = default;

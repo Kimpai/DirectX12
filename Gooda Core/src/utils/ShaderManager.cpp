@@ -2,10 +2,6 @@
 
 namespace GoodaCore
 {
-	ShaderManager::ShaderManager()
-	{
-	}
-
 	ShaderManager* ShaderManager::Instance()
 	{
 		static ShaderManager s_shaderManager;
@@ -21,10 +17,8 @@ namespace GoodaCore
 		return true;
 	}
 
-	bool ShaderManager::Frame()
+	bool ShaderManager::Frame(UINT frameIndex)
 	{
-		UINT frameIndex = Direct3D12::Instance()->GetCurrentFrame();
-
 		m_pipelines[0]->SetPipelineState();
 		m_rootSignature->SetRootSignature();
 

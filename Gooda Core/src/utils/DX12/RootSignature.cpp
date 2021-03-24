@@ -16,7 +16,7 @@ namespace GoodaCore
 
 		D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &rootsignature, NULL);
 
-		Direct3D12::Instance()->GetDevice()->CreateRootSignature(0, rootsignature->GetBufferPointer(), rootsignature->GetBufferSize(), __uuidof(ID3D12RootSignature), (void**)m_rootSignature.GetAddressOf());
+		Direct3D12::Instance()->GetDevice()->CreateRootSignature(0, rootsignature->GetBufferPointer(), rootsignature->GetBufferSize(), __uuidof(ID3D12RootSignature), (void**)&m_rootSignature);
 
 		m_rootSignature->SetName(L"Root Signature");
 
@@ -24,13 +24,18 @@ namespace GoodaCore
 			rootsignature->Release();
 	}
 
+	RootSignature::~RootSignature()
+	{
+		m_rootSignature->Release();
+	}
+
 	void RootSignature::SetRootSignature()
 	{
-		Direct3D12::Instance()->GetCommandList()->SetGraphicsRootSignature(m_rootSignature.Get());
+		Direct3D12::Instance()->GetCommandList()->SetGraphicsRootSignature(m_rootSignature);
 	}
 
 	ID3D12RootSignature* RootSignature::GetRootSignature()
 	{
-		return m_rootSignature.Get();
+		return m_rootSignature;
 	}
 }

@@ -14,7 +14,7 @@ namespace GoodaCore
 	{
 	public:
 		ConstantBuffer(const void*, UINT);
-		virtual ~ConstantBuffer() = default;
+		virtual ~ConstantBuffer();
 
 		void UpdateConstantBufferData(UINT);
 		int GetConstantBufferSize();
@@ -25,7 +25,7 @@ namespace GoodaCore
 		void CreateUploadHeap();
 		void CreateConstantBufferViewDesc();
 
-		ComPtr<ID3D12Resource> m_constantBufferUploadHeap[frameBufferCount];
+		ID3D12Resource* m_constantBufferUploadHeap[frameBufferCount];
 		UINT8* m_constantBufferGPUAddress[frameBufferCount];
 
 		const void* m_bufferData;

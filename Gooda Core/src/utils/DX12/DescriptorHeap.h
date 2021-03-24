@@ -10,7 +10,7 @@ namespace GoodaCore
 	{
 	public:
 		DescriptorHeap(UINT numOfDescriptors, bool shaderVisible, D3D12_DESCRIPTOR_HEAP_TYPE type);
-		virtual ~DescriptorHeap() = default;
+		virtual ~DescriptorHeap();
 
 		D3D12_CPU_DESCRIPTOR_HANDLE GetCPUIncrementHandle(UINT frameIndex, UINT descriptorIndex);
 		D3D12_GPU_DESCRIPTOR_HANDLE GetGPUIncrementHandle(UINT frameIndex, UINT descriptorIndex);
@@ -21,6 +21,6 @@ namespace GoodaCore
 	private:
 		UINT m_incrementSize;
 		int m_size;
-		ComPtr<ID3D12DescriptorHeap> m_descriptorHeap[frameBufferCount];
+		ID3D12DescriptorHeap* m_descriptorHeap[frameBufferCount];
 	};
 }
